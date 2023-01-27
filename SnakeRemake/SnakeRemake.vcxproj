@@ -24,6 +24,7 @@
     <ProjectGuid>{fae5192c-d50f-4102-974a-bb07b243cce7}</ProjectGuid>
     <RootNamespace>SnakeRemake</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>GalagaRemake</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
