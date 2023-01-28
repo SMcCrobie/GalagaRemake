@@ -24,7 +24,11 @@ enum GameInput {
 	InvalidInput
 };
 
-static float MOVE_INCREMENT = 5;
+static float SINGLE_THRUST_DIRECTION_INCREMENT = 1.5;
+static float DUAL_THRUST_DIRECTION_INCREMENT = SINGLE_THRUST_DIRECTION_INCREMENT * .66;
+static float RESISTENCE_INCREMENT = SINGLE_THRUST_DIRECTION_INCREMENT / 4;
+static float MAX_HORIZONTAL_SPEED = 12;
+static float MAX_VERTICAL_SPEED = 8;
 
 int main(int, char const**)
 {
@@ -36,7 +40,7 @@ int main(int, char const**)
 
 	//DIRECTION AND COUNTER VARIABLES
 	int counter = 0;
-	sf::Vector2f direction(0, 0);
+	sf::Vector2f shipVelocity(0, 0);
 
 	//Clock
 	sf::Clock clock;
@@ -45,10 +49,10 @@ int main(int, char const**)
 
 	map<GameInput, bool> GameInputStateMappings;
 	const map<sf::Keyboard::Key, GameInput> GameKeyToInputMappings = {
-		{sf::Keyboard::W, MoveUp},
-		{sf::Keyboard::S, MoveDown},
-		{sf::Keyboard::A, MoveLeft},
-		{sf::Keyboard::D, MoveRight},
+		{sf::Keyboard::Up, MoveUp},
+		{sf::Keyboard::Down, MoveDown},
+		{sf::Keyboard::Left, MoveLeft},
+		{sf::Keyboard::Right, MoveRight},
 		{sf::Keyboard::Space, PauseGame},
 		{sf::Keyboard::Escape, QuitGame}
 	};
@@ -83,27 +87,39 @@ int main(int, char const**)
 					}
 				}
 				if (event.type == sf::Event::KeyReleased) {
-					//state should be turned off, on key press
+					//state should be turned off, on key release
 					GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)] = false;
 				}
 			}
 		}
 
 
-		//MOVEMENT FOR SNAKE1	
+		//MOVEMENT FOR SHIP	
 		if (!GameInputStateMappings[PauseGame] && clock.getElapsedTime().asMilliseconds() >= 50) {
+			
+			if(shipVelocity.y > 0 )
+				shipVelocity.y += -RESISTENCE_INCREMENT;
+			if (shipVelocity.y < 0)
+				shipVelocity.y += RESISTENCE_INCREMENT;
+			
+			if(shipVelocity.x > 0)
+				shipVelocity.x += -RESISTENCE_INCREMENT;
+			if (shipVelocity.x < 0)
+				shipVelocity.x += RESISTENCE_INCREMENT;
 
-			//apply movement to direction, after RESET, opposing directions cancel
-			direction = sf::Vector2f(0, 0);
-			if (GameInputStateMappings[MoveUp])
-				direction.y += -MOVE_INCREMENT;
-			if (GameInputStateMappings[MoveDown])
-				direction.y += MOVE_INCREMENT;
-			if (GameInputStateMappings[MoveLeft])
-				direction.x += -MOVE_INCREMENT;
-			if (GameInputStateMappings[MoveRight])
-				direction.x += MOVE_INCREMENT;
-			ship.move(direction);
+			//apply movement to shipVelocity, after State update, opposing shipVelocitys cancel
+			if (GameInputStateMappings[MoveUp] && shipVelocity.y >= -MAX_VERTICAL_SPEED)
+				shipVelocity.y += GameInputStateMappings[MoveLeft] || GameInputStateMappings[MoveRight] ? -DUAL_THRUST_DIRECTION_INCREMENT : -SINGLE_THRUST_DIRECTION_INCREMENT;
+			if (GameInputStateMappings[MoveDown] && shipVelocity.y <= MAX_VERTICAL_SPEED)
+				shipVelocity.y += GameInputStateMappings[MoveLeft] || GameInputStateMappings[MoveRight] ? DUAL_THRUST_DIRECTION_INCREMENT : SINGLE_THRUST_DIRECTION_INCREMENT;
+
+
+
+			if (GameInputStateMappings[MoveLeft] && shipVelocity.x >= -MAX_HORIZONTAL_SPEED)
+				shipVelocity.x += GameInputStateMappings[MoveUp] || GameInputStateMappings[MoveDown] ? -DUAL_THRUST_DIRECTION_INCREMENT : -SINGLE_THRUST_DIRECTION_INCREMENT;
+			if (GameInputStateMappings[MoveRight] && shipVelocity.x <= MAX_HORIZONTAL_SPEED)
+				shipVelocity.x += GameInputStateMappings[MoveUp] || GameInputStateMappings[MoveDown] ? DUAL_THRUST_DIRECTION_INCREMENT : SINGLE_THRUST_DIRECTION_INCREMENT;
+			ship.move(shipVelocity);
 			clock.restart();
 
 		}
