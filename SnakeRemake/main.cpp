@@ -8,6 +8,9 @@
 #include <list>
 #include <algorithm>
 #include <map>
+#include <cstdlib>
+#include "projectile.h"
+
 
 using namespace std;
 
@@ -24,11 +27,20 @@ enum GameInput {
 	InvalidInput
 };
 
-static float SINGLE_THRUST_DIRECTION_INCREMENT = 1.5;
-static float DUAL_THRUST_DIRECTION_INCREMENT = SINGLE_THRUST_DIRECTION_INCREMENT * .66;
-static float RESISTENCE_INCREMENT = SINGLE_THRUST_DIRECTION_INCREMENT / 4;
-static float MAX_HORIZONTAL_SPEED = 12;
-static float MAX_VERTICAL_SPEED = 8;
+void PollEventFromInputs(sf::Window& window, map<GameInput, bool>& GameInputStateMappings, const map<sf::Keyboard::Key, GameInput>& GameKeyToInputMappings);
+void UpdateShipVelocity(sf::Vector2u windowSize, sf::FloatRect shipBounds, sf::Vector2f& shipVelocity, const map<GameInput, bool>& GameInputStateMappings);
+
+
+//Global Variables
+static float SINGLE_THRUST_DIRECTION_INCREMENT = .2;
+static float HORIZONTAL_DIRECTION_INCREMENT = .45;
+static float RESISTENCE_MULTIPLIER = .96;
+static float MAX_HORIZONTAL_SPEED = 8;
+static float MAX_VERTICAL_SPEED = 4;
+static float WORLD_BOUNDS_MARGIN = 10;
+
+
+
 
 int main(int, char const**)
 {
@@ -36,7 +48,8 @@ int main(int, char const**)
 
 	// Create the main window
 	sf::RenderWindow window(sf::VideoMode(600, 1000), "Galaga!");
-	window.setFramerateLimit(120);
+	window.setKeyRepeatEnabled(false);
+	//window.setFramerateLimit(120);
 
 	//DIRECTION AND COUNTER VARIABLES
 	int counter = 0;
@@ -45,7 +58,6 @@ int main(int, char const**)
 	//Clock
 	sf::Clock clock;
 	clock.restart();
-	int frame = 0;
 
 	map<GameInput, bool> GameInputStateMappings;
 	const map<sf::Keyboard::Key, GameInput> GameKeyToInputMappings = {
@@ -53,6 +65,7 @@ int main(int, char const**)
 		{sf::Keyboard::Down, MoveDown},
 		{sf::Keyboard::Left, MoveLeft},
 		{sf::Keyboard::Right, MoveRight},
+		{sf::Keyboard::F, FireWeapon1},
 		{sf::Keyboard::Space, PauseGame},
 		{sf::Keyboard::Escape, QuitGame}
 	};
@@ -65,71 +78,146 @@ int main(int, char const**)
 	ship.setPosition(sf::Vector2f(300, 800));
 	ship.setFillColor(sf::Color::Blue);
 
+
+	//projectiles fired
+	list<Projectile> projectiles;
+
 	while (window.isOpen())
 	{
-		sf::Event event;
-
-		while (window.pollEvent(event)) {
-
-			if (event.type == sf::Event::Closed) {
-				window.close();
+		//Poll for evetn
+		PollEventFromInputs(window, GameInputStateMappings, GameKeyToInputMappings);
+		if (GameInputStateMappings[PauseGame] || clock.getElapsedTime().asMilliseconds() <= 25) {
+			// Update the window
+			window.clear();
+			window.draw(ship);
+			for (Projectile projectile : projectiles)
+			{
+				window.draw(projectile);
 			}
-			if (GameKeyToInputMappings.find(event.key.code) != GameKeyToInputMappings.end()) {
-				// KEY PRESSED, Runs oen Key input at a time
-				if (event.type == sf::Event::KeyPressed) {
-					if (GameKeyToInputMappings.at(event.key.code) <= MoveRight) {
-						//state should be set turned on, on key press
-						GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)] = true;
-					}
-					else {
-						//state should be inverted on key press
-						GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)] = !GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)];
-					}
-				}
-				if (event.type == sf::Event::KeyReleased) {
-					//state should be turned off, on key release
-					GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)] = false;
-				}
-			}
+			window.display();
+			continue;
 		}
 
 
-		//MOVEMENT FOR SHIP	
-		if (!GameInputStateMappings[PauseGame] && clock.getElapsedTime().asMilliseconds() >= 50) {
-			
-			if(shipVelocity.y > 0 )
-				shipVelocity.y += -RESISTENCE_INCREMENT;
-			if (shipVelocity.y < 0)
-				shipVelocity.y += RESISTENCE_INCREMENT;
-			
-			if(shipVelocity.x > 0)
-				shipVelocity.x += -RESISTENCE_INCREMENT;
-			if (shipVelocity.x < 0)
-				shipVelocity.x += RESISTENCE_INCREMENT;
+		//Apply inputs and envirmental factors to movement
+		UpdateShipVelocity(window.getSize(), ship.getGlobalBounds(), shipVelocity, GameInputStateMappings);
+		ship.move(shipVelocity);
+		clock.restart();
 
-			//apply movement to shipVelocity, after State update, opposing shipVelocitys cancel
-			if (GameInputStateMappings[MoveUp] && shipVelocity.y >= -MAX_VERTICAL_SPEED)
-				shipVelocity.y += GameInputStateMappings[MoveLeft] || GameInputStateMappings[MoveRight] ? -DUAL_THRUST_DIRECTION_INCREMENT : -SINGLE_THRUST_DIRECTION_INCREMENT;
-			if (GameInputStateMappings[MoveDown] && shipVelocity.y <= MAX_VERTICAL_SPEED)
-				shipVelocity.y += GameInputStateMappings[MoveLeft] || GameInputStateMappings[MoveRight] ? DUAL_THRUST_DIRECTION_INCREMENT : SINGLE_THRUST_DIRECTION_INCREMENT;
-
-
-
-			if (GameInputStateMappings[MoveLeft] && shipVelocity.x >= -MAX_HORIZONTAL_SPEED)
-				shipVelocity.x += GameInputStateMappings[MoveUp] || GameInputStateMappings[MoveDown] ? -DUAL_THRUST_DIRECTION_INCREMENT : -SINGLE_THRUST_DIRECTION_INCREMENT;
-			if (GameInputStateMappings[MoveRight] && shipVelocity.x <= MAX_HORIZONTAL_SPEED)
-				shipVelocity.x += GameInputStateMappings[MoveUp] || GameInputStateMappings[MoveDown] ? DUAL_THRUST_DIRECTION_INCREMENT : SINGLE_THRUST_DIRECTION_INCREMENT;
-			ship.move(shipVelocity);
-			clock.restart();
-
+		//Fire, MOVE SHIP FIRST
+		if (GameInputStateMappings[FireWeapon1]) {
+			GameInputStateMappings[FireWeapon1] = false;
+			sf::FloatRect currentShipPosition = ship.getGlobalBounds();
+			Projectile tempProjectile(sf::Vector2f(4, 12));
+			tempProjectile.setFillColor(sf::Color::Red);
+			tempProjectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, currentShipPosition.top);
+			projectiles.push_back(tempProjectile);
 		}
-		window.clear();
-		window.draw(ship);
+
+		for (list<Projectile>::iterator it = projectiles.begin(); it != projectiles.end(); it++)
+		{
+			it->moveProjectile();
+			sf::FloatRect projectileBounds = it->getGlobalBounds();
+			if (projectileBounds.top + projectileBounds.height < -10) {
+				it = projectiles.erase(it);
+				if (it == projectiles.end())
+					break;
+			}
+		}
+	
 
 		// Update the window
+		window.clear();
+		window.draw(ship);
+		for (Projectile projectile : projectiles)
+		{
+			window.draw(projectile);
+		}
 		window.display();
-		frame++;
+	
 	}
 	return EXIT_SUCCESS;
 
+}
+
+void PollEventFromInputs(sf::Window& window, map<GameInput, bool>& GameInputStateMappings, const map<sf::Keyboard::Key, GameInput>& GameKeyToInputMappings) {
+	sf::Event event;
+
+	//Poll all game inputs and map
+	while (window.pollEvent(event)) {
+
+		if (event.type == sf::Event::Closed) {
+			window.close();
+		}
+		//continue if key isn't mapped
+		if (GameKeyToInputMappings.find(event.key.code) == GameKeyToInputMappings.end())
+			continue;
+
+		// KEY PRESSED, Runs oen Key input at a time
+		if (event.type == sf::Event::KeyPressed) {
+			if (GameKeyToInputMappings.at(event.key.code) <= FireWeapon2) {
+				//state should be set turned on, on key press
+				GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)] = true;
+			}
+			else {
+				//state should be inverted on key press
+				GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)] = !GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)];
+			}
+		}
+		if (event.type == sf::Event::KeyReleased) {
+			if (GameKeyToInputMappings.at(event.key.code) > MoveRight)
+				continue;
+
+			//state should be turned off, on key release
+			GameInputStateMappings[GameKeyToInputMappings.at(event.key.code)] = false;
+		}
+
+	}
+	return;
+
+}
+void UpdateShipVelocity(sf::Vector2u windowSize, sf::FloatRect shipBounds, sf::Vector2f& shipVelocity, const map<GameInput, bool>& GameInputStateMappings)
+{
+	//apply air resistence
+	if (shipVelocity.y != 0)
+		shipVelocity.y = shipVelocity.y * RESISTENCE_MULTIPLIER;
+
+	if (shipVelocity.x != 0)
+		shipVelocity.x = shipVelocity.x * RESISTENCE_MULTIPLIER;
+
+	//apply thrust to shipVelocity, after State update, opposing Thrusts cancel
+	if (GameInputStateMappings.at(MoveUp) && shipVelocity.y >= -MAX_VERTICAL_SPEED)
+		shipVelocity.y += -SINGLE_THRUST_DIRECTION_INCREMENT;
+	if (GameInputStateMappings.at(MoveDown) && shipVelocity.y <= MAX_VERTICAL_SPEED)
+		shipVelocity.y += SINGLE_THRUST_DIRECTION_INCREMENT;
+
+
+
+	if (GameInputStateMappings.at(MoveLeft) && shipVelocity.x >= -MAX_HORIZONTAL_SPEED)
+		shipVelocity.x += -HORIZONTAL_DIRECTION_INCREMENT;
+	if (GameInputStateMappings.at(MoveRight) && shipVelocity.x <= MAX_HORIZONTAL_SPEED)
+		shipVelocity.x += HORIZONTAL_DIRECTION_INCREMENT;
+
+
+	//WORLD BOUNDS, these are better but stil prob not best
+	while (shipBounds.left + shipBounds.width + shipVelocity.x > windowSize.x - WORLD_BOUNDS_MARGIN
+		|| shipBounds.left + shipVelocity.x < WORLD_BOUNDS_MARGIN) {
+		if (abs(shipBounds.left + shipBounds.width - windowSize.x - WORLD_BOUNDS_MARGIN) < .01f
+			|| (abs(shipBounds.left - WORLD_BOUNDS_MARGIN) < .01f)) {
+			shipVelocity.x = 0;
+			break;
+		}
+		shipVelocity.x = shipVelocity.x * .5f;
+	}
+	while (shipBounds.top + shipBounds.height + shipVelocity.y > windowSize.y - WORLD_BOUNDS_MARGIN
+		|| shipBounds.top + shipVelocity.y < WORLD_BOUNDS_MARGIN) {
+		if (abs(shipBounds.top + shipBounds.height - windowSize.y - WORLD_BOUNDS_MARGIN) < .01f
+			|| (abs(shipBounds.top - WORLD_BOUNDS_MARGIN) < .01f)) {
+			shipVelocity.y = 0;
+			break;
+		}
+		shipVelocity.y = shipVelocity.y * .5f;
+	}
+
+	return;
 }
