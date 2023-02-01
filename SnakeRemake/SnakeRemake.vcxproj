@@ -149,6 +149,9 @@
   <ItemGroup>
     <ClInclude Include="projectile.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\x64\Release\ShipAnimations.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

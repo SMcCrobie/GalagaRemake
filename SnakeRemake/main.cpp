@@ -12,6 +12,7 @@
 #include "projectile.h"
 
 
+
 using namespace std;
 
 enum GameInput {
@@ -38,8 +39,6 @@ static float RESISTENCE_MULTIPLIER = .96;
 static float MAX_HORIZONTAL_SPEED = 8;
 static float MAX_VERTICAL_SPEED = 4;
 static float WORLD_BOUNDS_MARGIN = 10;
-
-
 
 
 int main(int, char const**)
@@ -74,9 +73,19 @@ int main(int, char const**)
 		GameInputStateMappings[GameInput(i)] = false;
 	}
 
-	sf::CircleShape ship(20, 3);
+	sf::Texture shipAnimations;
+	if (!shipAnimations.loadFromFile("C:\\Users\\Sean McCrobie\\source\\repos\\GalageRemake\\x64\\Release\\ShipAnimations.png"))
+	{
+		cout << "failed to load sprite" << endl;
+		return EXIT_FAILURE;
+	}
+
+	sf::Vector2i shipAnimationFrame(45,48);
+
+	
+	sf::Sprite ship(shipAnimations, sf::IntRect(sf::Vector2i(0,0),shipAnimationFrame));
 	ship.setPosition(sf::Vector2f(300, 800));
-	ship.setFillColor(sf::Color::Blue);
+	ship.setColor(sf::Color(255, 255, 255, 200));
 
 
 	//projectiles fired
@@ -98,6 +107,42 @@ int main(int, char const**)
 			continue;
 		}
 
+		//apply texture base on input
+		if (GameInputStateMappings.at(MoveLeft) && !GameInputStateMappings.at(MoveRight)) {
+			if (GameInputStateMappings.at(MoveUp) && !GameInputStateMappings.at(MoveDown)) {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(shipAnimationFrame.x*2, shipAnimationFrame.y), shipAnimationFrame));
+			}
+			else if (!GameInputStateMappings.at(MoveUp) && GameInputStateMappings.at(MoveDown)) {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(0, shipAnimationFrame.y), shipAnimationFrame));
+			}
+			else {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(shipAnimationFrame.x, shipAnimationFrame.y), shipAnimationFrame));
+			}
+		}
+		else if (!GameInputStateMappings.at(MoveLeft) && GameInputStateMappings.at(MoveRight)) {
+			if (GameInputStateMappings.at(MoveUp) && !GameInputStateMappings.at(MoveDown)) {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(shipAnimationFrame.x * 2, shipAnimationFrame.y*2), shipAnimationFrame));
+			}
+			else if (!GameInputStateMappings.at(MoveUp) && GameInputStateMappings.at(MoveDown)) {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(0, shipAnimationFrame.y*2), shipAnimationFrame));
+			}
+			else {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(shipAnimationFrame.x , shipAnimationFrame.y*2), shipAnimationFrame));
+			}
+		}
+		else {
+			if (GameInputStateMappings.at(MoveUp) && !GameInputStateMappings.at(MoveDown)) {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(shipAnimationFrame.x * 2, 0), shipAnimationFrame));
+			}
+			else if (!GameInputStateMappings.at(MoveUp) && GameInputStateMappings.at(MoveDown)) {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), shipAnimationFrame));
+			}
+			else {
+				ship.setTextureRect(sf::IntRect(sf::Vector2i(shipAnimationFrame.x, 0), shipAnimationFrame));
+			}
+		}
+
+
 
 		//Apply inputs and envirmental factors to movement
 		UpdateShipVelocity(window.getSize(), ship.getGlobalBounds(), shipVelocity, GameInputStateMappings);
@@ -108,8 +153,8 @@ int main(int, char const**)
 		if (GameInputStateMappings[FireWeapon1]) {
 			GameInputStateMappings[FireWeapon1] = false;
 			sf::FloatRect currentShipPosition = ship.getGlobalBounds();
-			Projectile tempProjectile(sf::Vector2f(4, 12));
-			tempProjectile.setFillColor(sf::Color::Red);
+			Projectile tempProjectile(sf::Vector2f(3, 12));
+			tempProjectile.setFillColor(sf::Color(0x05ecf1ff));
 			tempProjectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, currentShipPosition.top);
 			projectiles.push_back(tempProjectile);
 		}
