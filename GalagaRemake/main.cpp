@@ -10,6 +10,7 @@
 #include <map>
 #include <cstdlib>
 #include "projectile.h"
+#include "BoundedFloatRect.h"
 
 
 
@@ -29,25 +30,35 @@ enum GameInput {
 };
 
 void PollEventFromInputs(sf::Window& window, map<GameInput, bool>& GameInputStateMappings, const map<sf::Keyboard::Key, GameInput>& GameKeyToInputMappings);
-void UpdateShipVelocity(sf::Vector2u windowSize, sf::FloatRect shipBounds, sf::Vector2f& shipVelocity, const map<GameInput, bool>& GameInputStateMappings);
+void UpdateShipVelocity(sf::Vector2u windowSize, BoundedFloatRect shipBounds, sf::Vector2f& shipVelocity, const map<GameInput, bool>& GameInputStateMappings);
 
 
 //Global Variables
-static float SINGLE_THRUST_DIRECTION_INCREMENT = .2;
-static float HORIZONTAL_DIRECTION_INCREMENT = .45;
-static float RESISTENCE_MULTIPLIER = .96;
-static float MAX_HORIZONTAL_SPEED = 8;
-static float MAX_VERTICAL_SPEED = 4;
-static float WORLD_BOUNDS_MARGIN = 10;
-
+const float SINGLE_THRUST_DIRECTION_INCREMENT = .3;
+const float HORIZONTAL_DIRECTION_INCREMENT = .55;
+const float RESISTENCE_MULTIPLIER = .96;
+float const MAX_HORIZONTAL_SPEED = 8;
+const float MAX_VERTICAL_SPEED = 6;
+const float WORLD_BOUNDS_MARGIN = 10;
+const float WORLD_VIEW_MOVEMENT = -1.25f;
+BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
+sf::View WORLD_VIEW(WORLD_BOUNDS);
+//replace everything you can with this
+//Can use itersects via this
 
 int main(int, char const**)
 {
 	srand(time(NULL));
 
+
 	// Create the main window
+	// X goes right and Y goes down
+	// Y is inverted 0 at the top 1000 at the bottom
 	sf::RenderWindow window(sf::VideoMode(600, 1000), "Galaga!");
 	window.setKeyRepeatEnabled(false);
+	window.setView(WORLD_VIEW);
+	
+	
 	//window.setFramerateLimit(120);
 
 	//DIRECTION AND COUNTER VARIABLES
@@ -74,12 +85,12 @@ int main(int, char const**)
 	}
 
 	sf::Texture shipAnimations;
-	if (!shipAnimations.loadFromFile("C:\\Users\\Sean McCrobie\\source\\repos\\GalageRemake\\x64\\Release\\ShipAnimations.png"))
+	if (!shipAnimations.loadFromFile("ShipAnimations.png"))
 	{
 		cout << "failed to load sprite" << endl;
 		return EXIT_FAILURE;
 	}
-
+	//
 	sf::Vector2i shipAnimationFrame(45,48);
 
 	
@@ -87,25 +98,32 @@ int main(int, char const**)
 	ship.setPosition(sf::Vector2f(300, 800));
 	ship.setColor(sf::Color(255, 255, 255, 200));
 
+	sf::RectangleShape background(sf::Vector2f(600, 1000));
+	shipAnimations.setRepeated(true);
+	background.setTexture(&shipAnimations);
+	
+
+
+
+
 
 	//projectiles fired
 	list<Projectile> projectiles;
 
 	while (window.isOpen())
 	{
-		//Poll for evetn
-		PollEventFromInputs(window, GameInputStateMappings, GameKeyToInputMappings);
 		if (GameInputStateMappings[PauseGame] || clock.getElapsedTime().asMilliseconds() <= 25) {
-			// Update the window
-			window.clear();
-			window.draw(ship);
-			for (Projectile projectile : projectiles)
-			{
-				window.draw(projectile);
-			}
-			window.display();
 			continue;
 		}
+
+		//increment the world
+		WORLD_VIEW.move(0.f, WORLD_VIEW_MOVEMENT);
+		WORLD_BOUNDS.top += WORLD_VIEW_MOVEMENT;
+		WORLD_BOUNDS.bottom += WORLD_VIEW_MOVEMENT;
+		window.setView(WORLD_VIEW);
+
+		//Poll for evetn
+		PollEventFromInputs(window, GameInputStateMappings, GameKeyToInputMappings);
 
 		//apply texture base on input
 		if (GameInputStateMappings.at(MoveLeft) && !GameInputStateMappings.at(MoveRight)) {
@@ -163,7 +181,7 @@ int main(int, char const**)
 		{
 			it->moveProjectile();
 			sf::FloatRect projectileBounds = it->getGlobalBounds();
-			if (projectileBounds.top + projectileBounds.height < -10) {
+			if (!WORLD_BOUNDS.intersects(projectileBounds)) {
 				it = projectiles.erase(it);
 				if (it == projectiles.end())
 					break;
@@ -173,7 +191,9 @@ int main(int, char const**)
 
 		// Update the window
 		window.clear();
+		//window.draw(background);
 		window.draw(ship);
+
 		for (Projectile projectile : projectiles)
 		{
 			window.draw(projectile);
@@ -221,9 +241,13 @@ void PollEventFromInputs(sf::Window& window, map<GameInput, bool>& GameInputStat
 	return;
 
 }
-void UpdateShipVelocity(sf::Vector2u windowSize, sf::FloatRect shipBounds, sf::Vector2f& shipVelocity, const map<GameInput, bool>& GameInputStateMappings)
+
+/// <summary>
+/// Needs to be abstracted away it to class object functions, with global instance variables to share
+/// </summary>
+void UpdateShipVelocity(sf::Vector2u windowSize, BoundedFloatRect shipBounds, sf::Vector2f& shipVelocity, const map<GameInput, bool>& GameInputStateMappings)
 {
-	//apply air resistence
+	//apply resistence
 	if (shipVelocity.y != 0)
 		shipVelocity.y = shipVelocity.y * RESISTENCE_MULTIPLIER;
 
@@ -244,24 +268,37 @@ void UpdateShipVelocity(sf::Vector2u windowSize, sf::FloatRect shipBounds, sf::V
 		shipVelocity.x += HORIZONTAL_DIRECTION_INCREMENT;
 
 
-	//WORLD BOUNDS, these are better but stil prob not best
-	while (shipBounds.left + shipBounds.width + shipVelocity.x > windowSize.x - WORLD_BOUNDS_MARGIN
-		|| shipBounds.left + shipVelocity.x < WORLD_BOUNDS_MARGIN) {
-		if (abs(shipBounds.left + shipBounds.width - windowSize.x - WORLD_BOUNDS_MARGIN) < .01f
-			|| (abs(shipBounds.left - WORLD_BOUNDS_MARGIN) < .01f)) {
+
+	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
+	while (shipBounds.right + shipVelocity.x > WORLD_BOUNDS.right - WORLD_BOUNDS_MARGIN
+		|| shipBounds.left + shipVelocity.x < WORLD_BOUNDS.left + WORLD_BOUNDS_MARGIN) {
+		
+		
+		
+		if (abs(shipBounds.right - WORLD_BOUNDS.right - WORLD_BOUNDS_MARGIN) < .01f
+			|| (abs(shipBounds.left - WORLD_BOUNDS.left + WORLD_BOUNDS_MARGIN) < .01f )) {
 			shipVelocity.x = 0;
 			break;
 		}
 		shipVelocity.x = shipVelocity.x * .5f;
+
+
+
 	}
-	while (shipBounds.top + shipBounds.height + shipVelocity.y > windowSize.y - WORLD_BOUNDS_MARGIN
-		|| shipBounds.top + shipVelocity.y < WORLD_BOUNDS_MARGIN) {
-		if (abs(shipBounds.top + shipBounds.height - windowSize.y - WORLD_BOUNDS_MARGIN) < .01f
-			|| (abs(shipBounds.top - WORLD_BOUNDS_MARGIN) < .01f)) {
-			shipVelocity.y = 0;
+	while (shipBounds.bottom + shipVelocity.y > WORLD_BOUNDS.bottom - WORLD_BOUNDS_MARGIN
+		|| shipBounds.top + shipVelocity.y < WORLD_BOUNDS.top + WORLD_BOUNDS_MARGIN) {
+		
+		
+		if (shipBounds.bottom > WORLD_BOUNDS.bottom - WORLD_BOUNDS_MARGIN ) {
+			shipVelocity.y = (WORLD_BOUNDS.bottom - WORLD_BOUNDS_MARGIN) - shipBounds.bottom;
+			break;
+		}
+		if(shipBounds.top < WORLD_BOUNDS.top + WORLD_BOUNDS_MARGIN) {
+			shipVelocity.y = shipBounds.top - (WORLD_BOUNDS.top + WORLD_BOUNDS_MARGIN);
 			break;
 		}
 		shipVelocity.y = shipVelocity.y * .5f;
+	
 	}
 
 	return;

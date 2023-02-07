@@ -24,15 +24,24 @@
     <ClCompile Include="projectile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BoundedFloatRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projectile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundedFloatRect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\x64\Release\ShipAnimations.png">
       <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="x64\Release\ShipAnimations.png">
+      <Filter>Source Files\Images</Filter>
     </Image>
   </ItemGroup>
 </Project>

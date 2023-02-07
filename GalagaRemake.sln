@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SnakeRemake", "SnakeRemake\SnakeRemake.vcxproj", "{FAE5192C-D50F-4102-974A-BB07B243CCE7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GalagaRemake", "GalagaRemake\GalagaRemake.vcxproj", "{FAE5192C-D50F-4102-974A-BB07B243CCE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
