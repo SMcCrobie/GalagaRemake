@@ -2,25 +2,25 @@
 
 Projectile::Projectile(const sf::Vector2f& size, const sf::Vector2f& velocity)
 {
-	this->setSize(size);
-	this->velocity = velocity;
+	setSize(size);
+	m_velocity = velocity;
 }
 
 const sf::Vector2f& Projectile::getVelocity() const
 {
-	return this->velocity;
+	return m_velocity;
 }
 
 bool Projectile::setVelocity(const sf::Vector2f& velocity)
 {
 	if (velocity.y > PROJECTILE_START_SPEED)
 		return false;
-	this->velocity = velocity;
+	m_velocity = velocity;
 	return true;
 }
 
-void Projectile::moveProjectile()
+void Projectile::move()
 {
-	move(this->velocity);
-	//this->velocity = this->velocity * PROJECTILE_RESISTENCE_MULTIPLIER;
+	sf::RectangleShape::move(m_velocity);
+	//m_velocity = m_velocity * PROJECTILE_RESISTENCE_MULTIPLIER;
 }

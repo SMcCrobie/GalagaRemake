@@ -144,12 +144,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BoundedFloatRect.cpp" />
+    <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="projectile.cpp" />
+    <ClCompile Include="Ship.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoundedFloatRect.h" />
+    <ClInclude Include="Controller.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="projectile.h" />
+    <ClInclude Include="Ship.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\x64\Release\ShipAnimations.png">
