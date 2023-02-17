@@ -63,7 +63,7 @@ int main(int, char const**)
 
 	//containers for drawables
 	list<Projectile> projectiles;
-	list<GameObject> enemyShips;
+	list<shared_ptr<GameObject>> enemyShips;
 
 	while (window.isOpen())
 	{
@@ -98,10 +98,8 @@ int main(int, char const**)
 		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= 2000) {
 			timeOfLastEnemyShip = clock.getElapsedTime().asMilliseconds();
 			
-			GameObject temp = GameObject();
-			temp.setPosition(300.f, -800.f + WORLD_BOUNDS.bottom);
-			
-			enemyShips.push_back(temp);
+			enemyShips.push_back(make_shared<GameObject>());
+			enemyShips.back()->setPosition(300.f, -800.f + WORLD_BOUNDS.bottom);
 		}
 
 		//Fire, MOVE SHIP FIRST
@@ -132,9 +130,9 @@ int main(int, char const**)
 		{
 			window.draw(projectile);
 		}
-		for (GameObject enemyShip : enemyShips)
+		for (list<GameObject>::iterator it = enemyShips.begin(); it != enemyShips.end(); it++)
 		{
-			window.draw(enemyShip);
+			window.draw(*it);
 		}
 		window.draw(playerShip);
 		window.display();
