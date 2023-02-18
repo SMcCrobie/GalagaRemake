@@ -11,15 +11,24 @@
 #include <cstdlib>
 #include "projectile.h"
 #include "BoundedFloatRect.h"
-#include "GameObject.h"
 #include "Ship.h"
 #include "Controller.h"
+#include "main.h"
 
 using namespace std;
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
+
+template <typename T,
+	class = typename enable_if <is_base_of <sf::Drawable, T>::value, bool>::type>
+void DrawList(std::list<T>& list, sf::RenderWindow& window) {
+	for (auto it = list.begin(); it != list.end(); it++) {
+		window.draw(*it);
+	}
+	return;
+}
 
 
 int main(int, char const**)
@@ -29,6 +38,7 @@ int main(int, char const**)
 	sf::RenderWindow window(sf::VideoMode(600, 1000), "Galaga!");
 	window.setKeyRepeatEnabled(false);
 	window.setView(WORLD_VIEW);
+	
 
 
 	//Clock
@@ -53,7 +63,7 @@ int main(int, char const**)
 	//intialize controller
 	Controller playerController;
 
-	
+
 	//counters
 	sf::Int32 timeOfLastGameLoop = 0;
 	sf::Int32 timeOfLastEnemyShip = 0;
@@ -63,7 +73,10 @@ int main(int, char const**)
 
 	//containers for drawables
 	list<Projectile> projectiles;
-	list<GameObject> enemyShips;
+	list<Ship> enemyShips;
+	
+	
+
 
 	while (window.isOpen())
 	{
@@ -93,17 +106,6 @@ int main(int, char const**)
 		playerShip.move();
 
 
-
-		//intialize some game objects
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= 2000) {
-			timeOfLastEnemyShip = clock.getElapsedTime().asMilliseconds();
-			
-			GameObject temp = GameObject();
-			temp.setPosition(300.f, -800.f + WORLD_BOUNDS.bottom);
-			
-			enemyShips.push_back(temp);
-		}
-
 		//Fire, MOVE SHIP FIRST
 		if (playerShip.isFire1) {
 			playerShip.isFire1 = false;
@@ -125,21 +127,15 @@ int main(int, char const**)
 			}
 		}
 	
-
-		// Update the window
+		// Update the window, use template function for any list of drawable subclass
 		window.clear();
-		for (Projectile projectile : projectiles)
-		{
-			window.draw(projectile);
-		}
-		for (GameObject enemyShip : enemyShips)
-		{
-			window.draw(enemyShip);
-		}
+		DrawList(projectiles, window);
+		DrawList(enemyShips, window);
 		window.draw(playerShip);
 		window.display();
-	
+
 	}
 	return EXIT_SUCCESS;
 
 }
+
