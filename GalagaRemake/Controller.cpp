@@ -46,8 +46,5 @@ void Controller::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
 
 	}
 
-	//Hacky, should be handled some other way
-	ship.isFire1 = ship.m_shipControlsStateMappings[FireWeapon1];
-	ship.m_shipControlsStateMappings[FireWeapon1] = false;
 	return;
 }

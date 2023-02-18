@@ -6,7 +6,8 @@ Ship::Ship() : sf::Sprite()
 	m_collisionBox = sf::RectangleShape();
 	m_shipControlsStateMappings = std::map<ShipControl, bool>();
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
-
+	m_weapon1Projectile = Projectile(sf::Vector2f(3, 12));
+	m_weapon1Projectile.setFillColor(sf::Color(0x05ecf1ff));
 	
 	for (int i = MoveUp; i < FireWeapon2; i++) {
 		m_shipControlsStateMappings[ShipControl(i)] = false;
@@ -118,5 +119,28 @@ void Ship::move()
 {
 	sf::Sprite::move(m_velocity);
 }
+
+const std::map<ShipControl, bool>& Ship::getShipControlStateMappings()
+{
+	return m_shipControlsStateMappings;
+}
+
+std::optional<Projectile> Ship::fireWeapon1IfFired()
+{
+	if (!m_shipControlsStateMappings[FireWeapon1])
+		return {};
+
+	sf::FloatRect currentShipPosition = getGlobalBounds();
+	m_shipControlsStateMappings[FireWeapon1] = false;
+	m_weapon1Projectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, currentShipPosition.top);
+	return m_weapon1Projectile;
+
+}
+
+std::optional<Projectile> Ship::fireWeapon2IfFired()
+{
+	return {};
+}
+
 
 

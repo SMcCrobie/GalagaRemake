@@ -9,26 +9,25 @@
 #include <algorithm>
 #include <map>
 #include <cstdlib>
-#include "projectile.h"
-#include "BoundedFloatRect.h"
 #include "Ship.h"
+#include "Projectile.h"
+#include "BoundedFloatRect.h"
 #include "Controller.h"
-#include "main.h"
-
-using namespace std;
+#include "ProjectileManager.h"
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
 
 template <typename T,
-	class = typename enable_if <is_base_of <sf::Drawable, T>::value, bool>::type>
+	class = typename std::enable_if <std::is_base_of <sf::Drawable, T>::value, bool>::type>
 void DrawList(std::list<T>& list, sf::RenderWindow& window) {
 	for (auto it = list.begin(); it != list.end(); it++) {
 		window.draw(*it);
 	}
 	return;
 }
+
 
 
 int main(int, char const**)
@@ -38,8 +37,6 @@ int main(int, char const**)
 	sf::RenderWindow window(sf::VideoMode(600, 1000), "Galaga!");
 	window.setKeyRepeatEnabled(false);
 	window.setView(WORLD_VIEW);
-	
-
 
 	//Clock
 	sf::Clock clock;
@@ -48,7 +45,7 @@ int main(int, char const**)
 	sf::Texture shipAnimations;
 	if (!shipAnimations.loadFromFile("ShipAnimations.png"))
 	{
-		cout << "failed to load sprite" << endl;
+		std::cout << "failed to load sprite" << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -70,10 +67,9 @@ int main(int, char const**)
 
 
 
-
 	//containers for drawables
-	list<Projectile> projectiles;
-	list<Ship> enemyShips;
+	ProjectileManager projectileManager;
+	std::list<Ship> enemyShips;
 	
 	
 
@@ -105,32 +101,15 @@ int main(int, char const**)
 		playerShip.updateShipVelocity(WORLD_BOUNDS);
 		playerShip.move();
 
+		//reduced projectiles to two function calls, 
+		projectileManager.collectProjectile(playerShip);
+		projectileManager.updateProjectiles(WORLD_BOUNDS);
 
-		//Fire, MOVE SHIP FIRST
-		if (playerShip.isFire1) {
-			playerShip.isFire1 = false;
-			sf::FloatRect currentShipPosition = playerShip.getGlobalBounds();
-			Projectile tempProjectile(sf::Vector2f(3, 12));
-			tempProjectile.setFillColor(sf::Color(0x05ecf1ff));
-			tempProjectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, currentShipPosition.top);
-			projectiles.push_back(tempProjectile);
-		}
-
-		for (list<Projectile>::iterator it = projectiles.begin(); it != projectiles.end(); it++)
-		{
-			it->move();
-			sf::FloatRect projectileBounds = it->getGlobalBounds();
-			if (!WORLD_BOUNDS.intersects(projectileBounds)) {
-				it = projectiles.erase(it);
-				if (it == projectiles.end())
-					break;
-			}
-		}
 	
 		// Update the window, use template function for any list of drawable subclass
 		window.clear();
-		DrawList(projectiles, window);
-		DrawList(enemyShips, window);
+		window.draw(projectileManager);
+		//DrawList(enemyShips, window);
 		window.draw(playerShip);
 		window.display();
 
