@@ -14,19 +14,19 @@ enum ShipControl {
 	
 	FireWeapon2
 };
-const float SINGLE_THRUST_DIRECTION_INCREMENT = .25;
-const float HORIZONTAL_DIRECTION_INCREMENT = .35;
-const float RESISTENCE_MULTIPLIER = .965;
-float const MAX_HORIZONTAL_SPEED = 14;
-const float MAX_VERTICAL_SPEED = 10;
-const float WORLD_BOUNDS_MARGIN = 10;
+const float SINGLE_THRUST_DIRECTION_INCREMENT = .25f;
+const float HORIZONTAL_DIRECTION_INCREMENT = .35f;
+const float RESISTENCE_MULTIPLIER = .965f;
+float const MAX_HORIZONTAL_SPEED = 14.0f;
+const float MAX_VERTICAL_SPEED = 10.0f;
+const float WORLD_BOUNDS_MARGIN = 10.0f;
 const float WORLD_VIEW_MOVEMENT = -1.25f;
 
 
 class Ship :
     public sf::Sprite
 {
-	friend class Controller;
+	friend class KeyboardController;
 	friend class ProjectileManager;
 
 public:

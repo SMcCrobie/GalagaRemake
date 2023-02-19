@@ -2,10 +2,10 @@
 #include "Ship.h"
 
 
-class Controller
+class KeyboardController
 {
 public:
-	Controller();
+	class KeyboardController();
 	void PollEventsAndUpdateShipState(sf::Window& window, Ship& ship);
 
 private:

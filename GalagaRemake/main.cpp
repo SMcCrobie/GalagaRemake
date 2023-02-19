@@ -45,7 +45,7 @@ int main(int, char const**)
 	sf::Texture shipAnimations;
 	if (!shipAnimations.loadFromFile("ShipAnimations.png"))
 	{
-		std::cout << "failed to load sprite" << std::endl;
+		std::cout << "failed to load ShipAnimations.png" << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -54,11 +54,11 @@ int main(int, char const**)
 	playerShip.setTexture(shipAnimations);
 	playerShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	playerShip.setPosition(sf::Vector2f(300, 800));
-	playerShip.setColor(sf::Color(255, 255, 255, 200));
+	//playerShip.setColor(sf::Color::Magenta);
 
 
 	//intialize controller
-	Controller playerController;
+	KeyboardController playerController;
 
 
 	//counters

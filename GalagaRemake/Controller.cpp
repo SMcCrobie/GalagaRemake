@@ -1,6 +1,6 @@
 #include "Controller.h"
 
-Controller::Controller()
+KeyboardController::KeyboardController()
 {
 	m_KeyboardToShipControlMappings = {
 		{ sf::Keyboard::Up, MoveUp},
@@ -11,7 +11,7 @@ Controller::Controller()
 	};
 }
 
-void Controller::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
+void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
 {
 	sf::Event event;
 
