@@ -11,6 +11,7 @@ public:
 	ProjectileManager();
 	void collectProjectile(Ship& ship);
 	void updateProjectiles(const BoundedFloatRect& worldBounds);
+	void detectCollision(sf::Transformable& gameObject);
 
 private:
 	std::list<Projectile> m_projectiles;

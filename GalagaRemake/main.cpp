@@ -32,6 +32,7 @@ void DrawList(std::list<T>& list, sf::RenderWindow& window) {
 
 int main(int, char const**)
 {
+	srand(time(NULL));
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottom
 	sf::RenderWindow window(sf::VideoMode(600, 1000), "Galaga!");
@@ -53,12 +54,26 @@ int main(int, char const**)
 	Ship playerShip;
 	playerShip.setTexture(shipAnimations);
 	playerShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
-	playerShip.setPosition(sf::Vector2f(300, 800));
+	playerShip.setPosition(sf::Vector2f(300.f, 800.f));
+	//playerShip.rotate180();
+	//playerShip.rotate(180.f);
 	//playerShip.setColor(sf::Color::Magenta);
 
-
+	Ship enemyShip;
+	enemyShip.setIsWorldBound(false);
+	enemyShip.setTexture(shipAnimations);
+	enemyShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
+	enemyShip.setPosition(sf::Vector2f(300.f, -50.f));
+	enemyShip.setColor(sf::Color::Magenta);
+	
+	Projectile enemyProjectile = Projectile(sf::Vector2f(3.f, 12.f));
+	enemyProjectile.setFillColor(sf::Color::Magenta);
+	enemyShip.setProjectile(enemyProjectile);
+	//enemyShip.setScale(sf::Vector2f(.5f,.5f));
+	enemyShip.rotate180();
 	//intialize controller
 	KeyboardController playerController;
+	StateMachineController enemyController;
 
 
 	//counters
@@ -89,20 +104,36 @@ int main(int, char const**)
 		WORLD_BOUNDS.bottom += WORLD_VIEW_MOVEMENT;
 		window.setView(WORLD_VIEW);
 
+
+
+
 		//Poll for events
 		playerController.PollEventsAndUpdateShipState(window, playerShip);
+		enemyController.updateControllerStateAndShipState(clock, enemyShip);
 
 
 		//apply texture, based on events from player controller
 		playerShip.setTextureRectBasedOnShipState();
-
+		enemyShip.setTextureRectBasedOnShipState();
 
 		//Apply inputs and envirmental factors to movement
 		playerShip.updateShipVelocity(WORLD_BOUNDS);
 		playerShip.move();
+		enemyShip.updateShipVelocity(WORLD_BOUNDS);
+		enemyShip.move();
+	
+		
+		if (enemyShip.getGlobalBounds().top > WORLD_BOUNDS.bottom) {
+			auto tempPosition = enemyShip.getGlobalBounds();
+			enemyShip.setPosition(tempPosition.left + tempPosition.width//requried due to origin being bottom right with rotation at 180
+				, WORLD_BOUNDS.top - 100.f);
+		}
+
 
 		//reduced projectiles to two function calls, 
 		projectileManager.collectProjectile(playerShip);
+		projectileManager.collectProjectile(enemyShip);
+
 		projectileManager.updateProjectiles(WORLD_BOUNDS);
 
 	
@@ -111,6 +142,7 @@ int main(int, char const**)
 		window.draw(projectileManager);
 		//DrawList(enemyShips, window);
 		window.draw(playerShip);
+		window.draw(enemyShip);
 		window.display();
 
 	}

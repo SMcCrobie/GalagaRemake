@@ -8,6 +8,10 @@ Ship::Ship() : sf::Sprite()
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
 	m_weapon1Projectile = Projectile(sf::Vector2f(3, 12));
 	m_weapon1Projectile.setFillColor(sf::Color(0x05ecf1ff));
+	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
+	m_verticalDirectionIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
+	m_isBackwards = false;
+	m_isWorldBound = true;
 	
 	for (int i = MoveUp; i < FireWeapon2; i++) {
 		m_shipControlsStateMappings[ShipControl(i)] = false;
@@ -54,6 +58,16 @@ void Ship::setTextureRectBasedOnShipState()
 	}
 }
 
+void Ship::setProjectile(const Projectile& projectile)
+{
+	m_weapon1Projectile = projectile;
+}
+
+void Ship::setIsWorldBound(bool isWorldBound)
+{
+	m_isWorldBound = isWorldBound;
+}
+
 void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 {
 
@@ -67,16 +81,17 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 
 	//apply thrust to shipVelocity, after State update, opposing Thrusts cancel
 	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
-		m_velocity.y += -SINGLE_THRUST_DIRECTION_INCREMENT;
+		m_velocity.y += -m_verticalDirectionIncrement;
 	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
-		m_velocity.y += SINGLE_THRUST_DIRECTION_INCREMENT / 3.f;
+		m_velocity.y += m_verticalDirectionIncrement / 3.f;
 
 
 
 	if (m_shipControlsStateMappings.at(MoveLeft) && m_velocity.x >= -MAX_HORIZONTAL_SPEED)
-		m_velocity.x += -HORIZONTAL_DIRECTION_INCREMENT;
+		m_velocity.x += -m_horizontalDirectionIncrement;
 	if (m_shipControlsStateMappings.at(MoveRight) && m_velocity.x <= MAX_HORIZONTAL_SPEED)
-		m_velocity.x += HORIZONTAL_DIRECTION_INCREMENT;
+		m_velocity.x += m_horizontalDirectionIncrement;
+
 
 
 
@@ -96,6 +111,10 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 
 
 	}
+
+	if (!m_isWorldBound)
+		return;
+
 	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
 		|| shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN) {
 
@@ -120,6 +139,16 @@ void Ship::move()
 	sf::Sprite::move(m_velocity);
 }
 
+void Ship::rotate180()
+{
+	m_isBackwards = !m_isBackwards;
+	m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
+	m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+	m_weapon1Projectile.setVelocity(sf::Vector2f(0, PROJECTILE_START_SPEED));
+	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
+
+}
+
 const std::map<ShipControl, bool>& Ship::getShipControlStateMappings()
 {
 	return m_shipControlsStateMappings;
@@ -129,10 +158,11 @@ std::optional<Projectile> Ship::fireWeapon1IfFired()
 {
 	if (!m_shipControlsStateMappings[FireWeapon1])
 		return {};
+	BoundedFloatRect currentShipPosition = getGlobalBounds();
+	float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom - m_weapon1Projectile.getGlobalBounds().height : currentShipPosition.top;
 
-	sf::FloatRect currentShipPosition = getGlobalBounds();
 	m_shipControlsStateMappings[FireWeapon1] = false;
-	m_weapon1Projectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, currentShipPosition.top);
+	m_weapon1Projectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, verticalStartPoint);
 	return m_weapon1Projectile;
 
 }

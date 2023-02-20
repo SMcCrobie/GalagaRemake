@@ -27,13 +27,17 @@ class Ship :
     public sf::Sprite
 {
 	friend class KeyboardController;
+	friend class StateMachineController;
 	friend class ProjectileManager;
 
 public:
     Ship();
 	void setTextureRectBasedOnShipState();
+	void setProjectile(const Projectile& projectile);
+	void setIsWorldBound(bool isWorldBound);
 	void updateShipVelocity(BoundedFloatRect worldBounds);
 	void move();
+	void rotate180();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
 
 
@@ -41,6 +45,10 @@ private:
 	virtual std::optional<Projectile> fireWeapon1IfFired();
 	virtual std::optional<Projectile> fireWeapon2IfFired();
 
+	bool m_isBackwards;
+	bool m_isWorldBound;
+	float m_horizontalDirectionIncrement;
+	float m_verticalDirectionIncrement;
 	sf::Vector2i m_shipAnimationFrame;
     sf::Vector2f m_velocity;
     sf::RectangleShape m_collisionBox;

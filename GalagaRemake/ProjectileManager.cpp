@@ -30,6 +30,11 @@ void ProjectileManager::updateProjectiles(const BoundedFloatRect& worldBounds)
 	}
 }
 
+void ProjectileManager::detectCollision(sf::Transformable& gameObject)
+{
+	//gameObject.getg
+}
+
 void ProjectileManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); it++) {
