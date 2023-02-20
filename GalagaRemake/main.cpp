@@ -121,6 +121,8 @@ int main(int, char const**)
 		playerShip.move();
 		enemyShip.updateShipVelocity(WORLD_BOUNDS);
 		enemyShip.move();
+
+		playerShip.rotateIfTriggered();
 	
 		
 		if (enemyShip.getGlobalBounds().top > WORLD_BOUNDS.bottom) {

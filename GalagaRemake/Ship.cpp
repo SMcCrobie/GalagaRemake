@@ -13,7 +13,7 @@ Ship::Ship() : sf::Sprite()
 	m_isBackwards = false;
 	m_isWorldBound = true;
 	
-	for (int i = MoveUp; i < FireWeapon2; i++) {
+	for (int i = MoveUp; i < InvalidShipControl; i++) {
 		m_shipControlsStateMappings[ShipControl(i)] = false;
 	}
 	
@@ -134,9 +134,17 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 	return;
 }
 
-void Ship::move()
+void Ship::move() 
 {
 	sf::Sprite::move(m_velocity);
+}
+
+void Ship::rotateIfTriggered()
+{
+	if (!m_shipControlsStateMappings.at(Rotate))
+		return;
+	m_shipControlsStateMappings[Rotate] = false;
+	rotate180();
 }
 
 void Ship::rotate180()
@@ -144,8 +152,13 @@ void Ship::rotate180()
 	m_isBackwards = !m_isBackwards;
 	m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
 	m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
-	m_weapon1Projectile.setVelocity(sf::Vector2f(0, PROJECTILE_START_SPEED));
+	m_weapon1Projectile.setVelocity(sf::Vector2f(0, -m_weapon1Projectile.getVelocity().y));
 	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
+	sf::FloatRect localBounds = getLocalBounds(); 
+	if(m_isBackwards)
+		sf::Transformable::move(localBounds.width,localBounds.height);
+	else
+		sf::Transformable::move(-localBounds.width, -localBounds.height);
 
 }
 

@@ -11,8 +11,10 @@ enum ShipControl {
 	MoveLeft,
 	MoveRight,
 	FireWeapon1,
-	
-	FireWeapon2
+	FireWeapon2,
+	Rotate,
+
+	InvalidShipControl
 };
 const float SINGLE_THRUST_DIRECTION_INCREMENT = .25f;
 const float HORIZONTAL_DIRECTION_INCREMENT = .35f;
@@ -37,6 +39,7 @@ public:
 	void setIsWorldBound(bool isWorldBound);
 	void updateShipVelocity(BoundedFloatRect worldBounds);
 	void move();
+	void rotateIfTriggered();
 	void rotate180();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
 

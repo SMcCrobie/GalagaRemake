@@ -7,7 +7,8 @@ KeyboardController::KeyboardController()
 		{ sf::Keyboard::Down, MoveDown },
 		{ sf::Keyboard::Left, MoveLeft },
 		{ sf::Keyboard::Right, MoveRight },
-		{ sf::Keyboard::F, FireWeapon1 }
+		{ sf::Keyboard::F, FireWeapon1 },
+		{ sf::Keyboard::G, Rotate }
 	};
 }
 
@@ -27,14 +28,14 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 
 		// KEY PRESSED, Runs oen Key input at a time
 		if (event.type == sf::Event::KeyPressed) {
-			if (m_keyboardToShipControlMap.at(event.key.code) <= FireWeapon2) {
+			//if (m_keyboardToShipControlMap.at(event.key.code) <= FireWeapon2) {
 				//state should be set turned on, on key press
 				ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)] = true;
-			}
-			else {
-				//state should be inverted on key press
-				ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)] = !ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)];
-			}
+			//}
+			//else {
+			//	//state should be inverted on key press
+			//	ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)] = !ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)];
+			//}
 		}
 		if (event.type == sf::Event::KeyReleased) {
 			if (m_keyboardToShipControlMap.at(event.key.code) > MoveRight)
@@ -56,26 +57,26 @@ StateMachineController::StateMachineController() :
 	m_deltaBeforeStateChange(200),
 	m_timeOfLastStateChange(0),
 	m_stateToShipControlInputsMap{
-		{State0, std::vector{ FireWeapon1}},
+		{State0, std::vector{ MoveUp, FireWeapon1}},
 		{State1, std::vector{ MoveLeft }},
 		{State2, std::vector{ MoveRight }},
-		{State3, std::vector{ MoveUp, FireWeapon1 }} },
+		{State3, std::vector{ FireWeapon1 }} },
 	m_stateWithInputToStateMap{
 		{State0, {
-			//{Hold,		State0}, can be implicit 
+			{Hold,		State0},
 			{Input1,	State1},
 			{Input2,	State2}}
 		},
 		{State1, {
-			//{Hold,		State1},
+			{Hold,		State1},
 			{Input1,	State0}}
 		},
 		{State2, {
-			//{Hold,		State2},
+			{Hold,		State2},
 			{Input1,	State0}} 
 		},
 		{State3, {
-			//{Hold,		State3},
+			{Hold,		State3},
 			{Input1,	State0}}
 		}
 	}
