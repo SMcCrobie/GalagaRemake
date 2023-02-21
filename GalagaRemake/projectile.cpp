@@ -22,5 +22,4 @@ bool Projectile::setVelocity(const sf::Vector2f& velocity)
 void Projectile::move()
 {
 	sf::RectangleShape::move(m_velocity);
-	//m_velocity = m_velocity * PROJECTILE_RESISTENCE_MULTIPLIER;
 }

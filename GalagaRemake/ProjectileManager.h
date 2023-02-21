@@ -2,6 +2,7 @@
 #include "Ship.h"
 #include "Projectile.h"
 #include <list>
+#include "ShipManager.h"
 
 
 class ProjectileManager 
@@ -10,8 +11,10 @@ class ProjectileManager
 public:
 	ProjectileManager();
 	void collectProjectile(Ship& ship);
+	void collectProjectile(ShipManager& shipManager);
 	void updateProjectiles(const BoundedFloatRect& worldBounds);
-	void detectCollision(sf::Transformable& gameObject);
+	bool detectCollision(const sf::FloatRect& gameObject);
+	void detectCollision(ShipManager& shipManager);
 
 private:
 	std::list<Projectile> m_projectiles;

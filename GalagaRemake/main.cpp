@@ -14,21 +14,11 @@
 #include "BoundedFloatRect.h"
 #include "Controller.h"
 #include "ProjectileManager.h"
+#include "ShipManager.h"
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
-
-template <typename T,
-	class = typename std::enable_if <std::is_base_of <sf::Drawable, T>::value, bool>::type>
-void DrawList(std::list<T>& list, sf::RenderWindow& window) {
-	for (auto it = list.begin(); it != list.end(); it++) {
-		window.draw(*it);
-	}
-	return;
-}
-
-
 
 int main(int, char const**)
 {
@@ -55,9 +45,7 @@ int main(int, char const**)
 	playerShip.setTexture(shipAnimations);
 	playerShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	playerShip.setPosition(sf::Vector2f(300.f, 800.f));
-	//playerShip.rotate180();
-	//playerShip.rotate(180.f);
-	//playerShip.setColor(sf::Color::Magenta);
+
 
 	Ship enemyShip;
 	enemyShip.setIsWorldBound(false);
@@ -69,8 +57,8 @@ int main(int, char const**)
 	Projectile enemyProjectile = Projectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
 	enemyShip.setProjectile(enemyProjectile);
-	//enemyShip.setScale(sf::Vector2f(.5f,.5f));
 	enemyShip.rotate180();
+	
 	//intialize controller
 	KeyboardController playerController;
 	StateMachineController enemyController;
@@ -78,16 +66,17 @@ int main(int, char const**)
 
 	//counters
 	sf::Int32 timeOfLastGameLoop = 0;
-	sf::Int32 timeOfLastEnemyShip = 0;
-
+	sf::Int32 timeOfLastEnemyShip = 500;
+	bool isPaused = false;
+	bool isPausedPressed = false;
 
 
 	//containers for drawables
-	ProjectileManager projectileManager;
-	std::list<Ship> enemyShips;
+	ProjectileManager enemyProjectileManager;
+	ProjectileManager playerProjectileManager;
+	ShipManager enemyShipsManager;
 	
 	
-
 
 	while (window.isOpen())
 	{
@@ -96,6 +85,26 @@ int main(int, char const**)
 		}
 		timeOfLastGameLoop = clock.getElapsedTime().asMilliseconds();
 
+		//Poll for events
+		isPausedPressed = playerController.PollEventsAndUpdateShipState(window, playerShip);
+		enemyController.updateControllerStateAndShipState(clock, enemyShip);
+		
+		//Pause check
+		if (isPausedPressed)
+			isPaused = !isPaused;
+		if (isPaused)
+			continue;
+
+		
+		//enemyShipCreation
+		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= 3000) {
+			//either below is broken or my boundries are broken... prob the latter
+			float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
+			enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
+			enemyShipsManager.createShip(enemyShip);
+			timeOfLastEnemyShip = clock.getElapsedTime().asMilliseconds();
+		}
+		
 
 
 		//increment the world
@@ -105,46 +114,32 @@ int main(int, char const**)
 		window.setView(WORLD_VIEW);
 
 
-
-
-		//Poll for events
-		playerController.PollEventsAndUpdateShipState(window, playerShip);
-		enemyController.updateControllerStateAndShipState(clock, enemyShip);
-
-
 		//apply texture, based on events from player controller
 		playerShip.setTextureRectBasedOnShipState();
-		enemyShip.setTextureRectBasedOnShipState();
 
 		//Apply inputs and envirmental factors to movement
 		playerShip.updateShipVelocity(WORLD_BOUNDS);
 		playerShip.move();
-		enemyShip.updateShipVelocity(WORLD_BOUNDS);
-		enemyShip.move();
 
 		playerShip.rotateIfTriggered();
-	
-		
-		if (enemyShip.getGlobalBounds().top > WORLD_BOUNDS.bottom) {
-			auto tempPosition = enemyShip.getGlobalBounds();
-			enemyShip.setPosition(tempPosition.left + tempPosition.width//requried due to origin being bottom right with rotation at 180
-				, WORLD_BOUNDS.top - 100.f);
-		}
 
+		//projectile calls
+		playerProjectileManager.collectProjectile(playerShip);
+		enemyProjectileManager.collectProjectile(enemyShipsManager);
 
-		//reduced projectiles to two function calls, 
-		projectileManager.collectProjectile(playerShip);
-		projectileManager.collectProjectile(enemyShip);
+		playerProjectileManager.updateProjectiles(WORLD_BOUNDS);
+		enemyProjectileManager.updateProjectiles(WORLD_BOUNDS);
+		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
-		projectileManager.updateProjectiles(WORLD_BOUNDS);
+		playerProjectileManager.detectCollision(enemyShipsManager);
+		enemyProjectileManager.detectCollision(playerShip.getGlobalBounds());
 
-	
-		// Update the window, use template function for any list of drawable subclass
+		// Update the window, 
 		window.clear();
-		window.draw(projectileManager);
-		//DrawList(enemyShips, window);
+		window.draw(playerProjectileManager);
+		window.draw(enemyProjectileManager);
 		window.draw(playerShip);
-		window.draw(enemyShip);
+		window.draw(enemyShipsManager);
 		window.display();
 
 	}

@@ -1,6 +1,7 @@
 #pragma once
 #include "Ship.h"
 
+
 enum State {
 	State0,
 	State1,
@@ -29,7 +30,7 @@ class KeyboardController
 {
 public:
 	KeyboardController();
-	void PollEventsAndUpdateShipState(sf::Window& window, Ship& ship);
+	bool PollEventsAndUpdateShipState(sf::Window& window, Ship& ship);
 
 private:
 	std::map<sf::Keyboard::Key, ShipControl> m_keyboardToShipControlMap;

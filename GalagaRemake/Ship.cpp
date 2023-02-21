@@ -2,7 +2,7 @@
 
 Ship::Ship() : sf::Sprite()
 {
-	m_velocity = sf::Vector2f();
+	m_velocity = sf::Vector2f(0.0f, 0.0f);
 	m_collisionBox = sf::RectangleShape();
 	m_shipControlsStateMappings = std::map<ShipControl, bool>();
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
@@ -18,6 +18,20 @@ Ship::Ship() : sf::Sprite()
 	}
 	
 }
+
+//Ship::Ship(const Ship& ship) :
+//	m_velocity(ship.m_velocity),
+//	m_collisionBox(ship.m_collisionBox),
+//	m_shipControlsStateMappings(ship.m_shipControlsStateMappings),
+//	m_shipAnimationFrame(ship.m_shipAnimationFrame),
+//	m_weapon1Projectile(ship.m_weapon1Projectile),
+//	m_weapon2Projectile(ship.m_weapon2Projectile),
+//	m_horizontalDirectionIncrement(ship.m_horizontalDirectionIncrement),
+//	m_verticalDirectionIncrement(ship.m_verticalDirectionIncrement),
+//	m_isBackwards(ship.m_isBackwards),
+//	m_isWorldBound(ship.m_isWorldBound)
+//{
+//}
 
 
 //currently requires a 3x3 sprite sheet, would be better to have it adapatable to sprite sheet if possible
@@ -172,7 +186,7 @@ std::optional<Projectile> Ship::fireWeapon1IfFired()
 	if (!m_shipControlsStateMappings[FireWeapon1])
 		return {};
 	BoundedFloatRect currentShipPosition = getGlobalBounds();
-	float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom - m_weapon1Projectile.getGlobalBounds().height : currentShipPosition.top;
+	float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom : currentShipPosition.top;
 
 	m_shipControlsStateMappings[FireWeapon1] = false;
 	m_weapon1Projectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, verticalStartPoint);

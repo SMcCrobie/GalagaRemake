@@ -33,7 +33,9 @@ class Ship :
 	friend class ProjectileManager;
 
 public:
+	
     Ship();
+//	Ship(const Ship& ship);Caused more issues for some reason
 	void setTextureRectBasedOnShipState();
 	void setProjectile(const Projectile& projectile);
 	void setIsWorldBound(bool isWorldBound);

@@ -1,4 +1,5 @@
 #include "Controller.h"
+bool IS_PAUSED = false;
 
 KeyboardController::KeyboardController()
 {
@@ -12,7 +13,7 @@ KeyboardController::KeyboardController()
 	};
 }
 
-void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
+bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
 {
 	sf::Event event;
 
@@ -22,20 +23,19 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 		if (event.type == sf::Event::Closed) {
 			window.close();
 		}
+
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
+			return true;
+		}
+
 		//continue if key isn't mapped
 		if (m_keyboardToShipControlMap.find(event.key.code) == m_keyboardToShipControlMap.end())
 			continue;
 
 		// KEY PRESSED, Runs oen Key input at a time
 		if (event.type == sf::Event::KeyPressed) {
-			//if (m_keyboardToShipControlMap.at(event.key.code) <= FireWeapon2) {
-				//state should be set turned on, on key press
-				ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)] = true;
-			//}
-			//else {
-			//	//state should be inverted on key press
-			//	ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)] = !ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)];
-			//}
+			ship.m_shipControlsStateMappings[m_keyboardToShipControlMap.at(event.key.code)] = true;
+		
 		}
 		if (event.type == sf::Event::KeyReleased) {
 			if (m_keyboardToShipControlMap.at(event.key.code) > MoveRight)
@@ -47,7 +47,7 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 
 	}
 
-	return;
+	return false;
 }
 
 StateMachineController::StateMachineController() :
