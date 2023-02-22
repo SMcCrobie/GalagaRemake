@@ -16,6 +16,10 @@
 #include "ProjectileManager.h"
 #include "ShipManager.h"
 
+
+#define Score_Value_As_Int (clock.getElapsedTime().asMilliseconds()/400 + (killCounter * 100))
+
+
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
@@ -40,12 +44,25 @@ int main(int, char const**)
 		return EXIT_FAILURE;
 	}
 
-	//intialize ship
+	sf::Font font;
+	if (!font.loadFromFile("Deutsch.ttf"))
+	{
+		std::cout << "failed to load Deutsch.ttf" << std::endl;
+		return EXIT_FAILURE;
+	}
+	sf::Text score("Score:0" , font);
+	score.setPosition(sf::Vector2f(10, 0));
+	score.setScale(.65f, .65f);
+
+	sf::Text lifeCounter("Lives: ", font);
+	lifeCounter.setPosition(sf::Vector2f(10, 970));
+	lifeCounter.setScale(.65f, .65f);
+
+	//intialize ships
 	Ship playerShip;
 	playerShip.setTexture(shipAnimations);
 	playerShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	playerShip.setPosition(sf::Vector2f(300.f, 800.f));
-
 
 	Ship enemyShip;
 	enemyShip.setIsWorldBound(false);
@@ -56,17 +73,35 @@ int main(int, char const**)
 	
 	Projectile enemyProjectile = Projectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
+	enemyProjectile.setVelocity(sf::Vector2f(0, -8));
 	enemyShip.setProjectile(enemyProjectile);
+	//enemyShip.setScale(1.4f, .6f);
 	enemyShip.rotate180();
 	
 	//intialize controller
 	KeyboardController playerController;
 	StateMachineController enemyController;
+	
+	
+	
+	std::vector<Ship> lives;
+	Ship lifeSymbol = playerShip;
+	lifeSymbol.setPosition(70, 970);
+	lifeSymbol.setScale(.4f, .4f);
+	lifeSymbol.rotate(30.f);
+	lifeSymbol.setVelocity(0, WORLD_VIEW_MOVEMENT);
+	Ship lifeSymbol2 = lifeSymbol;
+	lifeSymbol2.setPosition(95, 970);
+	Ship lifeSymbol3 = lifeSymbol;
+	lifeSymbol3.setPosition(120, 970);
 
 
 	//counters
-	sf::Int32 timeOfLastGameLoop = 0;
-	sf::Int32 timeOfLastEnemyShip = 500;
+	int timeOfLastGameLoop = 0;
+	int timeOfLastEnemyShip = -1000;
+	int deltaTillNextEnemyShip = 6000;
+	int killCounter = 0;
+
 	bool isPaused = false;
 	bool isPausedPressed = false;
 
@@ -79,7 +114,7 @@ int main(int, char const**)
 	
 
 	while (window.isOpen())
-	{
+	{ 
 		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= 25) {
 			continue;
 		}
@@ -97,21 +132,30 @@ int main(int, char const**)
 
 		
 		//enemyShipCreation
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= 3000) {
-			//either below is broken or my boundries are broken... prob the latter
+		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= deltaTillNextEnemyShip) {
+			float shipWidth = enemyShip.getGlobalBounds().width;//somehow this is wrong
+
 			float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
 			enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
 			enemyShipsManager.createShip(enemyShip);
-			timeOfLastEnemyShip = clock.getElapsedTime().asMilliseconds();
-		}
+			
 		
+			//enemyship Upgrade
+			if (Score_Value_As_Int > 2000) {
+				float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
+				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
+				enemyShip.rotate180();
+				enemyShipsManager.createShip(enemyShip);
+				enemyShip.rotate180();
+			}
 
+			timeOfLastEnemyShip = clock.getElapsedTime().asMilliseconds();
+			deltaTillNextEnemyShip = deltaTillNextEnemyShip - 40;
+		}
+	
+	
+		score.setString("Score: " + std::to_string(Score_Value_As_Int));
 
-		//increment the world
-		WORLD_VIEW.move(0.f, WORLD_VIEW_MOVEMENT);
-		WORLD_BOUNDS.top += WORLD_VIEW_MOVEMENT;
-		WORLD_BOUNDS.bottom += WORLD_VIEW_MOVEMENT;
-		window.setView(WORLD_VIEW);
 
 
 		//apply texture, based on events from player controller
@@ -131,7 +175,7 @@ int main(int, char const**)
 		enemyProjectileManager.updateProjectiles(WORLD_BOUNDS);
 		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
-		playerProjectileManager.detectCollision(enemyShipsManager);
+		playerProjectileManager.detectCollision(enemyShipsManager, killCounter);
 		enemyProjectileManager.detectCollision(playerShip.getGlobalBounds());
 
 		// Update the window, 
@@ -140,6 +184,17 @@ int main(int, char const**)
 		window.draw(enemyProjectileManager);
 		window.draw(playerShip);
 		window.draw(enemyShipsManager);
+		
+		
+		
+		window.draw(score);
+		window.draw(lifeCounter);
+		window.draw(lifeSymbol);
+		window.draw(lifeSymbol2);
+		window.draw(lifeSymbol3);
+		
+		
+		
 		window.display();
 
 	}

@@ -4,14 +4,15 @@ bool IS_PAUSED = false;
 KeyboardController::KeyboardController()
 {
 	m_keyboardToShipControlMap = {
-		{ sf::Keyboard::Up, MoveUp},
-		{ sf::Keyboard::Down, MoveDown },
-		{ sf::Keyboard::Left, MoveLeft },
-		{ sf::Keyboard::Right, MoveRight },
-		{ sf::Keyboard::F, FireWeapon1 },
-		{ sf::Keyboard::G, Rotate }
+		{ sf::Keyboard::W, MoveUp},
+		{ sf::Keyboard::S, MoveDown },
+		{ sf::Keyboard::A, MoveLeft },
+		{ sf::Keyboard::D, MoveRight },
+		{ sf::Keyboard::Enter, FireWeapon1 },
+		{ sf::Keyboard::Space, Rotate }
 	};
 }
+
 
 bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
 {
@@ -26,6 +27,12 @@ bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
 			return true;
+		}
+
+		if (event.type == sf::Event::MouseButtonPressed) {
+			if (event.key.code == sf::Mouse::Left) {
+				ship.m_shipControlsStateMappings[FireWeapon1] = true;
+			}
 		}
 
 		//continue if key isn't mapped

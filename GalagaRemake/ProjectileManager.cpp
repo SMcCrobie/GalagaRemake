@@ -38,23 +38,26 @@ void ProjectileManager::updateProjectiles(const BoundedFloatRect& worldBounds)
 	}
 }
 
-bool ProjectileManager::detectCollision(const sf::FloatRect& gameObject)
+bool ProjectileManager::detectCollision(const sf::FloatRect& gameObject, bool destroyProjectileInCollision)
 {
 	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); it++) {
 		if (it->getGlobalBounds().intersects(gameObject)) {
 			std::cout << "Collision Detected" << std::endl;
+			if(destroyProjectileInCollision)
+				m_projectiles.erase(it);
 			return true;
 		}
 	}
 	return false;
 }
 
-void ProjectileManager::detectCollision(ShipManager& shipManager)
+void ProjectileManager::detectCollision(ShipManager& shipManager, int& killCounter)
 {
 	for (auto it = shipManager.m_ships.begin(); it != shipManager.m_ships.end(); it++) {
 		if (detectCollision(it->first.getGlobalBounds())) {
 			it = shipManager.m_ships.erase(it);
 			std::cout << "Destroy Ship!" << std::endl;
+			killCounter++;
 		}
 	}
 }

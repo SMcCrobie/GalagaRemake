@@ -13,8 +13,8 @@ public:
 	void collectProjectile(Ship& ship);
 	void collectProjectile(ShipManager& shipManager);
 	void updateProjectiles(const BoundedFloatRect& worldBounds);
-	bool detectCollision(const sf::FloatRect& gameObject);
-	void detectCollision(ShipManager& shipManager);
+	bool detectCollision(const sf::FloatRect& gameObject, bool destroyProjectileInCollision = true);
+	void detectCollision(ShipManager& shipManager, int& killCounter);
 
 private:
 	std::list<Projectile> m_projectiles;

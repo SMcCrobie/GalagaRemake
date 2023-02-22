@@ -82,6 +82,11 @@ void Ship::setIsWorldBound(bool isWorldBound)
 	m_isWorldBound = isWorldBound;
 }
 
+void Ship::setVelocity(float x, float y)
+{
+	m_velocity = sf::Vector2f(x, y);
+}
+
 void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 {
 
@@ -161,10 +166,10 @@ void Ship::rotateIfTriggered()
 	rotate180();
 }
 
-void Ship::rotate180()
+void Ship::rotate180()//need to call after setting projectile
 {
 	m_isBackwards = !m_isBackwards;
-	m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
+	//m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
 	m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
 	m_weapon1Projectile.setVelocity(sf::Vector2f(0, -m_weapon1Projectile.getVelocity().y));
 	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
@@ -174,6 +179,11 @@ void Ship::rotate180()
 	else
 		sf::Transformable::move(-localBounds.width, -localBounds.height);
 
+}
+
+bool Ship::isBackwards()
+{
+	return m_isBackwards;
 }
 
 const std::map<ShipControl, bool>& Ship::getShipControlStateMappings()

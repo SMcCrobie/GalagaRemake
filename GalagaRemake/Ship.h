@@ -39,10 +39,12 @@ public:
 	void setTextureRectBasedOnShipState();
 	void setProjectile(const Projectile& projectile);
 	void setIsWorldBound(bool isWorldBound);
+	void setVelocity(float x, float y);
 	void updateShipVelocity(BoundedFloatRect worldBounds);
 	void move();
 	void rotateIfTriggered();
 	void rotate180();
+	bool isBackwards();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
 
 

@@ -19,10 +19,9 @@ void ShipManager::updateShips(const BoundedFloatRect& worldBounds, const sf::Clo
 		it->first.updateShipVelocity(worldBounds);
 		it->first.move();
 
-		if (it->first.getGlobalBounds().top > worldBounds.bottom) {
+		if (it->first.getGlobalBounds().top > worldBounds.bottom && it->first.isBackwards()) {
 			auto tempPosition = it->first.getGlobalBounds();
-			it->first.setPosition(tempPosition.left + tempPosition.width//requried due to origin being bottom right with rotation at 180
-				, worldBounds.top - 100.f);
+			it->first.rotate180();
 		}
 
 	}
