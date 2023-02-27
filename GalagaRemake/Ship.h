@@ -44,15 +44,24 @@ public:
 	void move();
 	void rotateIfTriggered();
 	void rotate180();
+	void respawnShip();
 	bool isBackwards();
+	bool isRespawning();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
 
 
 private:
+	void updateShadingIfRespawning();
+	void applyBackwardsVelocity();//kinda not needed
+	void applyStandardVelocity();
+	void applyStandardTexture();
+	void applyBackwardsTexture();
+
 	virtual std::optional<Projectile> fireWeapon1IfFired();
 	virtual std::optional<Projectile> fireWeapon2IfFired();
 
 	bool m_isBackwards;
+	int m_gameCyclesTillRespawned;
 	bool m_isWorldBound;
 	float m_horizontalDirectionIncrement;
 	float m_verticalDirectionIncrement;

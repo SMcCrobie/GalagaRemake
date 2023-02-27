@@ -42,7 +42,7 @@ class StateMachineController
 public:
 	StateMachineController();
 	void updateControllerStateAndShipState(const sf::Clock& clocks, Ship& ship);
-
+	void invertMovementInputs();
 private:
 	State m_currentState;
 	State m_previousState;

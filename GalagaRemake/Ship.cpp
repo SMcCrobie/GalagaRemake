@@ -37,6 +37,145 @@ Ship::Ship() : sf::Sprite()
 //currently requires a 3x3 sprite sheet, would be better to have it adapatable to sprite sheet if possible
 void Ship::setTextureRectBasedOnShipState()
 {
+	if (m_gameCyclesTillRespawned == 100) {
+		setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, 0), m_shipAnimationFrame));
+		return;
+	}
+	if (m_isBackwards) {
+		applyBackwardsTexture();
+	}
+	else {
+		applyStandardTexture();
+	}
+
+}
+
+void Ship::setProjectile(const Projectile& projectile)
+{
+	m_weapon1Projectile = projectile;
+}
+
+void Ship::setIsWorldBound(bool isWorldBound)
+{
+	m_isWorldBound = isWorldBound;
+}
+
+void Ship::setVelocity(float x, float y)
+{
+	m_velocity = sf::Vector2f(x, y);
+}
+
+void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
+{
+	if (m_gameCyclesTillRespawned == 100) {
+		//m_velocity = sf::Vector2f(0.f, 0.f);
+		updateShadingIfRespawning();
+		m_gameCyclesTillRespawned--;
+		return;
+	}
+	if (m_gameCyclesTillRespawned > 0) {
+		updateShadingIfRespawning();
+		m_gameCyclesTillRespawned--;
+	}
+
+	BoundedFloatRect shipBounds = getGlobalBounds();
+	//apply resistence
+	if (m_velocity.y != 0)
+		m_velocity.y = m_velocity.y * RESISTENCE_MULTIPLIER;
+
+	if (m_velocity.x != 0)
+		m_velocity.x = m_velocity.x * RESISTENCE_MULTIPLIER;
+
+	//apply thrust to shipVelocity, after State update, opposing Thrusts cancel
+	if (m_isBackwards) {
+		applyBackwardsVelocity();
+	}
+	else {
+		applyStandardVelocity();
+	}
+
+
+	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
+	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
+		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
+
+
+
+		if (abs(shipBounds.right - worldBounds.right - WORLD_BOUNDS_MARGIN) < .01f
+			|| (abs(shipBounds.left - worldBounds.left + WORLD_BOUNDS_MARGIN) < .01f)) {
+			m_velocity.x = 0;
+			break;
+		}
+		m_velocity.x = m_velocity.x * .5f;
+
+
+
+	}
+
+	if (!m_isWorldBound)
+		return;
+
+	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
+		|| shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN) {
+
+		/*if (abs(shipBounds.top - worldBounds.top - WORLD_BOUNDS_MARGIN) < .01f
+			|| (abs(shipBounds.bottom - worldBounds.bottom + WORLD_BOUNDS_MARGIN) < .01f)) {
+			m_velocity.x = 0;
+			break;
+		}*/
+		if (shipBounds.bottom > worldBounds.bottom - WORLD_BOUNDS_MARGIN) {
+			m_velocity.y = 0;// (worldBounds.bottom - WORLD_BOUNDS_MARGIN) - shipBounds.bottom;
+			break;
+		}
+		if (shipBounds.top < worldBounds.top + WORLD_BOUNDS_MARGIN) {
+			m_velocity.y = 0;// shipBounds.top - (worldBounds.top + WORLD_BOUNDS_MARGIN);
+			break;
+		}
+		m_velocity.y = m_velocity.y * .5f;
+
+	}
+
+	return;
+}
+
+void Ship::updateShadingIfRespawning()
+{
+	if (m_gameCyclesTillRespawned % 10 > 5) {
+		setColor(sf::Color::Black);
+	}
+	else {
+		setColor(sf::Color::White);
+	}
+}
+
+void Ship::applyBackwardsVelocity()
+{
+	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
+		m_velocity.y += -m_verticalDirectionIncrement / 3.f;
+	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
+		m_velocity.y += m_verticalDirectionIncrement;
+
+	if (m_shipControlsStateMappings.at(MoveLeft) && m_velocity.x >= -MAX_HORIZONTAL_SPEED)
+		m_velocity.x += -m_horizontalDirectionIncrement;
+	if (m_shipControlsStateMappings.at(MoveRight) && m_velocity.x <= MAX_HORIZONTAL_SPEED)
+		m_velocity.x += m_horizontalDirectionIncrement;
+}
+
+void Ship::applyStandardVelocity()
+{
+	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
+		m_velocity.y += -m_verticalDirectionIncrement;
+	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
+		m_velocity.y += m_verticalDirectionIncrement / 3.f;
+
+	if (m_shipControlsStateMappings.at(MoveLeft) && m_velocity.x >= -MAX_HORIZONTAL_SPEED)
+		m_velocity.x += -m_horizontalDirectionIncrement;
+	if (m_shipControlsStateMappings.at(MoveRight) && m_velocity.x <= MAX_HORIZONTAL_SPEED)
+		m_velocity.x += m_horizontalDirectionIncrement;
+}
+
+void Ship::applyStandardTexture()
+{
 	if (m_shipControlsStateMappings.at(MoveLeft) && !m_shipControlsStateMappings.at(MoveRight)) {
 		if (m_shipControlsStateMappings.at(MoveUp) && !m_shipControlsStateMappings.at(MoveDown)) {
 			setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x * 2, m_shipAnimationFrame.y), m_shipAnimationFrame));
@@ -72,85 +211,41 @@ void Ship::setTextureRectBasedOnShipState()
 	}
 }
 
-void Ship::setProjectile(const Projectile& projectile)
+void Ship::applyBackwardsTexture()
 {
-	m_weapon1Projectile = projectile;
-}
-
-void Ship::setIsWorldBound(bool isWorldBound)
-{
-	m_isWorldBound = isWorldBound;
-}
-
-void Ship::setVelocity(float x, float y)
-{
-	m_velocity = sf::Vector2f(x, y);
-}
-
-void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
-{
-
-	BoundedFloatRect shipBounds = getGlobalBounds();
-	//apply resistence
-	if (m_velocity.y != 0)
-		m_velocity.y = m_velocity.y * RESISTENCE_MULTIPLIER;
-
-	if (m_velocity.x != 0)
-		m_velocity.x = m_velocity.x * RESISTENCE_MULTIPLIER;
-
-	//apply thrust to shipVelocity, after State update, opposing Thrusts cancel
-	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
-		m_velocity.y += -m_verticalDirectionIncrement;
-	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
-		m_velocity.y += m_verticalDirectionIncrement / 3.f;
-
-
-
-	if (m_shipControlsStateMappings.at(MoveLeft) && m_velocity.x >= -MAX_HORIZONTAL_SPEED)
-		m_velocity.x += -m_horizontalDirectionIncrement;
-	if (m_shipControlsStateMappings.at(MoveRight) && m_velocity.x <= MAX_HORIZONTAL_SPEED)
-		m_velocity.x += m_horizontalDirectionIncrement;
-
-
-
-
-	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
-	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
-		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
-
-
-
-		if (abs(shipBounds.right - worldBounds.right - WORLD_BOUNDS_MARGIN) < .01f
-			|| (abs(shipBounds.left - worldBounds.left + WORLD_BOUNDS_MARGIN) < .01f)) {
-			m_velocity.x = 0;
-			break;
+	if (!m_shipControlsStateMappings.at(MoveLeft) && m_shipControlsStateMappings.at(MoveRight)) {
+		if (!m_shipControlsStateMappings.at(MoveUp) && m_shipControlsStateMappings.at(MoveDown)) {
+			setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x * 2, m_shipAnimationFrame.y), m_shipAnimationFrame));
 		}
-		m_velocity.x = m_velocity.x * .5f;
-
-
-
+		else if (m_shipControlsStateMappings.at(MoveUp) && !m_shipControlsStateMappings.at(MoveDown)) {
+			setTextureRect(sf::IntRect(sf::Vector2i(0, m_shipAnimationFrame.y), m_shipAnimationFrame));
+		}
+		else {
+			setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, m_shipAnimationFrame.y), m_shipAnimationFrame));
+		}
 	}
-
-	if (!m_isWorldBound)
-		return;
-
-	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
-		|| shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN) {
-
-
-		if (shipBounds.bottom > worldBounds.bottom - WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = (worldBounds.bottom - WORLD_BOUNDS_MARGIN) - shipBounds.bottom;
-			break;
+	else if (m_shipControlsStateMappings.at(MoveLeft) && !m_shipControlsStateMappings.at(MoveRight)) {
+		if (!m_shipControlsStateMappings.at(MoveUp) && m_shipControlsStateMappings.at(MoveDown)) {
+			setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x * 2, m_shipAnimationFrame.y * 2), m_shipAnimationFrame));
 		}
-		if (shipBounds.top < worldBounds.top + WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = shipBounds.top - (worldBounds.top + WORLD_BOUNDS_MARGIN);
-			break;
+		else if (m_shipControlsStateMappings.at(MoveUp) && !m_shipControlsStateMappings.at(MoveDown)) {
+			setTextureRect(sf::IntRect(sf::Vector2i(0, m_shipAnimationFrame.y * 2), m_shipAnimationFrame));
 		}
-		m_velocity.y = m_velocity.y * .5f;
-
+		else {
+			setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, m_shipAnimationFrame.y * 2), m_shipAnimationFrame));
+		}
 	}
-
-	return;
+	else {
+		if (!m_shipControlsStateMappings.at(MoveUp) && m_shipControlsStateMappings.at(MoveDown)) {
+			setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x * 2, 0), m_shipAnimationFrame));
+		}
+		else if (m_shipControlsStateMappings.at(MoveUp) && !m_shipControlsStateMappings.at(MoveDown)) {
+			setTextureRect(sf::IntRect(sf::Vector2i(0, 0), m_shipAnimationFrame));
+		}
+		else {
+			setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, 0), m_shipAnimationFrame));
+		}
+	}
 }
 
 void Ship::move() 
@@ -170,7 +265,9 @@ void Ship::rotate180()//need to call after setting projectile
 {
 	m_isBackwards = !m_isBackwards;
 	//m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
-	m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+	//m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+	
+	
 	m_weapon1Projectile.setVelocity(sf::Vector2f(0, -m_weapon1Projectile.getVelocity().y));
 	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
 	sf::FloatRect localBounds = getLocalBounds(); 
@@ -181,9 +278,22 @@ void Ship::rotate180()//need to call after setting projectile
 
 }
 
+void Ship::respawnShip()
+{
+	m_gameCyclesTillRespawned = 100;
+	/*if (m_isBackwards)
+		rotate180();
+	setPosition(300.f, 600.f);*/
+}
+
 bool Ship::isBackwards()
 {
 	return m_isBackwards;
+}
+
+bool Ship::isRespawning()
+{
+	return m_gameCyclesTillRespawned > 0;
 }
 
 const std::map<ShipControl, bool>& Ship::getShipControlStateMappings()

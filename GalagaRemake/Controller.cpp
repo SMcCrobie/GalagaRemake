@@ -11,6 +11,15 @@ KeyboardController::KeyboardController()
 		{ sf::Keyboard::Enter, FireWeapon1 },
 		{ sf::Keyboard::Space, Rotate }
 	};
+
+	/*m_keyboardToShipControlMap = {
+		{ sf::Keyboard::Up, MoveUp},
+		{ sf::Keyboard::Down, MoveDown },
+		{ sf::Keyboard::Left, MoveLeft },
+		{ sf::Keyboard::Right, MoveRight },
+		{ sf::Keyboard::Space, FireWeapon1 },
+		{ sf::Keyboard::LShift, Rotate }
+	};*/
 }
 
 
@@ -64,7 +73,7 @@ StateMachineController::StateMachineController() :
 	m_deltaBeforeStateChange(200),
 	m_timeOfLastStateChange(0),
 	m_stateToShipControlInputsMap{
-		{State0, std::vector{ MoveUp, FireWeapon1}},
+		{State0, std::vector{ MoveDown, FireWeapon1}},
 		{State1, std::vector{ MoveLeft }},
 		{State2, std::vector{ MoveRight }},
 		{State3, std::vector{ FireWeapon1 }} },
@@ -120,4 +129,17 @@ void StateMachineController::updateControllerStateAndShipState(const sf::Clock& 
 		ship.m_shipControlsStateMappings[*it] = true;
 	}
 	return;
+}
+
+void StateMachineController::invertMovementInputs()
+{
+	//this is dumb as fuck, should insert layer for map direction
+	for (auto mapIt = m_stateToShipControlInputsMap.begin(); mapIt != m_stateToShipControlInputsMap.end(); mapIt++) {
+		for (auto vectorIt= mapIt->second.begin(); vectorIt != mapIt->second.end(); vectorIt++) {
+			if (*vectorIt == MoveDown)
+				*vectorIt = MoveUp;
+			else if(*vectorIt == MoveUp)
+				* vectorIt = MoveDown;
+		}
+	}
 }

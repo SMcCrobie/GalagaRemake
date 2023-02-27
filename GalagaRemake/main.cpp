@@ -54,15 +54,21 @@ int main(int, char const**)
 	score.setPosition(sf::Vector2f(10, 0));
 	score.setScale(.65f, .65f);
 
-	sf::Text lifeCounter("Lives: ", font);
+	sf::Text lifeCounter("Extra Lives: ", font);
 	lifeCounter.setPosition(sf::Vector2f(10, 970));
 	lifeCounter.setScale(.65f, .65f);
+
+	sf::Text gameOverText("Game Over", font);
+	gameOverText.setPosition(sf::Vector2f(10, 970));
+	gameOverText.setScale(3.f, 3.f);
+	gameOverText.setFillColor(sf::Color(0x05ecf1ff));
+	gameOverText.setPosition(100.f, 400.f);
 
 	//intialize ships
 	Ship playerShip;
 	playerShip.setTexture(shipAnimations);
 	playerShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
-	playerShip.setPosition(sf::Vector2f(300.f, 800.f));
+	playerShip.setPosition(sf::Vector2f(300.f, 600.f));
 
 	Ship enemyShip;
 	enemyShip.setIsWorldBound(false);
@@ -86,15 +92,16 @@ int main(int, char const**)
 	
 	std::vector<Ship> lives;
 	Ship lifeSymbol = playerShip;
-	lifeSymbol.setPosition(70, 970);
+	lifeSymbol.setPosition(120, 970);
 	lifeSymbol.setScale(.4f, .4f);
 	lifeSymbol.rotate(30.f);
 	lifeSymbol.setVelocity(0, WORLD_VIEW_MOVEMENT);
-	Ship lifeSymbol2 = lifeSymbol;
-	lifeSymbol2.setPosition(95, 970);
-	Ship lifeSymbol3 = lifeSymbol;
-	lifeSymbol3.setPosition(120, 970);
-
+	lives.push_back(lifeSymbol);
+	lifeSymbol.setPosition(145, 970);
+	lives.push_back(lifeSymbol);
+	lifeSymbol.setPosition(170, 970);
+	lives.push_back(lifeSymbol);
+	bool playerDied = false;
 
 	//counters
 	int timeOfLastGameLoop = 0;
@@ -104,6 +111,7 @@ int main(int, char const**)
 
 	bool isPaused = false;
 	bool isPausedPressed = false;
+	bool isGameOver = false;
 
 
 	//containers for drawables
@@ -112,13 +120,37 @@ int main(int, char const**)
 	ShipManager enemyShipsManager;
 	
 	
+	
 
 	while (window.isOpen())
 	{ 
+
+		// Update the window, 
+		window.clear();
+		window.draw(playerProjectileManager);
+		window.draw(enemyProjectileManager);
+		window.draw(playerShip);
+		window.draw(enemyShipsManager);
+
+
+
+		window.draw(score);
+		window.draw(lifeCounter);
+		for (auto it = lives.begin(); it < lives.end(); it++)
+		{
+			window.draw(*it);
+		}
+		if (isGameOver)
+			window.draw(gameOverText);
+
+		window.display();
+
+		//Run game loop every 25 milliseconds
 		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= 25) {
 			continue;
 		}
 		timeOfLastGameLoop = clock.getElapsedTime().asMilliseconds();
+
 
 		//Poll for events
 		isPausedPressed = playerController.PollEventsAndUpdateShipState(window, playerShip);
@@ -129,6 +161,11 @@ int main(int, char const**)
 			isPaused = !isPaused;
 		if (isPaused)
 			continue;
+
+		if (isGameOver) {
+			continue;
+		}
+		
 
 		
 		//enemyShipCreation
@@ -160,6 +197,7 @@ int main(int, char const**)
 
 		//apply texture, based on events from player controller
 		playerShip.setTextureRectBasedOnShipState();
+		//playerShip.updateShadingIfRespawning();
 
 		//Apply inputs and envirmental factors to movement
 		playerShip.updateShipVelocity(WORLD_BOUNDS);
@@ -176,26 +214,28 @@ int main(int, char const**)
 		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
 		playerProjectileManager.detectCollision(enemyShipsManager, killCounter);
-		enemyProjectileManager.detectCollision(playerShip.getGlobalBounds());
+		if (!playerShip.isRespawning() && enemyProjectileManager.detectCollision(playerShip.getGlobalBounds())) {
+			//lives.pop_back();
+			if (lives.empty()) {
+				isGameOver = true;
+				continue;
+			}
+			lives.back().respawnShip();
+			playerShip.respawnShip();
+			playerDied = true;
+		}
 
-		// Update the window, 
-		window.clear();
-		window.draw(playerProjectileManager);
-		window.draw(enemyProjectileManager);
-		window.draw(playerShip);
-		window.draw(enemyShipsManager);
+		if (lives.back().isRespawning()) {
+			lives.back().updateShipVelocity(WORLD_BOUNDS);
+		}
+
+		if (playerDied && !lives.back().isRespawning()) {
+			playerDied = false;
+			lives.pop_back();
+		}
+
+
 		
-		
-		
-		window.draw(score);
-		window.draw(lifeCounter);
-		window.draw(lifeSymbol);
-		window.draw(lifeSymbol2);
-		window.draw(lifeSymbol3);
-		
-		
-		
-		window.display();
 
 	}
 	return EXIT_SUCCESS;
