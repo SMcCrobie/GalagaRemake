@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="BoundedFloatRect.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="ShipManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="BoundedFloatRect.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="ShipManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Projectile.h" />

@@ -36,21 +36,21 @@ public:
 	
     Ship();
 //	Ship(const Ship& ship);Caused more issues for some reason
-	void setTextureRectBasedOnShipState();
+	virtual void setTextureRectBasedOnShipState();
 	void setProjectile(const Projectile& projectile);
 	void setIsWorldBound(bool isWorldBound);
 	void setVelocity(float x, float y);
-	void updateShipVelocity(BoundedFloatRect worldBounds);
+	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
 	void move();
-	void rotateIfTriggered();
-	void rotate180();
+	//void rotateIfTriggered();
+	virtual void rotate180();
 	void respawnShip();
 	bool isBackwards();
 	bool isRespawning();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
 
 
-private:
+protected:
 	void updateShadingIfRespawning();
 	void applyBackwardsVelocity();//kinda not needed
 	void applyStandardVelocity();

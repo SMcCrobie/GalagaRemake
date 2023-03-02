@@ -53,11 +53,15 @@ bool ProjectileManager::detectCollision(const sf::FloatRect& gameObject, bool de
 
 void ProjectileManager::detectCollision(ShipManager& shipManager, int& killCounter)
 {
-	for (auto it = shipManager.m_ships.begin(); it != shipManager.m_ships.end(); it++) {
+	auto it = shipManager.m_ships.begin();
+	while (it != shipManager.m_ships.end()) {
 		if (detectCollision(it->first.getGlobalBounds())) {
-			it = shipManager.m_ships.erase(it);
+			it = shipManager.m_ships.erase(it);//increments the iterator
 			std::cout << "Destroy Ship!" << std::endl;
 			killCounter++;
+		}
+		else {
+			it++;
 		}
 	}
 }

@@ -15,6 +15,7 @@
 #include "Controller.h"
 #include "ProjectileManager.h"
 #include "ShipManager.h"
+#include "PlayerShip.h"
 
 
 #define Score_Value_As_Int (clock.getElapsedTime().asMilliseconds()/400 + (killCounter * 100))
@@ -26,7 +27,7 @@ sf::View WORLD_VIEW(WORLD_BOUNDS);
 
 int main(int, char const**)
 {
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottom
 	sf::RenderWindow window(sf::VideoMode(600, 1000), "Galaga!");
@@ -65,7 +66,7 @@ int main(int, char const**)
 	gameOverText.setPosition(100.f, 400.f);
 
 	//intialize ships
-	Ship playerShip;
+	PlayerShip playerShip;
 	playerShip.setTexture(shipAnimations);
 	playerShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	playerShip.setPosition(sf::Vector2f(300.f, 600.f));
@@ -132,17 +133,14 @@ int main(int, char const**)
 		window.draw(playerShip);
 		window.draw(enemyShipsManager);
 
-
-
 		window.draw(score);
 		window.draw(lifeCounter);
 		for (auto it = lives.begin(); it < lives.end(); it++)
 		{
 			window.draw(*it);
 		}
-		if (isGameOver)
+		if(isGameOver)
 			window.draw(gameOverText);
-
 		window.display();
 
 		//Run game loop every 25 milliseconds
@@ -155,17 +153,16 @@ int main(int, char const**)
 		//Poll for events
 		isPausedPressed = playerController.PollEventsAndUpdateShipState(window, playerShip);
 		enemyController.updateControllerStateAndShipState(clock, enemyShip);
+
+		if (isGameOver) {
+			continue;
+		}
 		
 		//Pause check
 		if (isPausedPressed)
 			isPaused = !isPaused;
 		if (isPaused)
 			continue;
-
-		if (isGameOver) {
-			continue;
-		}
-		
 
 		
 		//enemyShipCreation
@@ -214,9 +211,9 @@ int main(int, char const**)
 		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
 		playerProjectileManager.detectCollision(enemyShipsManager, killCounter);
-		if (!playerShip.isRespawning() && enemyProjectileManager.detectCollision(playerShip.getGlobalBounds())) {
-			//lives.pop_back();
-			if (lives.empty()) {
+		bool isOutOfLives = lives.empty();
+		if (!playerShip.isRespawning() && enemyProjectileManager.detectCollision(playerShip.getGlobalBounds(), !isOutOfLives)) {
+			if (isOutOfLives) {
 				isGameOver = true;
 				continue;
 			}
@@ -225,16 +222,14 @@ int main(int, char const**)
 			playerDied = true;
 		}
 
-		if (lives.back().isRespawning()) {
+		if (!isOutOfLives && lives.back().isRespawning()) {
 			lives.back().updateShipVelocity(WORLD_BOUNDS);
 		}
 
-		if (playerDied && !lives.back().isRespawning()) {
+		if (playerDied && !isOutOfLives && !lives.back().isRespawning()) {
 			playerDied = false;
 			lives.pop_back();
 		}
-
-
 		
 
 	}

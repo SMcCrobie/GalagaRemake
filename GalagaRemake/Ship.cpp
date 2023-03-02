@@ -41,12 +41,7 @@ void Ship::setTextureRectBasedOnShipState()
 		setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, 0), m_shipAnimationFrame));
 		return;
 	}
-	if (m_isBackwards) {
-		applyBackwardsTexture();
-	}
-	else {
-		applyStandardTexture();
-	}
+	applyStandardTexture();
 
 }
 
@@ -67,6 +62,7 @@ void Ship::setVelocity(float x, float y)
 
 void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 {
+
 	if (m_gameCyclesTillRespawned == 100) {
 		//m_velocity = sf::Vector2f(0.f, 0.f);
 		updateShadingIfRespawning();
@@ -87,12 +83,7 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 		m_velocity.x = m_velocity.x * RESISTENCE_MULTIPLIER;
 
 	//apply thrust to shipVelocity, after State update, opposing Thrusts cancel
-	if (m_isBackwards) {
-		applyBackwardsVelocity();
-	}
-	else {
-		applyStandardVelocity();
-	}
+	applyStandardVelocity();
 
 
 	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
@@ -253,19 +244,19 @@ void Ship::move()
 	sf::Sprite::move(m_velocity);
 }
 
-void Ship::rotateIfTriggered()
-{
-	if (!m_shipControlsStateMappings.at(Rotate))
-		return;
-	m_shipControlsStateMappings[Rotate] = false;
-	rotate180();
-}
+//void Ship::rotateIfTriggered()
+//{
+//	if (!m_shipControlsStateMappings.at(Rotate))
+//		return;
+//	m_shipControlsStateMappings[Rotate] = false;
+//	rotate180();
+//}
 
 void Ship::rotate180()//need to call after setting projectile
 {
 	m_isBackwards = !m_isBackwards;
-	//m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
-	//m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+	m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
+	m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
 	
 	
 	m_weapon1Projectile.setVelocity(sf::Vector2f(0, -m_weapon1Projectile.getVelocity().y));
