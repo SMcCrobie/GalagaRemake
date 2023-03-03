@@ -60,11 +60,9 @@ void Ship::setVelocity(float x, float y)
 	m_velocity = sf::Vector2f(x, y);
 }
 
-void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
+void Ship::updateRespawnTimer()
 {
-
 	if (m_gameCyclesTillRespawned == 100) {
-		//m_velocity = sf::Vector2f(0.f, 0.f);
 		updateShadingIfRespawning();
 		m_gameCyclesTillRespawned--;
 		return;
@@ -73,6 +71,22 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 		updateShadingIfRespawning();
 		m_gameCyclesTillRespawned--;
 	}
+}
+
+void Ship::updateShip(BoundedFloatRect worldBounds)
+{
+	updateRespawnTimer();
+	if(!m_isStatic)
+		updateShipVelocity(worldBounds);
+}
+
+void Ship::setStatic()
+{
+	m_isStatic = true;
+}
+
+void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
+{
 
 	BoundedFloatRect shipBounds = getGlobalBounds();
 	//apply resistence
@@ -239,7 +253,7 @@ void Ship::applyBackwardsTexture()
 	}
 }
 
-void Ship::move() 
+void Ship::moveShip() 
 {
 	sf::Sprite::move(m_velocity);
 }

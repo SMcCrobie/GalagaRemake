@@ -68,8 +68,8 @@ void ProjectileManager::detectCollision(ShipManager& shipManager, int& killCount
 
 void ProjectileManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); it++) {
-		target.draw(*it);
+	for (auto& projectile : m_projectiles) {
+		target.draw(projectile);
 	}
 }
 

@@ -21,8 +21,8 @@ void ShipManager::updateShips(const BoundedFloatRect& worldBounds, const sf::Clo
 	for (auto it = m_ships.begin(); it != m_ships.end(); it++) {
 		it->second.updateControllerStateAndShipState(clock, it->first);
 		it->first.setTextureRectBasedOnShipState();
-		it->first.updateShipVelocity(worldBounds);
-		it->first.move();
+		it->first.updateShip(worldBounds);
+		it->first.moveShip();
 
 		if (it->first.getGlobalBounds().top > worldBounds.bottom && it->first.isBackwards()) {
 			auto tempPosition = it->first.getGlobalBounds();

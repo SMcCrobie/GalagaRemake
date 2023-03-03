@@ -152,6 +152,7 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoundedFloatRect.h" />
@@ -162,18 +163,17 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="UIManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\Release\ShipAnimations.png" />
     <Image Include="..\x64\Release\ShipAnimations.png">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </Image>
-    <Image Include="x64\Release\ShipAnimations.png">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </Image>
   </ItemGroup>
   <ItemGroup>
+    <Font Include="ClimateCrisis-Regular.ttf" />
     <Font Include="Deutsch.ttf" />
     <Font Include="Galaxus.ttf" />
   </ItemGroup>

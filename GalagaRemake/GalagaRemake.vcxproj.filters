@@ -45,6 +45,9 @@
     <ClCompile Include="PlayerShip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UIManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Projectile.h">
@@ -71,12 +74,15 @@
     <ClInclude Include="PlayerShip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UIManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\x64\Release\ShipAnimations.png">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="x64\Release\ShipAnimations.png">
+    <Image Include="..\..\..\..\Downloads\Release\ShipAnimations.png">
       <Filter>Source Files\Images</Filter>
     </Image>
   </ItemGroup>
@@ -85,6 +91,9 @@
       <Filter>Source Files\Images</Filter>
     </Font>
     <Font Include="Deutsch.ttf">
+      <Filter>Source Files\Images</Filter>
+    </Font>
+    <Font Include="ClimateCrisis-Regular.ttf">
       <Filter>Source Files\Images</Filter>
     </Font>
   </ItemGroup>

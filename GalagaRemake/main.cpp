@@ -16,6 +16,7 @@
 #include "ProjectileManager.h"
 #include "ShipManager.h"
 #include "PlayerShip.h"
+#include "UIManager.h"
 
 
 #define Score_Value_As_Int (clock.getElapsedTime().asMilliseconds()/400 + (killCounter * 100))
@@ -44,32 +45,15 @@ int main(int, char const**)
 		std::cout << "failed to load ShipAnimations.png" << std::endl;
 		return EXIT_FAILURE;
 	}
-
 	sf::Font font;
-	if (!font.loadFromFile("Deutsch.ttf"))
+	if (!font.loadFromFile("ClimateCrisis-Regular.ttf"))
 	{
-		std::cout << "failed to load Deutsch.ttf" << std::endl;
+		std::cout << "failed to load ClimateCrisis-Regular.ttf" << std::endl;
 		return EXIT_FAILURE;
 	}
-	sf::Text score("Score:0" , font);
-	score.setPosition(sf::Vector2f(10, 0));
-	score.setScale(.65f, .65f);
-
-	sf::Text lifeCounter("Extra Lives: ", font);
-	lifeCounter.setPosition(sf::Vector2f(10, 970));
-	lifeCounter.setScale(.65f, .65f);
-
-	sf::Text gameOverText("Game Over", font);
-	gameOverText.setPosition(sf::Vector2f(10, 970));
-	gameOverText.setScale(3.f, 3.f);
-	gameOverText.setFillColor(sf::Color(0x05ecf1ff));
-	gameOverText.setPosition(100.f, 400.f);
 
 	//intialize ships
-	PlayerShip playerShip;
-	playerShip.setTexture(shipAnimations);
-	playerShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
-	playerShip.setPosition(sf::Vector2f(300.f, 600.f));
+	PlayerShip playerShip(shipAnimations, WORLD_BOUNDS);
 
 	Ship enemyShip;
 	enemyShip.setIsWorldBound(false);
@@ -77,32 +61,23 @@ int main(int, char const**)
 	enemyShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	enemyShip.setPosition(sf::Vector2f(300.f, -50.f));
 	enemyShip.setColor(sf::Color::Magenta);
-	
+
 	Projectile enemyProjectile = Projectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
 	enemyProjectile.setVelocity(sf::Vector2f(0, -8));
 	enemyShip.setProjectile(enemyProjectile);
 	//enemyShip.setScale(1.4f, .6f);
 	enemyShip.rotate180();
+
+	//Managers Class intialization
+	ProjectileManager enemyProjectileManager;
+	ProjectileManager playerProjectileManager;
+	ShipManager enemyShipsManager;
+	UIManager uiManager(playerShip, font, WORLD_BOUNDS);
 	
 	//intialize controller
 	KeyboardController playerController;
 	StateMachineController enemyController;
-	
-	
-	
-	std::vector<Ship> lives;
-	Ship lifeSymbol = playerShip;
-	lifeSymbol.setPosition(120, 970);
-	lifeSymbol.setScale(.4f, .4f);
-	lifeSymbol.rotate(30.f);
-	lifeSymbol.setVelocity(0, WORLD_VIEW_MOVEMENT);
-	lives.push_back(lifeSymbol);
-	lifeSymbol.setPosition(145, 970);
-	lives.push_back(lifeSymbol);
-	lifeSymbol.setPosition(170, 970);
-	lives.push_back(lifeSymbol);
-	bool playerDied = false;
 
 	//counters
 	int timeOfLastGameLoop = 0;
@@ -112,16 +87,7 @@ int main(int, char const**)
 
 	bool isPaused = false;
 	bool isPausedPressed = false;
-	bool isGameOver = false;
-
-
-	//containers for drawables
-	ProjectileManager enemyProjectileManager;
-	ProjectileManager playerProjectileManager;
-	ShipManager enemyShipsManager;
-	
-	
-	
+	bool isGameOver = false;	
 
 	while (window.isOpen())
 	{ 
@@ -132,15 +98,7 @@ int main(int, char const**)
 		window.draw(enemyProjectileManager);
 		window.draw(playerShip);
 		window.draw(enemyShipsManager);
-
-		window.draw(score);
-		window.draw(lifeCounter);
-		for (auto it = lives.begin(); it < lives.end(); it++)
-		{
-			window.draw(*it);
-		}
-		if(isGameOver)
-			window.draw(gameOverText);
+		window.draw(uiManager);
 		window.display();
 
 		//Run game loop every 25 milliseconds
@@ -187,20 +145,18 @@ int main(int, char const**)
 			deltaTillNextEnemyShip = deltaTillNextEnemyShip - 40;
 		}
 	
-	
-		score.setString("Score: " + std::to_string(Score_Value_As_Int));
-
-
-
 		//apply texture, based on events from player controller
 		playerShip.setTextureRectBasedOnShipState();
 		//playerShip.updateShadingIfRespawning();
 
 		//Apply inputs and envirmental factors to movement
-		playerShip.updateShipVelocity(WORLD_BOUNDS);
-		playerShip.move();
+		playerShip.updateShip(WORLD_BOUNDS);
+		playerShip.moveShip();
 
 		playerShip.rotateIfTriggered();
+
+		//UI Update
+		uiManager.updateUI(Score_Value_As_Int);
 
 		//projectile calls
 		playerProjectileManager.collectProjectile(playerShip);
@@ -211,26 +167,16 @@ int main(int, char const**)
 		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
 		playerProjectileManager.detectCollision(enemyShipsManager, killCounter);
-		bool isOutOfLives = lives.empty();
+		bool isOutOfLives = uiManager.isOutOfLives();
 		if (!playerShip.isRespawning() && enemyProjectileManager.detectCollision(playerShip.getGlobalBounds(), !isOutOfLives)) {
 			if (isOutOfLives) {
 				isGameOver = true;
+				uiManager.gameOver();
 				continue;
 			}
-			lives.back().respawnShip();
+			uiManager.playerLostLife();
 			playerShip.respawnShip();
-			playerDied = true;
-		}
-
-		if (!isOutOfLives && lives.back().isRespawning()) {
-			lives.back().updateShipVelocity(WORLD_BOUNDS);
-		}
-
-		if (playerDied && !isOutOfLives && !lives.back().isRespawning()) {
-			playerDied = false;
-			lives.pop_back();
-		}
-		
+		}		
 
 	}
 	return EXIT_SUCCESS;

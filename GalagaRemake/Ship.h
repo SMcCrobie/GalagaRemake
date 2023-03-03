@@ -40,8 +40,10 @@ public:
 	void setProjectile(const Projectile& projectile);
 	void setIsWorldBound(bool isWorldBound);
 	void setVelocity(float x, float y);
-	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
-	void move();
+	void updateShip(BoundedFloatRect worldBounds);
+	void updateRespawnTimer();
+	void setStatic();
+	void moveShip();
 	//void rotateIfTriggered();
 	virtual void rotate180();
 	void respawnShip();
@@ -56,11 +58,13 @@ protected:
 	void applyStandardVelocity();
 	void applyStandardTexture();
 	void applyBackwardsTexture();
+	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
 
 	virtual std::optional<Projectile> fireWeapon1IfFired();
 	virtual std::optional<Projectile> fireWeapon2IfFired();
 
 	bool m_isBackwards;
+	bool m_isStatic = false;
 	int m_gameCyclesTillRespawned;
 	bool m_isWorldBound;
 	float m_horizontalDirectionIncrement;

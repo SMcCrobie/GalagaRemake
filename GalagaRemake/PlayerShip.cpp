@@ -1,8 +1,16 @@
 #include "PlayerShip.h"
 
-PlayerShip::PlayerShip()
+PlayerShip::PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensions)
 	: Ship()
 {
+	setTexture(texture);
+	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
+	
+	sf::FloatRect shipSize = getGlobalBounds();
+	float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
+	float yPos = 700.f;
+	
+	setPosition(xPos, yPos);
 }
 
 void PlayerShip::setTextureRectBasedOnShipState()
@@ -21,17 +29,6 @@ void PlayerShip::setTextureRectBasedOnShipState()
 
 void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
 {
-	if (m_gameCyclesTillRespawned == 100) {
-		//m_velocity = sf::Vector2f(0.f, 0.f);
-		updateShadingIfRespawning();
-		m_gameCyclesTillRespawned--;
-		return;
-	}
-	if (m_gameCyclesTillRespawned > 0) {
-		updateShadingIfRespawning();
-		m_gameCyclesTillRespawned--;
-	}
-
 	BoundedFloatRect shipBounds = getGlobalBounds();
 	//apply resistence
 	if (m_velocity.y != 0)
