@@ -8,7 +8,7 @@ PlayerShip::PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensi
 	
 	sf::FloatRect shipSize = getGlobalBounds();
 	float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
-	float yPos = 700.f;
+	float yPos = worldDimensions.height/3 * 2;
 	
 	setPosition(xPos, yPos);
 }

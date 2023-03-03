@@ -81,7 +81,7 @@ void UIManager::initializeScore()
 
 	m_scoreText.setPosition(xPos, yPos);
 	m_scoreText.setScale(m_baseScale);
-	m_scoreText.setFillColor(sf::Color(0x05ecf1ff));
+	//m_scoreText.setFillColor(sf::Color(0x05ecf1ff));
 }
 
 void UIManager::initializeGameOverText()

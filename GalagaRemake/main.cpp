@@ -31,7 +31,7 @@ int main(int, char const**)
 	srand((unsigned int)time(NULL));
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottom
-	sf::RenderWindow window(sf::VideoMode(600, 1000), "Galaga!");
+	sf::RenderWindow window(sf::VideoMode((int)WORLD_BOUNDS.width, (int)WORLD_BOUNDS.height), "Galaga!");
 	window.setKeyRepeatEnabled(false);
 	window.setView(WORLD_VIEW);
 
