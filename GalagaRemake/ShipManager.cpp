@@ -8,12 +8,7 @@ ShipManager::ShipManager() :
 
 void ShipManager::createShip(Ship& ship)
 {
-	if(ship.isBackwards())
-		m_ships.push_back({ ship, StateMachineController() });
-	else {
-		auto temp = StateMachineController();
-		m_ships.push_back({ ship, temp});
-	}
+	m_ships.push_back({ ship, StateMachineController() });
 }
 
 void ShipManager::updateShips(const BoundedFloatRect& worldBounds, const sf::Clock& clock)

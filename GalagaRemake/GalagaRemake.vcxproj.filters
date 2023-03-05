@@ -48,6 +48,9 @@
     <ClCompile Include="UIManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BackgroundManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Projectile.h">
@@ -77,12 +80,18 @@
     <ClInclude Include="UIManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BackgroundManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\x64\Release\ShipAnimations.png">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="..\..\..\..\Downloads\Release\ShipAnimations.png">
+    <Image Include="Planets.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
+    <Image Include="ShipAnimations.png">
       <Filter>Source Files\Images</Filter>
     </Image>
   </ItemGroup>

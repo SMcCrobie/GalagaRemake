@@ -17,10 +17,54 @@
 #include "ShipManager.h"
 #include "PlayerShip.h"
 #include "UIManager.h"
+#include "BackgroundManager.h"
 
 
 #define Score_Value_As_Int (clock.getElapsedTime().asMilliseconds()/400 + (killCounter * 100))
+//#define Seans_Debug
 
+#ifdef Seans_Debug
+int allocation_counter = 0;
+
+void* operator new(size_t size)
+{
+	//std::cout << "allocating  " << size << " bytes of memory" << std::endl;
+	allocation_counter++;
+	std::cout << "allocating, current counter: " << allocation_counter << std::endl;
+	/*if (size > 1000)
+		std::cout << "why???" << std::endl;*/
+	void* p = malloc(size);
+	return p;
+}
+
+void operator delete(void* p)
+{
+	//std::cout << "Deleting Memory" << std::endl;
+	allocation_counter--;
+	std::cout << "Deleting, current counter: " << allocation_counter << std::endl;
+	free(p);
+}
+
+void* operator new[](size_t size)
+{
+	//std::cout << "allocating  " << size << " bytes of memory" << std::endl;
+	/*if (size > 1000)
+		std::cout << "why???" << std::endl;*/
+	allocation_counter++;
+	std::cout << "allocating, current counter: " << allocation_counter << std::endl;
+	void* p = malloc(size);
+	return p;
+}
+
+void operator delete[](void* p)
+{
+	allocation_counter--;
+	std::cout << "Deleting, current counter: " << allocation_counter << std::endl;
+	//std::cout << "Deleting Memory" << std::endl;
+	free(p);
+}
+
+#endif // Seans_Debug
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
@@ -45,12 +89,31 @@ int main(int, char const**)
 		std::cout << "failed to load ShipAnimations.png" << std::endl;
 		return EXIT_FAILURE;
 	}
+	//textures
+	sf::Texture planetsSheet;
+	if (!planetsSheet.loadFromFile("Planets.png"))
+	{
+		std::cout << "failed to load PLanets.png" << std::endl;
+		return EXIT_FAILURE;
+	}
 	sf::Font font;
 	if (!font.loadFromFile("ClimateCrisis-Regular.ttf"))
 	{
 		std::cout << "failed to load ClimateCrisis-Regular.ttf" << std::endl;
 		return EXIT_FAILURE;
 	}
+
+
+	planetsSheet.setSmooth(true);
+	sf::Sprite planet(planetsSheet);
+	//planet.setTextureRect(sf::IntRect(sf::Vector2i(100, 0), sf::Vector2i(100, 100)));
+	planet.setPosition(100, -500);
+	planet.setScale(7.f, 7.f);
+	planet.setColor(sf::Color(166, 166, 166));
+	
+
+
+
 
 	//intialize ships
 	PlayerShip playerShip(shipAnimations, WORLD_BOUNDS);
@@ -64,7 +127,9 @@ int main(int, char const**)
 
 	Projectile enemyProjectile = Projectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
-	enemyProjectile.setVelocity(sf::Vector2f(0, -8));
+	/*enemyProjectile.setOutlineColor(sf::Color(255, 255, 255, 30));
+	enemyProjectile.setOutlineThickness(2.f);*/
+	//enemyProjectile.setVelocity(sf::Vector2f(0, -8));
 	enemyShip.setProjectile(enemyProjectile);
 	//enemyShip.setScale(1.4f, .6f);
 	enemyShip.rotate180();
@@ -74,6 +139,8 @@ int main(int, char const**)
 	ProjectileManager playerProjectileManager;
 	ShipManager enemyShipsManager;
 	UIManager uiManager(playerShip, font, WORLD_BOUNDS);
+	BackgroundManager backgroundManager(WORLD_BOUNDS);
+	backgroundManager.addForegroundPlanet(planet);
 	
 	//intialize controller
 	KeyboardController playerController;
@@ -94,6 +161,7 @@ int main(int, char const**)
 
 		// Update the window, 
 		window.clear();
+		window.draw(backgroundManager);
 		window.draw(playerProjectileManager);
 		window.draw(enemyProjectileManager);
 		window.draw(playerShip);
@@ -157,6 +225,9 @@ int main(int, char const**)
 
 		//UI Update
 		uiManager.updateUI(Score_Value_As_Int);
+
+		//updateBackground
+		backgroundManager.moveBackground(.45f);
 
 		//projectile calls
 		playerProjectileManager.collectProjectile(playerShip);

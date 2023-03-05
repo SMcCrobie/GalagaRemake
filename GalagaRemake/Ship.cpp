@@ -7,7 +7,9 @@ Ship::Ship() : sf::Sprite()
 	m_shipControlsStateMappings = std::map<ShipControl, bool>();
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
 	m_weapon1Projectile = Projectile(sf::Vector2f(3, 12));
-	m_weapon1Projectile.setFillColor(sf::Color(0x05ecf1ff));
+	m_weapon1Projectile.setFillColor(sf::Color(5, 236, 241));
+	/*m_weapon1Projectile.setOutlineColor(sf::Color(255, 255, 255, 30));
+	m_weapon1Projectile.setOutlineThickness(3.f);*/
 	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
 	m_verticalDirectionIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
 	m_isBackwards = false;
