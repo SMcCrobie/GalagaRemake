@@ -94,6 +94,9 @@
     <Image Include="ShipAnimations.png">
       <Filter>Source Files\Images</Filter>
     </Image>
+    <Image Include="EnemyShip1.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Galaxus.ttf">

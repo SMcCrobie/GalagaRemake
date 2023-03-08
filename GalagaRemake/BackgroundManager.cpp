@@ -7,7 +7,7 @@ BackgroundManager::BackgroundManager(BoundedFloatRect windowDimensions)
 	for (int i = 0; i < 50; i++) {
 		m_stars.push_back(sf::CircleShape(2.5f));
 		sf::CircleShape& star = m_stars.back();
-		star.setFillColor(i == 0 ? sf::Color(102, 217, 255, 150) : sf::Color(155, 255, 255, 150));
+		star.setFillColor(i == 0 ? sf::Color(102, 217, 255, 200) : sf::Color(255, 255, 255, 200));
 		star.setOutlineColor(i == 0 ? sf::Color(153, 230, 255, 80) : sf::Color(255, 255, 230, 80));
 		star.setOutlineThickness(2.5f);
 
@@ -28,13 +28,10 @@ void BackgroundManager::moveBackground(float increment)
 			star.setPosition(xCoordinate, m_windowDimensions.top - m_windowBuffer);
 		}
 	}
-	if (m_planetMovementCounter % 8 == 0) {
-		m_foregroundPlanet.move(0, increment);
-		m_foregroundPlanet.setScale(m_foregroundPlanet.getScale() * 1.0001f);
-		m_foregroundPlanet.setColor(sf::Color(m_planetColorOffest, m_planetColorOffest, m_planetColorOffest));
-		if (m_planetMovementCounter % 128 == 0 && m_planetColorOffest < 255) {
-			m_planetColorOffest++;
-		}
+	if (true){//m_planetMovementCounter %  8== 0) {
+		m_foregroundPlanet.move(-increment/8, increment/8);
+		m_foregroundPlanet.setScale(m_foregroundPlanet.getScale() * 1.0002f);
+		//foregroundPlanet.setColor(sf::Color(m_planetColorOffest, m_planetColorOffest, m_planetColorOffest));
 	}
 	m_planetMovementCounter++;
 }
@@ -47,6 +44,7 @@ void BackgroundManager::addForegroundPlanet(sf::Sprite planet)
 void BackgroundManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for (auto& star : m_stars) {
+		//if(!star.getGlobalBounds().intersects(m_foregroundPlanet.getGlobalBounds()))
 		target.draw(star);
 	}
 	target.draw(m_foregroundPlanet);

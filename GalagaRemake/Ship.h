@@ -58,6 +58,7 @@ protected:
 	void applyStandardVelocity();
 	void applyStandardTexture();
 	void applyBackwardsTexture();
+	//sf::IntRect MoveRight();
 	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
 
 	virtual std::optional<Projectile> fireWeapon1IfFired();

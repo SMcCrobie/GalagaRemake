@@ -18,9 +18,10 @@
 #include "PlayerShip.h"
 #include "UIManager.h"
 #include "BackgroundManager.h"
+#include <Windows.h>
 
 
-#define Score_Value_As_Int (clock.getElapsedTime().asMilliseconds()/400 + (killCounter * 100))
+#define Score_Value_As_Int ((gameCycleCounter/20) + (killCounter * 100))
 //#define Seans_Debug
 
 #ifdef Seans_Debug
@@ -66,12 +67,31 @@ void operator delete[](void* p)
 
 #endif // Seans_Debug
 
+void ShowConsole()
+{
+	::ShowWindow(::GetConsoleWindow(), SW_SHOW);
+}
+void HideConsole()
+{
+	::ShowWindow(::GetConsoleWindow(), SW_HIDE);
+}
+
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
 
+
 int main(int, char const**)
 {
+	//HideConsole();
+	//ShowConsole();
+#ifdef NDEBUG
+	HideConsole();
+#endif
+#ifdef _DEBUG
+	ShowConsole();
+#endif
+
 	srand((unsigned int)time(NULL));
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottom
@@ -91,9 +111,9 @@ int main(int, char const**)
 	}
 	//textures
 	sf::Texture planetsSheet;
-	if (!planetsSheet.loadFromFile("Planets.png"))
+	if (!planetsSheet.loadFromFile("Planets(1).png"))
 	{
-		std::cout << "failed to load PLanets.png" << std::endl;
+		std::cout << "failed to load PLanets(1).png" << std::endl;
 		return EXIT_FAILURE;
 	}
 	sf::Font font;
@@ -107,9 +127,9 @@ int main(int, char const**)
 	planetsSheet.setSmooth(true);
 	sf::Sprite planet(planetsSheet);
 	//planet.setTextureRect(sf::IntRect(sf::Vector2i(100, 0), sf::Vector2i(100, 100)));
-	planet.setPosition(100, -500);
-	planet.setScale(7.f, 7.f);
-	planet.setColor(sf::Color(166, 166, 166));
+	planet.setPosition(300, -500);
+	//planet.setScale(2.5f, 2.5f);
+	planet.setColor(sf::Color(120, 120, 120));
 	
 
 
@@ -129,7 +149,7 @@ int main(int, char const**)
 	enemyProjectile.setFillColor(sf::Color::Magenta);
 	/*enemyProjectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	enemyProjectile.setOutlineThickness(2.f);*/
-	//enemyProjectile.setVelocity(sf::Vector2f(0, -8));
+	enemyProjectile.setVelocity(sf::Vector2f(0, -8));
 	enemyShip.setProjectile(enemyProjectile);
 	//enemyShip.setScale(1.4f, .6f);
 	enemyShip.rotate180();
@@ -151,6 +171,7 @@ int main(int, char const**)
 	int timeOfLastEnemyShip = -1000;
 	int deltaTillNextEnemyShip = 6000;
 	int killCounter = 0;
+	int gameCycleCounter = 0;
 
 	bool isPaused = false;
 	bool isPausedPressed = false;
@@ -170,12 +191,11 @@ int main(int, char const**)
 		window.display();
 
 		//Run game loop every 25 milliseconds
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= 25) {
+		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= 20) {
 			continue;
 		}
 		timeOfLastGameLoop = clock.getElapsedTime().asMilliseconds();
-
-
+		
 		//Poll for events
 		isPausedPressed = playerController.PollEventsAndUpdateShipState(window, playerShip);
 		enemyController.updateControllerStateAndShipState(clock, enemyShip);
@@ -192,7 +212,7 @@ int main(int, char const**)
 
 		
 		//enemyShipCreation
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= deltaTillNextEnemyShip) {
+		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= deltaTillNextEnemyShip && killCounter < 30) {
 			float shipWidth = enemyShip.getGlobalBounds().width;//somehow this is wrong
 
 			float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
@@ -201,7 +221,7 @@ int main(int, char const**)
 			
 		
 			//enemyship Upgrade
-			if (Score_Value_As_Int > 2000) {
+			if (killCounter > 8) {
 				float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
 				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
 				enemyShip.rotate180();
@@ -227,7 +247,7 @@ int main(int, char const**)
 		uiManager.updateUI(Score_Value_As_Int);
 
 		//updateBackground
-		backgroundManager.moveBackground(.45f);
+		backgroundManager.moveBackground(.25f);
 
 		//projectile calls
 		playerProjectileManager.collectProjectile(playerShip);
@@ -248,8 +268,10 @@ int main(int, char const**)
 			uiManager.playerLostLife();
 			playerShip.respawnShip();
 		}		
+		gameCycleCounter++;
 
 	}
+
 	return EXIT_SUCCESS;
 
 }
