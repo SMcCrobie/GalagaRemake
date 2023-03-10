@@ -83,18 +83,18 @@
     <ClInclude Include="BackgroundManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebugMacros.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\x64\Release\ShipAnimations.png">
-      <Filter>Source Files</Filter>
-    </Image>
     <Image Include="Planets.png">
       <Filter>Source Files\Images</Filter>
     </Image>
     <Image Include="ShipAnimations.png">
       <Filter>Source Files\Images</Filter>
     </Image>
-    <Image Include="EnemyShip1.png">
+    <Image Include="BossAnimations.png">
       <Filter>Source Files\Images</Filter>
     </Image>
   </ItemGroup>

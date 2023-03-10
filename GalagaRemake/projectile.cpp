@@ -1,17 +1,17 @@
 #include "projectile.h"
 
-Projectile::Projectile(const sf::Vector2f& size, const sf::Vector2f& velocity)
+RectangleProjectile::RectangleProjectile(const sf::Vector2f& size, const sf::Vector2f& velocity)
 {
 	setSize(size);
 	m_velocity = velocity;
 }
 
-const sf::Vector2f& Projectile::getVelocity() const
+const sf::Vector2f& RectangleProjectile::getVelocity() const
 {
 	return m_velocity;
 }
 
-bool Projectile::setVelocity(const sf::Vector2f& velocity)
+bool RectangleProjectile::setVelocity(const sf::Vector2f& velocity)
 {
 	if (velocity.y > PROJECTILE_START_SPEED)
 		return false;
@@ -19,7 +19,7 @@ bool Projectile::setVelocity(const sf::Vector2f& velocity)
 	return true;
 }
 
-void Projectile::move()
+void RectangleProjectile::move()
 {
 	sf::RectangleShape::move(m_velocity);
 }

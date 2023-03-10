@@ -5,7 +5,8 @@ Notes For Game
 
 Premise
 ---------------
-	Make a copy of each enemy within the class 
+	Make a copy of each enemy within the class
+	load those pass those enemys by reference to be copied into arrays by ship manager, when the level decides its ready
 
 
 member functions

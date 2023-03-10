@@ -4,11 +4,11 @@
 static float PROJECTILE_START_SPEED = 12;
 //static float PROJECTILE_RESISTENCE_MULTIPLIER = .995;
 
-class Projectile :
+class RectangleProjectile :
     public sf::RectangleShape
 {
 public:
-    Projectile(const sf::Vector2f& size = sf::Vector2f(0, 0), const sf::Vector2f& velocity = sf::Vector2f(0, -PROJECTILE_START_SPEED));
+    RectangleProjectile(const sf::Vector2f& size = sf::Vector2f(0, 0), const sf::Vector2f& velocity = sf::Vector2f(0, -PROJECTILE_START_SPEED));
     const sf::Vector2f& getVelocity() const;
     bool setVelocity(const sf::Vector2f& velocity);
     void move();

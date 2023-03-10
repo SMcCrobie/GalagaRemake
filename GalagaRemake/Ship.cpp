@@ -6,14 +6,14 @@ Ship::Ship() : sf::Sprite()
 	m_collisionBox = sf::RectangleShape();
 	m_shipControlsStateMappings = std::map<ShipControl, bool>();
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
-	m_weapon1Projectile = Projectile(sf::Vector2f(3, 12));
+	m_weapon1Projectile = RectangleProjectile(sf::Vector2f(3, 12));
 	m_weapon1Projectile.setFillColor(sf::Color(5, 236, 241));
 	/*m_weapon1Projectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	m_weapon1Projectile.setOutlineThickness(3.f);*/
 	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
 	m_verticalDirectionIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
 	m_isBackwards = false;
-	m_isWorldBound = true;
+	m_isHorizontallyWorldBound = true;
 	
 	for (int i = MoveUp; i < InvalidShipControl; i++) {
 		m_shipControlsStateMappings[ShipControl(i)] = false;
@@ -31,7 +31,7 @@ Ship::Ship() : sf::Sprite()
 //	m_horizontalDirectionIncrement(ship.m_horizontalDirectionIncrement),
 //	m_verticalDirectionIncrement(ship.m_verticalDirectionIncrement),
 //	m_isBackwards(ship.m_isBackwards),
-//	m_isWorldBound(ship.m_isWorldBound)
+//	m_IsHorizontallyWorldBound(ship.m_IsHorizontallyWorldBound)
 //{
 //}
 
@@ -47,14 +47,14 @@ void Ship::setTextureRectBasedOnShipState()
 
 }
 
-void Ship::setProjectile(const Projectile& projectile)
+void Ship::setProjectile(const RectangleProjectile& projectile)
 {
 	m_weapon1Projectile = projectile;
 }
 
-void Ship::setIsWorldBound(bool isWorldBound)
+void Ship::setIsHorizontallyWorldBound(bool IsHorizontallyWorldBound)
 {
-	m_isWorldBound = isWorldBound;
+	m_isHorizontallyWorldBound = IsHorizontallyWorldBound;
 }
 
 void Ship::setVelocity(float x, float y)
@@ -119,7 +119,7 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 
 	}
 
-	if (!m_isWorldBound)
+	if (!m_isHorizontallyWorldBound)
 		return;
 
 	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
@@ -308,7 +308,7 @@ const std::map<ShipControl, bool>& Ship::getShipControlStateMappings()
 	return m_shipControlsStateMappings;
 }
 
-std::optional<Projectile> Ship::fireWeapon1IfFired()
+std::optional<RectangleProjectile> Ship::fireWeapon1IfFired()
 {
 	if (!m_shipControlsStateMappings[FireWeapon1])
 		return {};
@@ -321,7 +321,7 @@ std::optional<Projectile> Ship::fireWeapon1IfFired()
 
 }
 
-std::optional<Projectile> Ship::fireWeapon2IfFired()
+std::optional<RectangleProjectile> Ship::fireWeapon2IfFired()
 {
 	return {};
 }

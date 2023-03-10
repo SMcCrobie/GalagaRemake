@@ -37,8 +37,8 @@ public:
     Ship();
 //	Ship(const Ship& ship);Caused more issues for some reason
 	virtual void setTextureRectBasedOnShipState();
-	void setProjectile(const Projectile& projectile);
-	void setIsWorldBound(bool isWorldBound);
+	void setProjectile(const RectangleProjectile& projectile);
+	void setIsHorizontallyWorldBound(bool IsHorizontallyWorldBound);
 	void setVelocity(float x, float y);
 	void updateShip(BoundedFloatRect worldBounds);
 	void updateRespawnTimer();
@@ -61,20 +61,20 @@ protected:
 	//sf::IntRect MoveRight();
 	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
 
-	virtual std::optional<Projectile> fireWeapon1IfFired();
-	virtual std::optional<Projectile> fireWeapon2IfFired();
+	virtual std::optional<RectangleProjectile> fireWeapon1IfFired();
+	virtual std::optional<RectangleProjectile> fireWeapon2IfFired();
 
 	bool m_isBackwards;
 	bool m_isStatic = false;
 	int m_gameCyclesTillRespawned;
-	bool m_isWorldBound;
+	bool m_isHorizontallyWorldBound;
 	float m_horizontalDirectionIncrement;
 	float m_verticalDirectionIncrement;
 	sf::Vector2i m_shipAnimationFrame;
     sf::Vector2f m_velocity;
     sf::RectangleShape m_collisionBox;
-	Projectile m_weapon1Projectile;
-	Projectile m_weapon2Projectile;
+	RectangleProjectile m_weapon1Projectile;
+	RectangleProjectile m_weapon2Projectile;
     std::map<ShipControl, bool> m_shipControlsStateMappings;
 };
 

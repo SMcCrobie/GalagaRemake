@@ -159,6 +159,7 @@
     <ClInclude Include="BackgroundManager.h" />
     <ClInclude Include="BoundedFloatRect.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="DebugMacros.h" />
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="ShipManager.h" />
     <ClInclude Include="GameObject.h" />
@@ -168,18 +169,25 @@
     <ClInclude Include="UIManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\x64\Release\ShipAnimations.png">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    <Image Include="BossAnimations.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Image>
-    <Image Include="EnemyShip1.png" />
-    <Image Include="Planets.png" />
-    <Image Include="ShipAnimations.png" />
+    <Image Include="Planets.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </Image>
+    <Image Include="ShipAnimations.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="ClimateCrisis-Regular.ttf" />
     <Font Include="Deutsch.ttf" />
-    <Font Include="Galaxus.ttf" />
+    <Font Include="Galaxus.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </Font>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

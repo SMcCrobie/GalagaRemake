@@ -63,7 +63,7 @@ void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
 
 	}
 
-	if (!m_isWorldBound)
+	if (!m_isHorizontallyWorldBound)
 		return;
 
 	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
@@ -109,4 +109,10 @@ void PlayerShip::rotate180()
 		sf::Transformable::move(localBounds.width, localBounds.height);
 	else
 		sf::Transformable::move(-localBounds.width, -localBounds.height);
+}
+
+
+bool PlayerShip::detectCollision(ProjectileManager& projectileManager)
+{
+	return projectileManager.detectCollisionAndDestroyProjectile(getGlobalBounds());
 }

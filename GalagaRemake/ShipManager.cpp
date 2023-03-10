@@ -1,4 +1,6 @@
 #include "ShipManager.h"
+#include <iostream>
+
 
 ShipManager::ShipManager() :
 	m_ships(),
@@ -24,6 +26,28 @@ void ShipManager::updateShips(const BoundedFloatRect& worldBounds, const sf::Clo
 			it->first.rotate180();
 		}
 
+	}
+}
+
+void ShipManager::detectCollision(ProjectileManager& projectileManager, int& killCounter)
+{
+	auto it = m_ships.begin();
+	while (it != m_ships.end()) {
+		if (projectileManager.detectCollisionAndDestroyProjectile(it->first.getGlobalBounds())) {
+			it = m_ships.erase(it);//increments the iterator
+			std::cout << "Destroy Ship!" << std::endl;
+			killCounter++;
+		}
+		else {
+			it++;
+		}
+	}
+}
+
+void ShipManager::offloadProjectiles(ProjectileManager& projectileManager)
+{
+	for (auto it = m_ships.begin(); it != m_ships.end(); it++) {
+		projectileManager.collectProjectile(it->first);
 	}
 }
 

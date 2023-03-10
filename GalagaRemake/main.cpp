@@ -18,63 +18,12 @@
 #include "PlayerShip.h"
 #include "UIManager.h"
 #include "BackgroundManager.h"
-#include <Windows.h>
+ 
+#include "DebugMacros.h"
 
 
 #define Score_Value_As_Int ((gameCycleCounter/20) + (killCounter * 100))
 //#define Seans_Debug
-
-#ifdef Seans_Debug
-int allocation_counter = 0;
-
-void* operator new(size_t size)
-{
-	//std::cout << "allocating  " << size << " bytes of memory" << std::endl;
-	allocation_counter++;
-	std::cout << "allocating, current counter: " << allocation_counter << std::endl;
-	/*if (size > 1000)
-		std::cout << "why???" << std::endl;*/
-	void* p = malloc(size);
-	return p;
-}
-
-void operator delete(void* p)
-{
-	//std::cout << "Deleting Memory" << std::endl;
-	allocation_counter--;
-	std::cout << "Deleting, current counter: " << allocation_counter << std::endl;
-	free(p);
-}
-
-void* operator new[](size_t size)
-{
-	//std::cout << "allocating  " << size << " bytes of memory" << std::endl;
-	/*if (size > 1000)
-		std::cout << "why???" << std::endl;*/
-	allocation_counter++;
-	std::cout << "allocating, current counter: " << allocation_counter << std::endl;
-	void* p = malloc(size);
-	return p;
-}
-
-void operator delete[](void* p)
-{
-	allocation_counter--;
-	std::cout << "Deleting, current counter: " << allocation_counter << std::endl;
-	//std::cout << "Deleting Memory" << std::endl;
-	free(p);
-}
-
-#endif // Seans_Debug
-
-void ShowConsole()
-{
-	::ShowWindow(::GetConsoleWindow(), SW_SHOW);
-}
-void HideConsole()
-{
-	::ShowWindow(::GetConsoleWindow(), SW_HIDE);
-}
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
@@ -109,13 +58,19 @@ int main(int, char const**)
 		std::cout << "failed to load ShipAnimations.png" << std::endl;
 		return EXIT_FAILURE;
 	}
-	//textures
+	sf::Texture bossAnimations;
+	if (!bossAnimations.loadFromFile("bossAnimations.png"))
+	{
+		std::cout << "failed to load bossAnimations.png" << std::endl;
+		return EXIT_FAILURE;
+	}
 	sf::Texture planetsSheet;
 	if (!planetsSheet.loadFromFile("Planets(1).png"))
 	{
 		std::cout << "failed to load PLanets(1).png" << std::endl;
 		return EXIT_FAILURE;
 	}
+	//Fonts
 	sf::Font font;
 	if (!font.loadFromFile("ClimateCrisis-Regular.ttf"))
 	{
@@ -139,13 +94,21 @@ int main(int, char const**)
 	PlayerShip playerShip(shipAnimations, WORLD_BOUNDS);
 
 	Ship enemyShip;
-	enemyShip.setIsWorldBound(false);
+	enemyShip.setIsHorizontallyWorldBound(false);
 	enemyShip.setTexture(shipAnimations);
 	enemyShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	enemyShip.setPosition(sf::Vector2f(300.f, -50.f));
 	enemyShip.setColor(sf::Color::Magenta);
 
-	Projectile enemyProjectile = Projectile(sf::Vector2f(3.f, 12.f));
+	Ship BossShip;
+	BossShip.setIsHorizontallyWorldBound(false);
+	BossShip.setTexture(bossAnimations);
+	BossShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(48, 48)));
+	BossShip.setPosition(sf::Vector2f(300.f, -50.f));
+	//BossShip.setColor(sf::Color::Magenta);
+
+
+	RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
 	/*enemyProjectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	enemyProjectile.setOutlineThickness(2.f);*/
@@ -251,15 +214,15 @@ int main(int, char const**)
 
 		//projectile calls
 		playerProjectileManager.collectProjectile(playerShip);
-		enemyProjectileManager.collectProjectile(enemyShipsManager);
+		enemyShipsManager.offloadProjectiles(enemyProjectileManager);
 
 		playerProjectileManager.updateProjectiles(WORLD_BOUNDS);
 		enemyProjectileManager.updateProjectiles(WORLD_BOUNDS);
 		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
-		playerProjectileManager.detectCollision(enemyShipsManager, killCounter);
+		enemyShipsManager.detectCollision(playerProjectileManager, killCounter);
 		bool isOutOfLives = uiManager.isOutOfLives();
-		if (!playerShip.isRespawning() && enemyProjectileManager.detectCollision(playerShip.getGlobalBounds(), !isOutOfLives)) {
+		if (!playerShip.isRespawning() && playerShip.detectCollision(enemyProjectileManager)) {
 			if (isOutOfLives) {
 				isGameOver = true;
 				uiManager.gameOver();

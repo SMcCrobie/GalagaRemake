@@ -2,8 +2,6 @@
 #include "Ship.h"
 #include "Projectile.h"
 #include <list>
-#include "ShipManager.h"
-
 
 class ProjectileManager 
 	: public sf::Drawable
@@ -11,16 +9,15 @@ class ProjectileManager
 public:
 	ProjectileManager();
 	void collectProjectile(Ship& ship);
-	void collectProjectile(ShipManager& shipManager);
 	void updateProjectiles(const BoundedFloatRect& worldBounds);
-	bool detectCollision(const sf::FloatRect& gameObject, bool destroyProjectileInCollision = true);
-	void detectCollision(ShipManager& shipManager, int& killCounter);
+	bool detectCollision(const sf::FloatRect& gameObject);
+	bool detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject);
+	std::list<RectangleProjectile>::iterator findProjectileInCollision(const sf::FloatRect& gameObject);
 
 private:
-	std::list<Projectile> m_projectiles;
+	std::list<RectangleProjectile> m_projectiles;
 
 	// Inherited via Drawable
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 };
-
