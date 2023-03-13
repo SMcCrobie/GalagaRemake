@@ -98,8 +98,8 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
 		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
 
-		if (abs(shipBounds.right - worldBounds.right - WORLD_BOUNDS_MARGIN) < .01f
-			|| (abs(shipBounds.left - worldBounds.left + WORLD_BOUNDS_MARGIN) < .01f)) {
+		if (abs(shipBounds.right - worldBounds.right + WORLD_BOUNDS_MARGIN) < .01f
+			|| abs(shipBounds.left - worldBounds.left - WORLD_BOUNDS_MARGIN) < .01f) {
 			m_velocity.x = 0;
 			break;
 		}
