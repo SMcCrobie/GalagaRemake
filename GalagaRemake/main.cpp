@@ -1,28 +1,24 @@
-
+#include <cstdlib>
+#include <cstdlib> 
+#include <ctime>
 #include <iostream>
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>
+#include <list>
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include <vector>
-#include <list>
-#include <algorithm>
-#include <map>
-#include <cstdlib>
-#include "Ship.h"
-#include "Projectile.h"
+
+#include "BackgroundManager.h"
 #include "BoundedFloatRect.h"
 #include "Controller.h"
-#include "ProjectileManager.h"
-#include "ShipManager.h"
-#include "PlayerShip.h"
-#include "UIManager.h"
-#include "BackgroundManager.h"
- 
 #include "DebugMacros.h"
+#include "PlayerShip.h"
+#include "Projectile.h"
+#include "ProjectileManager.h"
+#include "Ship.h"
+#include "ShipManager.h"
+#include "UIManager.h"
 
 
-#define Score_Value_As_Int ((gameCycleCounter/20) + (killCounter * 100))
+#define SCORE_VALUE_AS_INT ((gameCycleCounter/20) + (killCounter * 100))
 //#define Seans_Debug
 
 //Global Variables
@@ -41,10 +37,11 @@ int main(int, char const**)
 	ShowConsole();
 #endif
 
-	srand((unsigned int)time(NULL));
+	srand(static_cast<unsigned int>(time(nullptr)));
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottom
-	sf::RenderWindow window(sf::VideoMode((int)WORLD_BOUNDS.width, (int)WORLD_BOUNDS.height), "Galaga!");
+	sf::RenderWindow window(sf::VideoMode(static_cast<int>(WORLD_BOUNDS.width), 
+		static_cast<int>(WORLD_BOUNDS.height)), "Galaga!");
 	window.setKeyRepeatEnabled(false);
 	window.setView(WORLD_VIEW);
 
@@ -100,20 +97,34 @@ int main(int, char const**)
 	enemyShip.setPosition(sf::Vector2f(300.f, -50.f));
 	enemyShip.setColor(sf::Color::Magenta);
 
-	Ship BossShip;
-	BossShip.setIsHorizontallyWorldBound(false);
-	BossShip.setTexture(bossAnimations);
-	BossShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(48, 48)));
-	BossShip.setPosition(sf::Vector2f(300.f, -50.f));
-	//BossShip.setColor(sf::Color::Magenta);
+	Ship bossShip;
+	bossShip.setIsHorizontallyWorldBound(false);
+	bossShip.setTexture(bossAnimations);
+	bossShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(42, 48)));
+	bossShip.setPosition(sf::Vector2f(300.f, -50.f));
+	auto preScaleSize = bossShip.getGlobalBounds();
+	bossShip.scale(2.f, 2.f);
+	auto postScaleSize = bossShip.getGlobalBounds();
+	//bossShip.setColor(sf::Color::Magenta);
+
+	CircleProjectile bossProjectile = CircleProjectile();
+	bossProjectile.setFillColor(sf::Color::Red);
+	bossProjectile.setVelocity(sf::Vector2f(0, -8));
+	bossProjectile.setRadius(10.f);
+	//bossProjectile.setOutlineColor(sf::Color::Cyan);
+	//bossProjectile.setOutlineThickness(2.f);
+
+	bossShip.setProjectile(std::make_shared<CircleProjectile>(bossProjectile));
+	bossShip.rotate180();
 
 
+	
 	RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
 	/*enemyProjectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	enemyProjectile.setOutlineThickness(2.f);*/
 	enemyProjectile.setVelocity(sf::Vector2f(0, -8));
-	enemyShip.setProjectile(enemyProjectile);
+	enemyShip.setProjectile(std::make_shared<Projectile>(enemyProjectile));
 	//enemyShip.setScale(1.4f, .6f);
 	enemyShip.rotate180();
 
@@ -133,12 +144,13 @@ int main(int, char const**)
 	int timeOfLastGameLoop = 0;
 	int timeOfLastEnemyShip = -1000;
 	int deltaTillNextEnemyShip = 6000;
-	int killCounter = 0;
+	int killCounter = 31;
 	int gameCycleCounter = 0;
 
 	bool isPaused = false;
 	bool isPausedPressed = false;
 	bool isGameOver = false;	
+	bool isBossCreated = false;
 
 	while (window.isOpen())
 	{ 
@@ -175,21 +187,26 @@ int main(int, char const**)
 
 		
 		//enemyShipCreation
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= deltaTillNextEnemyShip && killCounter < 30) {
-			float shipWidth = enemyShip.getGlobalBounds().width;//somehow this is wrong
-
-			float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
-			enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
-			enemyShipsManager.createShip(enemyShip);
-			
-		
-			//enemyship Upgrade
-			if (killCounter > 8) {
+		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= deltaTillNextEnemyShip) {
+			if (killCounter <= 30) {
+				float shipWidth = enemyShip.getGlobalBounds().width;//somehow this is wrong
 				float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
-				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
-				enemyShip.rotate180();
+				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
 				enemyShipsManager.createShip(enemyShip);
-				enemyShip.rotate180();
+
+
+				//enemyship Upgrade
+				if (killCounter > 8) {
+					float xCoordinate = 56.f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (589.f - 56.f)));
+					enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
+					enemyShip.rotate180();
+					enemyShipsManager.createShip(enemyShip);
+					enemyShip.rotate180();
+				}
+			}
+			if (killCounter > 30 && !isBossCreated) {
+				isBossCreated = true;
+				enemyShipsManager.createShip(bossShip);
 			}
 
 			timeOfLastEnemyShip = clock.getElapsedTime().asMilliseconds();
@@ -207,7 +224,7 @@ int main(int, char const**)
 		playerShip.rotateIfTriggered();
 
 		//UI Update
-		uiManager.updateUI(Score_Value_As_Int);
+		uiManager.updateUI(SCORE_VALUE_AS_INT);
 
 		//updateBackground
 		backgroundManager.moveBackground(.25f);

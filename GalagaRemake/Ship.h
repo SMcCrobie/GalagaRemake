@@ -35,16 +35,15 @@ class Ship :
 public:
 	
     Ship();
-//	Ship(const Ship& ship);Caused more issues for some reason
 	virtual void setTextureRectBasedOnShipState();
-	void setProjectile(const RectangleProjectile& projectile);
-	void setIsHorizontallyWorldBound(bool IsHorizontallyWorldBound);
+	void setProjectile(std::shared_ptr<Projectile> projectile);
+	void setIsHorizontallyWorldBound(bool isHorizontallyWorldBound);
 	void setVelocity(float x, float y);
 	void updateShip(BoundedFloatRect worldBounds);
 	void updateRespawnTimer();
 	void setStatic();
+	void setTextureRect(const sf::IntRect& rectangle);
 	void moveShip();
-	//void rotateIfTriggered();
 	virtual void rotate180();
 	void respawnShip();
 	bool isBackwards();
@@ -61,8 +60,8 @@ protected:
 	//sf::IntRect MoveRight();
 	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
 
-	virtual std::optional<RectangleProjectile> fireWeapon1IfFired();
-	virtual std::optional<RectangleProjectile> fireWeapon2IfFired();
+	virtual std::optional<std::shared_ptr<Projectile>> fireWeapon1IfFired();
+	virtual std::optional<std::shared_ptr<Projectile>> fireWeapon2IfFired();
 
 	bool m_isBackwards;
 	bool m_isStatic = false;
@@ -73,8 +72,8 @@ protected:
 	sf::Vector2i m_shipAnimationFrame;
     sf::Vector2f m_velocity;
     sf::RectangleShape m_collisionBox;
-	RectangleProjectile m_weapon1Projectile;
-	RectangleProjectile m_weapon2Projectile;
+	std::shared_ptr<Projectile> m_weapon1Projectile;
+	std::shared_ptr<Projectile> m_weapon2Projectile;
     std::map<ShipControl, bool> m_shipControlsStateMappings;
 };
 

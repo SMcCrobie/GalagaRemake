@@ -15,3 +15,12 @@ BoundedFloatRect::BoundedFloatRect(const BoundedFloatRect& boundedFloatRect) : s
     right = boundedFloatRect.right;
     bottom = boundedFloatRect.bottom;
 }
+
+void BoundedFloatRect::operator+=(float inwardMargin)
+{
+    top += inwardMargin;
+    bottom -= inwardMargin;
+
+    left += inwardMargin;
+    right -= inwardMargin;
+}

@@ -6,8 +6,8 @@ Ship::Ship() : sf::Sprite()
 	m_collisionBox = sf::RectangleShape();
 	m_shipControlsStateMappings = std::map<ShipControl, bool>();
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
-	m_weapon1Projectile = RectangleProjectile(sf::Vector2f(3, 12));
-	m_weapon1Projectile.setFillColor(sf::Color(5, 236, 241));
+	m_weapon1Projectile = std::make_shared<RectangleProjectile>( RectangleProjectile(sf::Vector2f(3, 12)));
+	m_weapon1Projectile->setFillColor(sf::Color(5, 236, 241));
 	/*m_weapon1Projectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	m_weapon1Projectile.setOutlineThickness(3.f);*/
 	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
@@ -16,24 +16,10 @@ Ship::Ship() : sf::Sprite()
 	m_isHorizontallyWorldBound = true;
 	
 	for (int i = MoveUp; i < InvalidShipControl; i++) {
-		m_shipControlsStateMappings[ShipControl(i)] = false;
+		m_shipControlsStateMappings[static_cast<ShipControl>(i)] = false;
 	}
 	
 }
-
-//Ship::Ship(const Ship& ship) :
-//	m_velocity(ship.m_velocity),
-//	m_collisionBox(ship.m_collisionBox),
-//	m_shipControlsStateMappings(ship.m_shipControlsStateMappings),
-//	m_shipAnimationFrame(ship.m_shipAnimationFrame),
-//	m_weapon1Projectile(ship.m_weapon1Projectile),
-//	m_weapon2Projectile(ship.m_weapon2Projectile),
-//	m_horizontalDirectionIncrement(ship.m_horizontalDirectionIncrement),
-//	m_verticalDirectionIncrement(ship.m_verticalDirectionIncrement),
-//	m_isBackwards(ship.m_isBackwards),
-//	m_IsHorizontallyWorldBound(ship.m_IsHorizontallyWorldBound)
-//{
-//}
 
 
 //currently requires a 3x3 sprite sheet, would be better to have it adapatable to sprite sheet if possible
@@ -47,17 +33,17 @@ void Ship::setTextureRectBasedOnShipState()
 
 }
 
-void Ship::setProjectile(const RectangleProjectile& projectile)
+void Ship::setProjectile(const std::shared_ptr<Projectile> projectile)
 {
 	m_weapon1Projectile = projectile;
 }
 
-void Ship::setIsHorizontallyWorldBound(bool IsHorizontallyWorldBound)
+void Ship::setIsHorizontallyWorldBound(const bool isHorizontallyWorldBound)
 {
-	m_isHorizontallyWorldBound = IsHorizontallyWorldBound;
+	m_isHorizontallyWorldBound = isHorizontallyWorldBound;
 }
 
-void Ship::setVelocity(float x, float y)
+void Ship::setVelocity(const float x, const float y)
 {
 	m_velocity = sf::Vector2f(x, y);
 }
@@ -87,6 +73,12 @@ void Ship::setStatic()
 	m_isStatic = true;
 }
 
+void Ship::setTextureRect(const sf::IntRect& rectangle)
+{
+	Sprite::setTextureRect(rectangle);
+	m_shipAnimationFrame = sf::Vector2i(rectangle.width, rectangle.height);
+}
+
 void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 {
 
@@ -106,16 +98,12 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
 		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
 
-
-
 		if (abs(shipBounds.right - worldBounds.right - WORLD_BOUNDS_MARGIN) < .01f
 			|| (abs(shipBounds.left - worldBounds.left + WORLD_BOUNDS_MARGIN) < .01f)) {
 			m_velocity.x = 0;
 			break;
 		}
 		m_velocity.x = m_velocity.x * .5f;
-
-
 
 	}
 
@@ -125,17 +113,9 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
 		|| shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN) {
 
-		/*if (abs(shipBounds.top - worldBounds.top - WORLD_BOUNDS_MARGIN) < .01f
+		if (abs(shipBounds.top - worldBounds.top - WORLD_BOUNDS_MARGIN) < .01f
 			|| (abs(shipBounds.bottom - worldBounds.bottom + WORLD_BOUNDS_MARGIN) < .01f)) {
 			m_velocity.x = 0;
-			break;
-		}*/
-		if (shipBounds.bottom > worldBounds.bottom - WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = 0;// (worldBounds.bottom - WORLD_BOUNDS_MARGIN) - shipBounds.bottom;
-			break;
-		}
-		if (shipBounds.top < worldBounds.top + WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = 0;// shipBounds.top - (worldBounds.top + WORLD_BOUNDS_MARGIN);
 			break;
 		}
 		m_velocity.y = m_velocity.y * .5f;
@@ -260,14 +240,6 @@ void Ship::moveShip()
 	sf::Sprite::move(m_velocity);
 }
 
-//void Ship::rotateIfTriggered()
-//{
-//	if (!m_shipControlsStateMappings.at(Rotate))
-//		return;
-//	m_shipControlsStateMappings[Rotate] = false;
-//	rotate180();
-//}
-
 void Ship::rotate180()//need to call after setting projectile
 {
 	m_isBackwards = !m_isBackwards;
@@ -275,22 +247,19 @@ void Ship::rotate180()//need to call after setting projectile
 	m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
 	
 	
-	m_weapon1Projectile.setVelocity(sf::Vector2f(0, -m_weapon1Projectile.getVelocity().y));
+	m_weapon1Projectile->setVelocity(sf::Vector2f(0, -m_weapon1Projectile->getVelocity().y));
 	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
-	sf::FloatRect localBounds = getLocalBounds(); 
+	const sf::FloatRect localBounds = getGlobalBounds(); 
 	if(m_isBackwards)
-		sf::Transformable::move(localBounds.width,localBounds.height);
+		move(localBounds.width,localBounds.height);
 	else
-		sf::Transformable::move(-localBounds.width, -localBounds.height);
+		move(-localBounds.width, -localBounds.height);
 
 }
 
 void Ship::respawnShip()
 {
 	m_gameCyclesTillRespawned = 100;
-	/*if (m_isBackwards)
-		rotate180();
-	setPosition(300.f, 600.f);*/
 }
 
 bool Ship::isBackwards()
@@ -308,20 +277,20 @@ const std::map<ShipControl, bool>& Ship::getShipControlStateMappings()
 	return m_shipControlsStateMappings;
 }
 
-std::optional<RectangleProjectile> Ship::fireWeapon1IfFired()
+std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 {
 	if (!m_shipControlsStateMappings[FireWeapon1])
 		return {};
-	BoundedFloatRect currentShipPosition = getGlobalBounds();
-	float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom : currentShipPosition.top;
+	const BoundedFloatRect currentShipPosition = getGlobalBounds();
+	const float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom : currentShipPosition.top;
 
 	m_shipControlsStateMappings[FireWeapon1] = false;
-	m_weapon1Projectile.setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, verticalStartPoint);
-	return m_weapon1Projectile;
+	m_weapon1Projectile->setPosition(currentShipPosition.left + (currentShipPosition.width / 2) - 2, verticalStartPoint);
+	return m_weapon1Projectile->clone();
 
 }
 
-std::optional<RectangleProjectile> Ship::fireWeapon2IfFired()
+std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon2IfFired()
 {
 	return {};
 }
