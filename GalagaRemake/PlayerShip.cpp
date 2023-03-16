@@ -5,12 +5,18 @@ PlayerShip::PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensi
 {
 	setTexture(texture);
 	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
-	
-	sf::FloatRect shipSize = getGlobalBounds();
-	float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
-	float yPos = worldDimensions.height/3 * 2;
+
+	const sf::FloatRect shipSize = getGlobalBounds();
+	const float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
+	const float yPos = worldDimensions.height/3 * 2;
 	
 	setPosition(xPos, yPos);
+}
+
+void PlayerShip::updateShip(BoundedFloatRect worldBounds)
+{
+	Ship::updateShip(worldBounds);
+	rotateIfTriggered();
 }
 
 void PlayerShip::setTextureRectBasedOnShipState()
@@ -47,9 +53,6 @@ void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
 	//Need to figure out why right and top cushions won't work
 	//testAndApplyCushion(shipBounds, worldBounds, 100.f);
 
-
-
-	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
 	testAndApplyHorizontalWorldBounds(shipBounds, worldBounds);
 
 	if (!m_isHorizontallyWorldBound)
@@ -57,8 +60,6 @@ void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
 
 	testAndApplyVerticalWorldBounds(shipBounds, worldBounds);
 
-	return;
-	
 }
 
 void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatRect worldBounds, float cushion)
@@ -66,37 +67,17 @@ void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatR
 	worldBounds += cushion;
 	float threshold = 2.f;
 
-	if (abs(m_velocity.y < threshold)) {}
+	if (m_velocity.y < threshold) {}
 	else if (isShipwithBottomCushionAndMovingThatDirection(shipBounds, worldBounds)
 		|| isShipWithinTopCusionAndMovingThatDirection(shipBounds, worldBounds)) {
 		m_velocity.y = m_velocity.y * .72f;
 		return;
 	}
-	if (abs(m_velocity.x < threshold)) {}
+	if (m_velocity.x < threshold) {}
 	else if (isWithinRightCusionAndMovingThatDirection(shipBounds, worldBounds)
 		|| isWithinLeftCushionAndMovingThatDirection(shipBounds, worldBounds))
 		m_velocity.x = m_velocity.x * .72f;
-	return;
-}
 
-bool PlayerShip::isWithinLeftCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
-{
-	return shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN && m_velocity.x < 0;
-}
-
-bool PlayerShip::isWithinRightCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
-{
-	return shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN && m_velocity.x > 0;
-}
-
-bool PlayerShip::isShipWithinTopCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
-{
-	return shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN && m_velocity.y < 0;
-}
-
-bool PlayerShip::isShipwithBottomCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
-{
-	return shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN && m_velocity.y > 0;
 }
 
 void PlayerShip::testAndApplyVerticalWorldBounds(BoundedFloatRect & shipBounds, BoundedFloatRect & worldBounds)
@@ -104,11 +85,6 @@ void PlayerShip::testAndApplyVerticalWorldBounds(BoundedFloatRect & shipBounds, 
 	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
 		|| shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN) {
 
-		/*if (abs(shipBounds.top - worldBounds.top - WORLD_BOUNDS_MARGIN) < .01f
-		|| (abs(shipBounds.bottom - worldBounds.bottom + WORLD_BOUNDS_MARGIN) < .01f)) {
-		m_velocity.x = 0;
-		break;
-		}*/
 		if (shipBounds.bottom > worldBounds.bottom - WORLD_BOUNDS_MARGIN) {
 			m_velocity.y = 0;// (worldBounds.bottom - WORLD_BOUNDS_MARGIN) - shipBounds.bottom;
 			break;
@@ -155,15 +131,30 @@ void PlayerShip::rotate180()
 	
 	m_weapon1Projectile->setVelocity(sf::Vector2f(0, -m_weapon1Projectile->getVelocity().y));
 	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
-	sf::FloatRect localBounds = getLocalBounds();
+	const sf::FloatRect localBounds = getLocalBounds();
 	if (m_isBackwards)
-		sf::Transformable::move(localBounds.width, localBounds.height);
+		move(localBounds.width, localBounds.height);
 	else
-		sf::Transformable::move(-localBounds.width, -localBounds.height);
+		move(-localBounds.width, -localBounds.height);
 }
 
 
-bool PlayerShip::detectCollision(ProjectileManager& projectileManager)
+bool PlayerShip::isWithinLeftCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
 {
-	return projectileManager.detectCollisionAndDestroyProjectile(getGlobalBounds());
+	return shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN && m_velocity.x < 0;
+}
+
+bool PlayerShip::isWithinRightCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+{
+	return shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN && m_velocity.x > 0;
+}
+
+bool PlayerShip::isShipWithinTopCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+{
+	return shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN && m_velocity.y < 0;
+}
+
+bool PlayerShip::isShipwithBottomCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+{
+	return shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN && m_velocity.y > 0;
 }

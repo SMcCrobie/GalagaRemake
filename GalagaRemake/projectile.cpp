@@ -1,9 +1,9 @@
 #include "projectile.h"
 
 
-void Projectile::move()
+void Projectile::updateProjectile()
 {
-	Transformable::move(m_velocity);
+	move(m_velocity);
 }
 
 std::size_t Projectile::getPointCount() const
@@ -15,7 +15,6 @@ sf::Vector2f Projectile::getPoint(std::size_t index) const
 {
     return {0, 0};
 }
-
 
 RectangleProjectile::RectangleProjectile(const sf::Vector2f& size, const sf::Vector2f& velocity)
 	
@@ -74,7 +73,32 @@ void Projectile::setVelocity(const sf::Vector2f& velocity)
 	m_velocity = velocity;
 }
 
+void Projectile::setInitOffSets(float x, float y)
+{
+    m_initializationOffsets = sf::Vector2f(x, y);
+}
 
+void Projectile::initStartPosition(const float x, const float y)
+{
+    setPosition(x + m_initializationOffsets.x, y + m_initializationOffsets.y);
+}
+
+void CircleProjectile::rotateProjectile()
+{
+    m_rotationCounter++;
+    if(m_rotationCounter < 4)
+        return;
+
+    m_rotationCounter = 0;
+    rotate(-22.5f);
+    update();
+}
+
+void CircleProjectile::updateProjectile()
+{
+    //rotateProjectile();
+    Projectile::updateProjectile();
+}
 
 void CircleProjectile::setRadius(const float radius)
 {
@@ -89,10 +113,23 @@ float CircleProjectile::getRadius() const
 }
 
 
+
 void CircleProjectile::setPointCount(const std::size_t count)
 {
     m_pointCount = count;
     update();
+}
+
+void CircleProjectile::setShieldColor(const sf::Color& color)
+{
+    setFillColor(color);
+    m_color = color;
+}
+
+void CircleProjectile::refreshColor()
+{
+    if (m_color != getFillColor())
+        setFillColor(m_color);
 }
 
 
@@ -117,10 +154,10 @@ sf::Vector2f CircleProjectile::getPoint(const std::size_t index) const
 CircleProjectile::CircleProjectile(const float radius, std::size_t pointCount, const sf::Vector2f& velocity)
 	: m_velocity(velocity), m_radius(radius), m_pointCount(pointCount)
 {
-
 }
 
 std::shared_ptr<Projectile> CircleProjectile::clone()
 {
     return std::make_shared<CircleProjectile>(CircleProjectile(*this));
 }
+

@@ -176,13 +176,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </Image>
+    <Image Include="shieldWithCracksOverTime.png" />
     <Image Include="ShipAnimations.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="ClimateCrisis-Regular.ttf" />
-    <Font Include="Deutsch.ttf" />
     <Font Include="Galaxus.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

@@ -7,11 +7,13 @@ class PlayerShip :
 {
 public:
     PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensions);
+    void updateShip(BoundedFloatRect worldBounds) override;
     void setTextureRectBasedOnShipState() override;
+
+
     void rotateIfTriggered();
     void rotate180() override;
-    bool detectCollision(ProjectileManager& projectileManager);
-
+   
 private:
     void updateShipVelocity(BoundedFloatRect worldBounds) override;
     void testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatRect worldBounds, float cushion);

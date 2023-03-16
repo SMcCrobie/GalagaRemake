@@ -15,7 +15,7 @@ void ProjectileManager::updateProjectiles(const BoundedFloatRect& worldBounds)
 {
 	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); it++)
 	{
-		(*it)->move();
+		(*it)->updateProjectile();
 		sf::FloatRect projectileBounds = (*it)->getGlobalBounds();
 		if (!worldBounds.intersects(projectileBounds)) {
 			it = m_projectiles.erase(it);

@@ -3,6 +3,7 @@
 
 void ShipManager::createShip(Ship& ship)
 {
+
 	m_ships.emplace_back(ship, StateMachineController());
 }
 
@@ -12,7 +13,7 @@ void ShipManager::updateShips(const BoundedFloatRect& worldBounds, const sf::Clo
 		it->second.updateControllerStateAndShipState(clock, it->first);
 		it->first.setTextureRectBasedOnShipState();
 		it->first.updateShip(worldBounds);
-		it->first.moveShip();
+		//it->first.moveShip();
 
 		const BoundedFloatRect shipBounds = it->first.getGlobalBounds();
 		if (shipBounds.top > worldBounds.bottom && it->first.isBackwards()) {
@@ -30,14 +31,16 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager, int& kil
 {
 	auto it = m_ships.begin();
 	while (it != m_ships.end()) {
-		if (projectileManager.detectCollisionAndDestroyProjectile(it->first.getGlobalBounds())) {
-			it = m_ships.erase(it);//increments the iterator
-			std::cout << "Destroy Ship!" << std::endl;
-			killCounter++;
+		it->first.detectCollision(projectileManager);
+		if(it->first.hasHealth())
+		{
+			++it;
+			continue;
 		}
-		else {
-			it++;
-		}
+
+		it = m_ships.erase(it);//increments the iterator
+		std::cout << "Destroy Ship!" << std::endl;
+		killCounter++;
 	}
 }
 
@@ -52,5 +55,10 @@ void ShipManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for (auto it = m_ships.begin(); it != m_ships.end(); it++) {
 		target.draw(it->first);
+		if (it->first.hasShield())
+		{
+			target.draw(it->first.m_shield);
+		}
+			
 	}
 }

@@ -97,15 +97,12 @@
     <Image Include="BossAnimations.png">
       <Filter>Source Files\Images</Filter>
     </Image>
+    <Image Include="shieldWithCracksOverTime.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Galaxus.ttf">
-      <Filter>Source Files\Images</Filter>
-    </Font>
-    <Font Include="Deutsch.ttf">
-      <Filter>Source Files\Images</Filter>
-    </Font>
-    <Font Include="ClimateCrisis-Regular.ttf">
       <Filter>Source Files\Images</Filter>
     </Font>
   </ItemGroup>

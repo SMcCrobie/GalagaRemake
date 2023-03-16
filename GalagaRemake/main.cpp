@@ -38,6 +38,7 @@ int main(int, char const**)
 #endif
 
 	srand(static_cast<unsigned int>(time(nullptr)));
+
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottom
 	sf::RenderWindow window(sf::VideoMode(static_cast<int>(WORLD_BOUNDS.width), 
@@ -61,6 +62,13 @@ int main(int, char const**)
 		std::cout << "failed to load bossAnimations.png" << std::endl;
 		return EXIT_FAILURE;
 	}
+	auto* bossProjectileTexture = new sf::Texture;
+	if (!bossProjectileTexture->loadFromFile("shieldWithCracksOverTime.png"))
+	{
+		std::cout << "failed to load projectileTexture.png" << std::endl;
+		return EXIT_FAILURE;
+	}
+	bossProjectileTexture->setSmooth(true);
 	sf::Texture planetsSheet;
 	if (!planetsSheet.loadFromFile("Planets(1).png"))
 	{
@@ -82,8 +90,6 @@ int main(int, char const**)
 	planet.setPosition(300, -500);
 	//planet.setScale(2.5f, 2.5f);
 	planet.setColor(sf::Color(120, 120, 120));
-	
-
 
 
 
@@ -95,38 +101,43 @@ int main(int, char const**)
 	enemyShip.setTexture(shipAnimations);
 	enemyShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	enemyShip.setPosition(sf::Vector2f(300.f, -50.f));
-	enemyShip.setColor(sf::Color::Magenta);
+	enemyShip.setShipColor(sf::Color::Magenta);
 
 	Ship bossShip;
 	bossShip.setIsHorizontallyWorldBound(false);
 	bossShip.setTexture(bossAnimations);
 	bossShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(42, 48)));
 	bossShip.setPosition(sf::Vector2f(300.f, -50.f));
-	auto preScaleSize = bossShip.getGlobalBounds();
 	bossShip.scale(2.f, 2.f);
-	auto postScaleSize = bossShip.getGlobalBounds();
-	//bossShip.setColor(sf::Color::Magenta);
 
 	CircleProjectile bossProjectile = CircleProjectile();
-	bossProjectile.setFillColor(sf::Color::Red);
 	bossProjectile.setVelocity(sf::Vector2f(0, -8));
-	bossProjectile.setRadius(10.f);
-	//bossProjectile.setOutlineColor(sf::Color::Cyan);
-	//bossProjectile.setOutlineThickness(2.f);
+	bossProjectile.setTexture(bossProjectileTexture);
+	bossProjectile.setRadius(12.f);
+	bossProjectile.setShieldColor(sf::Color::Red);
+	bossProjectile.setTextureRect(sf::IntRect(0, 0, 64, 64));
 
 	bossShip.setProjectile(std::make_shared<CircleProjectile>(bossProjectile));
+
+	auto shieldColor = sf::Color::Red;
+	shieldColor.a = 100;
+
+	auto radius = 56.f;
+	bossProjectile.setRadius(radius);
+	bossProjectile.setShieldColor(shieldColor);
+	bossProjectile.setOrigin(radius, radius);
+	bossShip.setHealth(30);
+	bossShip.setShield(bossProjectile, 100);
 	bossShip.rotate180();
 
 
 	
 	RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
-	/*enemyProjectile.setOutlineColor(sf::Color(255, 255, 255, 30));
-	enemyProjectile.setOutlineThickness(2.f);*/
 	enemyProjectile.setVelocity(sf::Vector2f(0, -8));
-	enemyShip.setProjectile(std::make_shared<Projectile>(enemyProjectile));
-	//enemyShip.setScale(1.4f, .6f);
+	enemyShip.setProjectile(std::make_shared<RectangleProjectile>(enemyProjectile));
 	enemyShip.rotate180();
+	enemyShip.setHealth(2);
 
 	//Managers Class intialization
 	ProjectileManager enemyProjectileManager;
@@ -144,7 +155,7 @@ int main(int, char const**)
 	int timeOfLastGameLoop = 0;
 	int timeOfLastEnemyShip = -1000;
 	int deltaTillNextEnemyShip = 6000;
-	int killCounter = 31;
+	int killCounter = 0;
 	int gameCycleCounter = 0;
 
 	bool isPaused = false;
@@ -165,7 +176,7 @@ int main(int, char const**)
 		window.draw(uiManager);
 		window.display();
 
-		//Run game loop every 25 milliseconds
+		//Run game loop every X milliseconds
 		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= 20) {
 			continue;
 		}
@@ -215,16 +226,11 @@ int main(int, char const**)
 	
 		//apply texture, based on events from player controller
 		playerShip.setTextureRectBasedOnShipState();
-		//playerShip.updateShadingIfRespawning();
 
-		//Apply inputs and envirmental factors to movement
+		//update ships based on inputs from controllers
 		playerShip.updateShip(WORLD_BOUNDS);
-		playerShip.moveShip();
+		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
-		playerShip.rotateIfTriggered();
-
-		//UI Update
-		uiManager.updateUI(SCORE_VALUE_AS_INT);
 
 		//updateBackground
 		backgroundManager.moveBackground(.25f);
@@ -235,11 +241,12 @@ int main(int, char const**)
 
 		playerProjectileManager.updateProjectiles(WORLD_BOUNDS);
 		enemyProjectileManager.updateProjectiles(WORLD_BOUNDS);
-		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
 
 		enemyShipsManager.detectCollision(playerProjectileManager, killCounter);
 		bool isOutOfLives = uiManager.isOutOfLives();
-		if (!playerShip.isRespawning() && playerShip.detectCollision(enemyProjectileManager)) {
+		if (!playerShip.isRespawning() && playerShip.detectCollision(enemyProjectileManager)
+			&& !playerShip.hasHealth()) {
+
 			if (isOutOfLives) {
 				isGameOver = true;
 				uiManager.gameOver();
@@ -247,7 +254,11 @@ int main(int, char const**)
 			}
 			uiManager.playerLostLife();
 			playerShip.respawnShip();
-		}		
+		}
+
+		//UI Update
+		uiManager.updateUI(SCORE_VALUE_AS_INT);
+
 		gameCycleCounter++;
 
 	}
