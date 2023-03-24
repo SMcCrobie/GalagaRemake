@@ -5,7 +5,8 @@
 #include <optional>
 
 
-enum ShipControl {
+enum ShipControl
+{
 	MoveUp,
 	MoveDown,
 	MoveLeft,
@@ -16,14 +17,14 @@ enum ShipControl {
 
 	InvalidShipControl
 };
-const float SINGLE_THRUST_DIRECTION_INCREMENT = .25f;
-const float HORIZONTAL_DIRECTION_INCREMENT = .35f;
-const float RESISTENCE_MULTIPLIER = .965f;
+
+const float SINGLE_THRUST_DIRECTION_INCREMENT = .20f;
+const float HORIZONTAL_DIRECTION_INCREMENT = .30f;
+const float RESISTENCE_MULTIPLIER = .975f;
 float const MAX_HORIZONTAL_SPEED = 14.0f;
 const float MAX_VERTICAL_SPEED = 10.0f;
 const float WORLD_BOUNDS_MARGIN = 10.0f;
 const float WORLD_VIEW_MOVEMENT = -1.25f;
-
 
 class Ship :
     public sf::Sprite
@@ -41,7 +42,10 @@ public:
 
 
 	bool detectCollision(ProjectileManager& projectileManager);
-	void setProjectile(std::shared_ptr<Projectile> projectile);
+	void setProjectile1(const RectangleProjectile& projectile);
+	void setProjectile1(const CircleProjectile& projectile);
+	void setProjectile2(const RectangleProjectile& projectile);
+	void setProjectile2(const CircleProjectile& projectile);
 	void setIsHorizontallyWorldBound(bool isHorizontallyWorldBound);
 	void setVelocity(float x, float y);
 	void updateRespawnTimer();
@@ -57,6 +61,7 @@ public:
 	void setShield(const CircleProjectile& shield, const int shieldHealth = 10);
 	const CircleProjectile& getShield();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
+	virtual void rotateIfTriggered();
 	bool hasHealth() const;
 	void decrementHealth();
 	void setHealth(int healthTotal);
@@ -93,6 +98,7 @@ protected:
     std::map<ShipControl, bool> m_shipControlsStateMappings;
 
 private:
+	void refreshColors();
 	void setColor(const sf::Color& color);//makes higher level function private
 };
 

@@ -7,6 +7,7 @@ class ProjectileManager
 	: public sf::Drawable
 {
 public:
+	void collectProjectile(CircleProjectile& projectile);
 	void collectProjectile(Ship& ship);
 	void updateProjectiles(const BoundedFloatRect& worldBounds);
 	bool detectCollision(const sf::FloatRect& gameObject);

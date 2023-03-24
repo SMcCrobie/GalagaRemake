@@ -9,6 +9,7 @@ enum State {
 	State3,
 	State4,
 	State5,
+	State6,
 
 
 	InvalidState
@@ -26,6 +27,7 @@ enum Input {
 	InvalidInput
 };
 
+
 class KeyboardController
 {
 public:
@@ -41,6 +43,11 @@ class StateMachineController
 {
 public:
 	StateMachineController();
+	StateMachineController(std::map<State, std::vector<ShipControl>> stateToShipControlInputsMap,
+	                       std::map<State, std::map<Input, State>> stateWithInputToStateMap,
+	                       int totalInputs,
+	                       int deltaBeforeStateChange = 200);
+	bool isItTimeToUpdateState(const sf::Clock& clock, const sf::Int32& currentTime) const;
 	void updateControllerStateAndShipState(const sf::Clock& clocks, Ship& ship);
 private:
 	State m_currentState;

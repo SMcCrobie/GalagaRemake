@@ -7,8 +7,9 @@ Ship::Ship() : sf::Sprite()
 	m_collisionBox = sf::RectangleShape();
 	m_shipControlsStateMappings = std::map<ShipControl, bool>();
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
-	m_weapon1Projectile = std::make_shared<RectangleProjectile>( RectangleProjectile(sf::Vector2f(3, 12)));
-	m_weapon1Projectile->setFillColor(sf::Color(5, 236, 241));
+	RectangleProjectile temp(sf::Vector2f(3, 12));
+	temp.setFillColor(sf::Color(5, 236, 241));
+	m_weapon1Projectile = std::make_shared<RectangleProjectile>(temp);
 	/*m_weapon1Projectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	m_weapon1Projectile.setOutlineThickness(3.f);*/
 	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
@@ -27,19 +28,25 @@ Ship::Ship() : sf::Sprite()
 }
 
 
-void Ship::updateShip(BoundedFloatRect worldBounds)
+void Ship::refreshColors()
 {
-	updateRespawnTimer();
-	if (m_isStatic)
-		return;
-	updateShipVelocity(worldBounds);
-	moveShip();
 	m_shield.refreshColor();
 	if (m_shipHitTimer < 0)
 		return;
 	if(m_shipHitTimer == 0)
 		setColor(m_shipColor);
 	m_shipHitTimer--;
+}
+
+void Ship::updateShip(BoundedFloatRect worldBounds)
+{
+	updateRespawnTimer();
+	if (m_isStatic)
+		return;
+	rotateIfTriggered();
+	updateShipVelocity(worldBounds);
+	moveShip();
+	refreshColors();
 		
 }
 
@@ -74,9 +81,24 @@ bool Ship::detectCollision(ProjectileManager& projectileManager)
 	return false;
 }
 
-void Ship::setProjectile(const std::shared_ptr<Projectile> projectile)
+void Ship::setProjectile1(const RectangleProjectile& projectile)
 {
-	m_weapon1Projectile = projectile;
+	m_weapon1Projectile = std::make_shared<RectangleProjectile>(projectile);
+}
+
+void Ship::setProjectile1(const CircleProjectile& projectile)
+{
+	m_weapon1Projectile = std::make_shared<CircleProjectile>(projectile);
+}
+
+void Ship::setProjectile2(const RectangleProjectile& projectile)
+{
+	m_weapon2Projectile = std::make_shared<RectangleProjectile>(projectile);
+}
+
+void Ship::setProjectile2(const CircleProjectile& projectile)
+{
+	m_weapon2Projectile = std::make_shared<CircleProjectile>(projectile);
 }
 
 void Ship::setIsHorizontallyWorldBound(const bool isHorizontallyWorldBound)
@@ -130,17 +152,17 @@ void Ship::decrementShieldHealth()
 	}
 	auto textRect = m_shield.getTextureRect();
 	const int spriteFrameWidth = textRect.width;
-	if (m_shieldHealth < 25 && textRect.left == spriteFrameWidth*2)
+	if (m_shieldHealth < 10 && textRect.left == spriteFrameWidth*2)
 	{
 		textRect.left += spriteFrameWidth;
 		m_shield.setTextureRect(textRect);
 	}
-	else if (m_shieldHealth < 50 && textRect.left == spriteFrameWidth)
+	else if (m_shieldHealth < 20 && textRect.left == spriteFrameWidth)
 	{
 		textRect.left += spriteFrameWidth;
 		m_shield.setTextureRect(textRect);
 	}
-	else if (m_shieldHealth < 75 && textRect.left == 0)
+	else if (m_shieldHealth < 30 && textRect.left == 0)
 	{
 		textRect.left += spriteFrameWidth;
 		m_shield.setTextureRect(textRect);
@@ -214,7 +236,7 @@ void Ship::updateShadingIfRespawning()
 void Ship::applyBackwardsVelocity()
 {
 	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
-		m_velocity.y += -m_verticalDirectionIncrement / 3.f;
+		m_velocity.y += -m_verticalDirectionIncrement / 4.f;
 	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
 		m_velocity.y += m_verticalDirectionIncrement;
 
@@ -229,7 +251,7 @@ void Ship::applyStandardVelocity()
 	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
 		m_velocity.y += -m_verticalDirectionIncrement;
 	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
-		m_velocity.y += m_verticalDirectionIncrement / 3.f;
+		m_velocity.y += m_verticalDirectionIncrement / 4.f;
 
 	if (m_shipControlsStateMappings.at(MoveLeft) && m_velocity.x >= -MAX_HORIZONTAL_SPEED)
 		m_velocity.x += -m_horizontalDirectionIncrement;
@@ -386,9 +408,19 @@ const std::map<ShipControl, bool>& Ship::getShipControlStateMappings()
 	return m_shipControlsStateMappings;
 }
 
+void Ship::rotateIfTriggered()
+{
+	if (!m_shipControlsStateMappings.at(Rotate))
+		return;
+	m_shipControlsStateMappings[Rotate] = false;
+	rotate180();
+}
+
+
+//really solid function
 std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 {
-	if (!m_shipControlsStateMappings[FireWeapon1])
+	if (!m_shipControlsStateMappings[FireWeapon1] || m_weapon1Projectile == nullptr)
 		return {};
 	const BoundedFloatRect currentShipPosition = getGlobalBounds();
 	const float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom - m_weapon1Projectile->getGlobalBounds().height : currentShipPosition.top;
@@ -397,7 +429,7 @@ std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 	yVel = m_isBackwards ? yVel : -yVel;
 
 	m_shipControlsStateMappings[FireWeapon1] = false;
-	m_weapon1Projectile->initStartPosition(horizontalStartPoint, verticalStartPoint);
+	m_weapon1Projectile->initStartPosition(horizontalStartPoint, verticalStartPoint, isBackwards());
 	m_weapon1Projectile->setVelocity(sf::Vector2f(0, yVel));
 	return m_weapon1Projectile->clone();
 
@@ -405,7 +437,19 @@ std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 
 std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon2IfFired()
 {
-	return {};
+	if (!m_shipControlsStateMappings[FireWeapon2] || m_weapon2Projectile == nullptr)
+		return {};
+	const BoundedFloatRect currentShipPosition = getGlobalBounds();
+	const float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom - m_weapon2Projectile->getGlobalBounds().height : currentShipPosition.top;
+	const float horizontalStartPoint = currentShipPosition.left + (currentShipPosition.width / 2) - (m_weapon2Projectile->getGlobalBounds().width / 2);
+	auto yVel = abs(m_weapon2Projectile->getVelocity().y);
+	yVel = m_isBackwards ? yVel : -yVel;
+
+
+	m_shipControlsStateMappings[FireWeapon2] = false;
+	m_weapon2Projectile->initStartPosition(horizontalStartPoint, verticalStartPoint, isBackwards());
+	m_weapon2Projectile->setVelocity(sf::Vector2f(0, yVel));
+	return m_weapon2Projectile->clone();
 }
 
 void Ship::setColor(const sf::Color& color)

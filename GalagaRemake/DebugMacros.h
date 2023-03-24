@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-
+//#define Seans_Debug
 #ifdef Seans_Debug
 int allocation_counter = 0;
 

@@ -16,6 +16,9 @@
     <Filter Include="Source Files\Images">
       <UniqueIdentifier>{673be6a7-e221-43e2-9c15-a0dc76695354}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Configs">
+      <UniqueIdentifier>{f42a5188-9b17-4288-bbc8-3ffb1cab6b4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -86,6 +89,12 @@
     <ClInclude Include="DebugMacros.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ControllerConfigs.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RandMacros.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Planets.png">
@@ -100,10 +109,21 @@
     <Image Include="shieldWithCracksOverTime.png">
       <Filter>Source Files\Images</Filter>
     </Image>
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\BossSideKicksAnimations.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
+    <Image Include="meteor.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Galaxus.ttf">
       <Filter>Source Files\Images</Filter>
     </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ControlsConfig.txt">
+      <Filter>Source Files\Configs</Filter>
+    </Text>
   </ItemGroup>
 </Project>

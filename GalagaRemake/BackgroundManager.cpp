@@ -1,4 +1,5 @@
 #include "BackgroundManager.h"
+#include "RandMacros.h"
 
 BackgroundManager::BackgroundManager(BoundedFloatRect windowDimensions)
 	: m_stars(), m_windowDimensions(windowDimensions), m_windowBuffer(100.f)
@@ -11,10 +12,8 @@ BackgroundManager::BackgroundManager(BoundedFloatRect windowDimensions)
 		star.setOutlineColor(i == 0 ? sf::Color(153, 230, 255, 80) : sf::Color(255, 255, 230, 80));
 		star.setOutlineThickness(2.5f);
 
-		float xCoordinate = m_windowDimensions.left + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (m_windowDimensions.right - m_windowDimensions.left)));
-		float yCoordinate = (m_windowDimensions.top - m_windowBuffer) + static_cast <float> (rand()) / 
-			(static_cast <float> (RAND_MAX / ((m_windowDimensions.bottom + m_windowBuffer) - (m_windowDimensions.top - m_windowBuffer))));
-	
+		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(m_windowDimensions.left, m_windowDimensions.right);
+		const float yCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(m_windowDimensions.top - m_windowBuffer, m_windowDimensions.bottom + m_windowBuffer); 
 		star.setPosition(xCoordinate, yCoordinate);
 	}
 }
@@ -24,19 +23,16 @@ void BackgroundManager::moveBackground(float increment)
 	for (auto& star : m_stars) {
 		star.move(0, increment);
 		if (star.getGlobalBounds().top > m_windowDimensions.bottom + m_windowBuffer) {
-			float xCoordinate = m_windowDimensions.left + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (m_windowDimensions.right - m_windowDimensions.left)));
+			const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(m_windowDimensions.left, m_windowDimensions.right);
 			star.setPosition(xCoordinate, m_windowDimensions.top - m_windowBuffer);
 		}
 	}
-	if (true){//m_planetMovementCounter %  8== 0) {
-		m_foregroundPlanet.move(-increment/8, increment/8);
-		m_foregroundPlanet.setScale(m_foregroundPlanet.getScale() * 1.0002f);
-		//foregroundPlanet.setColor(sf::Color(m_planetColorOffest, m_planetColorOffest, m_planetColorOffest));
-	}
-	m_planetMovementCounter++;
+	m_foregroundPlanet.move(-increment/8, increment/8);
+	m_foregroundPlanet.setScale(m_foregroundPlanet.getScale() * 1.0002f);
+	
 }
 
-void BackgroundManager::addForegroundPlanet(sf::Sprite planet)
+void BackgroundManager::addForegroundPlanet(const sf::Sprite planet)
 {
 	m_foregroundPlanet = planet;
 }

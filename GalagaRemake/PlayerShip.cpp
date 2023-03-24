@@ -9,6 +9,7 @@ PlayerShip::PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensi
 	const sf::FloatRect shipSize = getGlobalBounds();
 	const float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
 	const float yPos = worldDimensions.height/3 * 2;
+	m_shipHealth = 3;
 	
 	setPosition(xPos, yPos);
 }
@@ -16,7 +17,6 @@ PlayerShip::PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensi
 void PlayerShip::updateShip(BoundedFloatRect worldBounds)
 {
 	Ship::updateShip(worldBounds);
-	rotateIfTriggered();
 }
 
 void PlayerShip::setTextureRectBasedOnShipState()

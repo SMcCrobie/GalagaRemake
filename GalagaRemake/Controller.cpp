@@ -1,8 +1,8 @@
 #include "Controller.h"
-bool IS_PAUSED = false;
 
 KeyboardController::KeyboardController()
 {
+	//Controller A
 	m_keyboardToShipControlMap = {
 		{ sf::Keyboard::W, MoveUp},
 		{ sf::Keyboard::S, MoveDown },
@@ -12,6 +12,7 @@ KeyboardController::KeyboardController()
 		{ sf::Keyboard::Space, Rotate }
 	};
 
+	//Controller B
 	/*m_keyboardToShipControlMap = {
 		{ sf::Keyboard::Up, MoveUp},
 		{ sf::Keyboard::Down, MoveDown },
@@ -25,7 +26,7 @@ KeyboardController::KeyboardController()
 
 bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
 {
-	sf::Event event;
+	sf::Event event{};
 
 	//Poll all game inputs and map
 	while (window.pollEvent(event)) {
@@ -69,9 +70,12 @@ bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 StateMachineController::StateMachineController() :
 	m_currentState(State0),
 	m_previousState(InvalidState),
+	m_timeOfLastStateChange(0),
+
+
+
 	m_totalInputs(4),
 	m_deltaBeforeStateChange(200),
-	m_timeOfLastStateChange(0),
 	m_stateToShipControlInputsMap{
 		{State0, std::vector{ MoveUp, FireWeapon1}},
 		{State1, std::vector{ MoveLeft }},
@@ -99,34 +103,51 @@ StateMachineController::StateMachineController() :
 {
 }
 
+StateMachineController::StateMachineController(std::map<State, std::vector<ShipControl>> stateToShipControlInputsMap,
+	std::map<State, std::map<Input, State>> stateWithInputToStateMap, int totalInputs, int deltaBeforeStateChange) :
+	m_currentState(State0),
+	m_previousState(InvalidState),
+	m_timeOfLastStateChange(0),
+
+	m_stateToShipControlInputsMap(stateToShipControlInputsMap),
+	m_stateWithInputToStateMap(stateWithInputToStateMap),
+	m_totalInputs(totalInputs),
+	m_deltaBeforeStateChange(deltaBeforeStateChange)
+{
+}
+
+bool StateMachineController::isItTimeToUpdateState(const sf::Clock& clock, const sf::Int32& currentTime) const
+{
+	if (currentTime - m_timeOfLastStateChange < m_deltaBeforeStateChange)
+		return true;
+	return false;
+}
+
 void StateMachineController::updateControllerStateAndShipState(const sf::Clock& clock, Ship& ship)
 {
-	auto currentTime = clock.getElapsedTime().asMilliseconds();
-	if (currentTime - m_timeOfLastStateChange < m_deltaBeforeStateChange)
-		return;
+	const sf::Int32 currentTime = clock.getElapsedTime().asMilliseconds();
+	if (isItTimeToUpdateState(clock, currentTime)) return;
 
 	m_timeOfLastStateChange = currentTime;
-	//get a random input, might be bad since the loop runs every 25 milliseconds
-	Input newInput = Input(rand() % m_totalInputs);
+	const auto newInput = static_cast<Input>(rand() % m_totalInputs);
 
 	//update state
-	auto newState = m_stateWithInputToStateMap.at(m_currentState).find(newInput);
-	if (newState != m_stateWithInputToStateMap.at(m_currentState).end())
-		m_currentState = newState->second;
+	const auto inputToStateEntry = m_stateWithInputToStateMap.at(m_currentState).find(newInput);
+	if (inputToStateEntry != m_stateWithInputToStateMap.at(m_currentState).end())
+		m_currentState = inputToStateEntry->second;//if current state is new state, mov not reassigned
 
 	//Can't do this currently because the ship currently shuts its own fire1 off
 	//if (m_currentState == m_previousState)
 	//	return;
 
-
-	//update ship inputs based on new state
-	std::vector<ShipControl>& currentShipControlVec = m_stateToShipControlInputsMap.at(m_currentState);
-
+	//clear previous states commands
 	for (auto it = ship.m_shipControlsStateMappings.begin(); it != ship.m_shipControlsStateMappings.end(); it++) {
 		it->second = false;
 	}
+
+	//update ship inputs based on new state
+	std::vector<ShipControl>& currentShipControlVec = m_stateToShipControlInputsMap.at(m_currentState);
 	for (auto it = currentShipControlVec.begin(); it != currentShipControlVec.end(); it++) {
 		ship.m_shipControlsStateMappings[*it] = true;
 	}
-	return;
 }

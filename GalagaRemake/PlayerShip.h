@@ -11,7 +11,7 @@ public:
     void setTextureRectBasedOnShipState() override;
 
 
-    void rotateIfTriggered();
+    void rotateIfTriggered() override;
     void rotate180() override;
    
 private:

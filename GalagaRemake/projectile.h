@@ -2,21 +2,18 @@
 #include <SFML/Graphics.hpp>
 
 static float PROJECTILE_START_SPEED = 12;
-//static float PROJECTILE_RESISTENCE_MULTIPLIER = .995;
 
 class Projectile
 	: public sf::Shape{
 public:
-    // ~Projectile() override = 0; // can't make virtual class if I want to pass it around as a shared pointer
-								  // can do it if I reset the pointer to its type 
 	virtual void updateProjectile();
     std::size_t getPointCount() const override;
     sf::Vector2f getPoint(std::size_t index) const override;
     void setVelocity(const sf::Vector2f& velocity);
     void setInitOffSets(float x, float y);
-    void initStartPosition(float x, float y);
+    void initStartPosition(float x, float y, bool isBackwards);
     const sf::Vector2f& getVelocity() const;
-    virtual std::shared_ptr<Projectile> clone();//returns nullptr
+    virtual std::shared_ptr<Projectile> clone() = 0;
 protected:
     sf::Vector2f m_velocity;
     sf::Vector2f m_initializationOffsets;
@@ -56,6 +53,7 @@ public:
 	void setPointCount(std::size_t count);
     void setShieldColor(const sf::Color& color);//can prob hide base color functions
     void refreshColor();
+    void makeRotating();
 
 	std::size_t getPointCount() const override;
 	sf::Vector2f getPoint(std::size_t index) const override;
@@ -64,7 +62,7 @@ private:
     sf::Vector2f m_velocity;
     float       m_radius;   
     std::size_t m_pointCount;
-    int m_rotationCounter{0};
+    int m_rotationCounter;
     sf::Color m_color;
 
 };

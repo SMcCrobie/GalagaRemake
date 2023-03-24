@@ -1,23 +1,32 @@
 #include <iostream>
 #include "ProjectileManager.h"
 
+void ProjectileManager::collectProjectile(CircleProjectile& projectile)
+{
+	m_projectiles.push_back(projectile.clone());
+}
+
 void ProjectileManager::collectProjectile(Ship& ship)
 {
 	const auto projectile = ship.fireWeapon1IfFired();
-	if (!projectile.has_value() || projectile.value() == nullptr)
-		return;
+	const auto projectile2 = ship.fireWeapon2IfFired();
+	if (projectile.has_value())
+		m_projectiles.push_back(projectile.value());
 	
-	
-	m_projectiles.push_back(projectile.value());
+	if(projectile2.has_value())
+		m_projectiles.push_back(projectile2.value());
 }
 
 void ProjectileManager::updateProjectiles(const BoundedFloatRect& worldBounds)
 {
-	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); it++)
+	auto it = m_projectiles.begin();
+	while (it != m_projectiles.end())
 	{
 		(*it)->updateProjectile();
 		sf::FloatRect projectileBounds = (*it)->getGlobalBounds();
-		if (!worldBounds.intersects(projectileBounds)) {
+		if (worldBounds.intersects(projectileBounds))
+			it++;
+		else {
 			it = m_projectiles.erase(it);
 			if (it == m_projectiles.end())
 				break;

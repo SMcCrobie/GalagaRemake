@@ -63,10 +63,6 @@ const sf::Vector2f& Projectile::getVelocity() const
 	return m_velocity;
 }
 
-std::shared_ptr<Projectile> Projectile::clone()
-{
-    return nullptr;
-}
 
 void Projectile::setVelocity(const sf::Vector2f& velocity)
 {
@@ -78,31 +74,37 @@ void Projectile::setInitOffSets(float x, float y)
     m_initializationOffsets = sf::Vector2f(x, y);
 }
 
-void Projectile::initStartPosition(const float x, const float y)
+void Projectile::initStartPosition(const float x, const float y, const bool isBackwards)
 {
-    setPosition(x + m_initializationOffsets.x, y + m_initializationOffsets.y);
+    if(isBackwards)
+        setPosition(x + m_initializationOffsets.x, y - m_initializationOffsets.y);
+    else
+		setPosition(x + m_initializationOffsets.x, y + m_initializationOffsets.y);
 }
 
 void CircleProjectile::rotateProjectile()
 {
+    if(m_rotationCounter < 0)
+        return;
     m_rotationCounter++;
     if(m_rotationCounter < 4)
         return;
 
     m_rotationCounter = 0;
-    rotate(-22.5f);
+    rotate(22.5f);
     update();
 }
 
 void CircleProjectile::updateProjectile()
 {
-    //rotateProjectile();
+    rotateProjectile();
     Projectile::updateProjectile();
 }
 
 void CircleProjectile::setRadius(const float radius)
 {
     m_radius = radius;
+    setOrigin(radius, radius);
     update();
 }
 
@@ -132,6 +134,11 @@ void CircleProjectile::refreshColor()
         setFillColor(m_color);
 }
 
+void CircleProjectile::makeRotating()
+{
+    m_rotationCounter = 0;
+}
+
 
 std::size_t CircleProjectile::getPointCount() const
 {
@@ -152,12 +159,12 @@ sf::Vector2f CircleProjectile::getPoint(const std::size_t index) const
 
 
 CircleProjectile::CircleProjectile(const float radius, std::size_t pointCount, const sf::Vector2f& velocity)
-	: m_velocity(velocity), m_radius(radius), m_pointCount(pointCount)
+	: m_velocity(velocity), m_radius(radius), m_pointCount(pointCount), m_rotationCounter(-1)
 {
 }
 
 std::shared_ptr<Projectile> CircleProjectile::clone()
 {
-    return std::make_shared<CircleProjectile>(CircleProjectile(*this));
+	return std::make_shared<CircleProjectile>(CircleProjectile(*this));
 }
 
