@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "Ship.h"
-#include <iostream>
+#include "TempText.h"
 
 class UIManager
 	: public sf::Drawable
@@ -9,10 +9,11 @@ class UIManager
 public:
 	UIManager(const Ship& livesShipRepresentation, const sf::Font& font, BoundedFloatRect windowDimensions, 
 		int totalExtraLives = 3, float windowMargin = 10.f);
-	sf::Text& addUiText(std::string text);
+	void addUiText(TempText text);
 	void gameOver();
 	bool isOutOfLives();
 	void playerLostLife();
+	void updateTempText();
 	void updateUI(int currentScore);
 
 private:
@@ -22,7 +23,7 @@ private:
 	void initializeExtraLivesText();
 
 	std::vector<Ship> m_lives;
-	std::vector<sf::Text> m_texts; //maybe in the future
+	std::vector<TempText> m_texts;
 	bool m_isGameOver = false;
 	bool m_playerDied = false;
 	sf::Text m_gameOverText;

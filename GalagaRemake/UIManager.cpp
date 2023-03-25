@@ -11,11 +11,11 @@ UIManager::UIManager(const Ship& livesShipRepresentation, const sf::Font& font,
 	initializeLives(livesShipRepresentation, totalExtraLives);
 }
 
-sf::Text& UIManager::addUiText(std::string text)
+void UIManager::addUiText(TempText text)
 {
-	m_texts.push_back(sf::Text(text, m_font));
-	return m_texts.back();
+	m_texts.push_back(text);
 }
+
 
 void UIManager::gameOver()
 {
@@ -33,8 +33,27 @@ void UIManager::playerLostLife()
 	m_playerDied = true;
 }
 
+void UIManager::updateTempText()
+{
+	if (m_texts.empty())
+		return;
+
+	auto it = m_texts.begin();
+	while(it != m_texts.end())
+	{
+		if(it->isDone())
+		{
+			it = m_texts.erase(it);
+			continue;
+		}
+		it->updateText();
+		it++;
+	}
+}
+
 void UIManager::updateUI(int currentScore)
 {
+	updateTempText();
 	m_scoreText.setString("Score  " + std::to_string(currentScore));
 	if (m_lives.empty())
 		return;
@@ -75,9 +94,9 @@ void UIManager::initializeLives(const Ship& livesShipRepresentation, int totalEx
 void UIManager::initializeScore()
 {
 	m_scoreText = sf::Text("Score  0", m_font);
-	
-	float xPos = m_windowDimensions.left + m_windowMargin;
-	float yPos = m_windowDimensions.top + m_windowMargin;
+
+	const float xPos = m_windowDimensions.left + m_windowMargin;
+	const float yPos = m_windowDimensions.top + m_windowMargin;
 
 	m_scoreText.setPosition(xPos, yPos);
 	m_scoreText.setScale(m_baseScale);
@@ -88,10 +107,10 @@ void UIManager::initializeGameOverText()
 {
 	m_gameOverText = sf::Text("Game Over", m_font);
 	m_gameOverText.setScale(m_baseScale * 4.61f);
-	
-	BoundedFloatRect textSize = m_gameOverText.getGlobalBounds();
-	float xPos = (m_windowDimensions.width - textSize.width) / 2;
-	float yPos = (m_windowDimensions.height / 2.5f) - textSize.height;
+
+	const BoundedFloatRect textSize = m_gameOverText.getGlobalBounds();
+	const float xPos = (m_windowDimensions.width - textSize.width) / 2;
+	const float yPos = (m_windowDimensions.height / 2.5f) - textSize.height;
 
 	m_gameOverText.setPosition(xPos, yPos);
 	m_gameOverText.setFillColor(sf::Color(0x05ecf1ff));
@@ -102,9 +121,9 @@ void UIManager::initializeExtraLivesText()
 	m_extraLivesText = sf::Text("Extra Lives ", m_font);
 	m_extraLivesText.setScale(m_baseScale);
 
-	sf::FloatRect textSize = m_extraLivesText.getGlobalBounds();
-	float xPos = m_windowDimensions.left + m_windowMargin;
-	float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - textSize.height \
+	const sf::FloatRect textSize = m_extraLivesText.getGlobalBounds();
+	const float xPos = m_windowDimensions.left + m_windowMargin;
+	const float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - textSize.height \
 		- 4.f;//needed since the text height doesnt correctly match shown text height
 
 	m_extraLivesText.setPosition(xPos, yPos);

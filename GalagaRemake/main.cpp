@@ -69,6 +69,7 @@ int main(int, char const**)
 
 	//fonts
 	sf::Font font;
+	sf::Font font2;
 
 
 	//LOADING
@@ -83,6 +84,7 @@ int main(int, char const**)
 
 		//Fonts
 		LOAD_SAFELY(font, "ClimateCrisis-Regular.ttf");
+		LOAD_SAFELY(font2, "PlayfairDisplay.ttf");
 	}
 	catch (std::invalid_argument& e) {
 		std::cout << e.what() << std::endl;
@@ -93,6 +95,31 @@ int main(int, char const**)
 	sf::Sprite planet(planetsSheet);
 	planet.setPosition(300, -500);
 	planet.setColor(sf::Color(120, 120, 120));
+
+
+
+	//tempt text
+	TempText levelIntoText("Level 1", font, 200);
+	levelIntoText.setScale(1.5f, 1.5f);
+	levelIntoText.setFillColor(sf::Color(0x05ecf1ff));
+	const BoundedFloatRect textSize = levelIntoText.getGlobalBounds();
+	const float xPos = (WORLD_BOUNDS.width - textSize.width) / 2;
+	const float yPos = (WORLD_BOUNDS.height / 2.5f) - textSize.height;
+
+	levelIntoText.setPosition(xPos, yPos);
+	levelIntoText.addFadeOut(80);
+
+	TempText levelIntoTextB("Entering Tarkion III Orbit", font2, 200);
+	levelIntoTextB.setScale(.5f, .5f);
+	const BoundedFloatRect textSizeb = levelIntoTextB.getGlobalBounds();
+	const float xPosb = (WORLD_BOUNDS.width - textSizeb.width) / 2;
+	const float yPosb = (WORLD_BOUNDS.height / 2.5f) - textSizeb.height;
+
+	levelIntoTextB.setPosition(xPosb, yPosb + 30);
+	levelIntoTextB.addFadeOut(80);
+
+
+
 
 
 
@@ -181,6 +208,8 @@ int main(int, char const**)
 	ProjectileManager playerProjectileManager;
 	ShipManager enemyShipsManager;
 	UIManager uiManager(playerShip, font, WORLD_BOUNDS);
+	uiManager.addUiText(levelIntoText);
+	uiManager.addUiText(levelIntoTextB);
 	BackgroundManager backgroundManager(WORLD_BOUNDS);
 	backgroundManager.addForegroundPlanet(planet);
 	

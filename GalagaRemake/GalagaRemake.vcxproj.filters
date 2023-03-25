@@ -54,6 +54,9 @@
     <ClCompile Include="BackgroundManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TempText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Projectile.h">
@@ -94,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="RandMacros.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TempText.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

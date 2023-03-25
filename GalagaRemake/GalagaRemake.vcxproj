@@ -153,6 +153,7 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="TempText.cpp" />
     <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +169,7 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="TempText.h" />
     <ClInclude Include="UIManager.h" />
   </ItemGroup>
   <ItemGroup>
