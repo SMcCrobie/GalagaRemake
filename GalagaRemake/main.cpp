@@ -90,6 +90,7 @@ int main(int, char const**)
 	}
 	catch (std::invalid_argument& e) {
 		std::cout << e.what() << std::endl;
+		std::cin.get();
 		return EXIT_FAILURE;
 	}
 
