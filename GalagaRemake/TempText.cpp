@@ -33,6 +33,11 @@ void TempText::addToDuration(const unsigned int increment)
 	m_duration += increment;
 }
 
+void TempText::setDuration(const unsigned duration)
+{
+	m_duration = duration;
+}
+
 bool TempText::isDone() const
 {
 	return m_duration == 0;

@@ -37,8 +37,8 @@
 
 #define BOSS_STATE_WITH_INPUT_TO_STATE_MAP_CONFIG \
 			{State0, {	\
-				{Hold,	State0},								\
-				{Input1,	State3},							\
+				{Hold,	State3},								\
+				{Input1,	State0},							\
 				{Input2,	State1},							\
 				{Input3,	State2} }							\
 			},													\
@@ -51,8 +51,8 @@
 				{Input1,	State2}}\
 			},\
 			{ State3, { \
-				{Hold,		State3}, \
-				{Input1,	State0}, \
+				{Hold,		State0}, \
+				{Input1,	State3}, \
 				{Input2,	State4}, \
 				{Input3,	State5}} \
 			}, \
@@ -78,7 +78,7 @@
 		{ State0, std::vector{ MoveUp, FireWeapon1}},\
 		{ State1, std::vector{ MoveLeft, FireWeapon1 }},	\
 		{ State2, std::vector{ MoveRight, FireWeapon1 } },	\
-		{ State3, std::vector{ MoveDown, FireWeapon1 } },	\
+		{ State3, std::vector{ FireWeapon1 } },	\
 		{ State4, std::vector{ MoveUp, MoveRight } },		\
 		{ State5, std::vector{ MoveUp, MoveLeft } },		\
 		{ State6, std::vector{ Rotate } }

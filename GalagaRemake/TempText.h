@@ -9,6 +9,7 @@ public:
 	TempText(const sf::String& string, const sf::Font& font, unsigned int duration = 100);
 	void updateText();
 	void addToDuration(unsigned int increment);
+	void setDuration(unsigned int duration);
 	bool isDone() const;
 	void addFadeOut(unsigned int fadeStart);
 

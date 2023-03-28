@@ -27,7 +27,6 @@ class RectangleProjectile :
 {
 public:
 	RectangleProjectile(const sf::Vector2f& size = sf::Vector2f(3.f, 8.f), const sf::Vector2f& velocity = sf::Vector2f(0.f, -PROJECTILE_START_SPEED));
-	//RectangleProjectile(const RectangleProjectile& rectangleProjectile);
 	void setSize(const sf::Vector2f& size);
     const sf::Vector2f& getSize() const;
     std::size_t getPointCount() const override;

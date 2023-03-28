@@ -19,6 +19,7 @@
 #include "ShipManager.h"
 #include "UIManager.h"
 
+//YOU HAVE TODO TODOS
 template<typename LoaderClass>
 void LOAD_SAFELY(LoaderClass& loader, const std::string& filePath)
 {
@@ -30,6 +31,7 @@ void LOAD_SAFELY(LoaderClass& loader, const std::string& filePath)
 }
 
 #define SCORE_VALUE_AS_INT ((gameCycleCounter/20) + (killCounter * 100))
+#define GAME_SPEED 20
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
@@ -79,7 +81,7 @@ int main(int, char const**)
 		LOAD_SAFELY(bossAnimations, "bossAnimations.png");
 		LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
 		LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
-		LOAD_SAFELY(planetsSheet, "Planets(2).png");
+		LOAD_SAFELY(planetsSheet, "Planets(1).png");
 		LOAD_SAFELY(*meteorTexture, "meteor.png");
 
 		//Fonts
@@ -99,29 +101,11 @@ int main(int, char const**)
 
 
 	//tempt text
-	TempText levelIntoText("Level 1", font, 200);
-	levelIntoText.setScale(1.5f, 1.5f);
-	levelIntoText.setFillColor(sf::Color(0x05ecf1ff));
-	const BoundedFloatRect textSize = levelIntoText.getGlobalBounds();
-	const float xPos = (WORLD_BOUNDS.width - textSize.width) / 2;
-	const float yPos = (WORLD_BOUNDS.height / 2.5f) - textSize.height;
+	TempText levelIntoTextPrimary("Level 1", font);
+	TempText levelIntoTextSecondary("Entering Tarkion III Orbit", font2);
 
-	levelIntoText.setPosition(xPos, yPos);
-	levelIntoText.addFadeOut(80);
-
-	TempText levelIntoTextB("Entering Tarkion III Orbit", font2, 200);
-	levelIntoTextB.setScale(.5f, .5f);
-	const BoundedFloatRect textSizeb = levelIntoTextB.getGlobalBounds();
-	const float xPosb = (WORLD_BOUNDS.width - textSizeb.width) / 2;
-	const float yPosb = (WORLD_BOUNDS.height / 2.5f) - textSizeb.height;
-
-	levelIntoTextB.setPosition(xPosb, yPosb + 30);
-	levelIntoTextB.addFadeOut(80);
-
-
-
-
-
+	TempText levelOutroTextPrimary("Level Complete", font);
+	TempText levelOutroTextSecondary("Exiting Tarkion III Orbit", font2);
 
 	//intialize ships
 	PlayerShip playerShip(shipAnimations, WORLD_BOUNDS);
@@ -154,6 +138,7 @@ int main(int, char const**)
 	bossProjectile.setVelocity(sf::Vector2f(0, -8));
 	bossProjectile.setTexture(bossProjectileTexture.get());
 	bossProjectile.setRadius(12.f);
+	bossProjectile.setInitOffSets(12.f, 15.f);
 	bossProjectile.setShieldColor(sf::Color::Red);
 	bossProjectile.setTextureRect(sf::IntRect(0, 0, 64, 64));
 
@@ -208,8 +193,7 @@ int main(int, char const**)
 	ProjectileManager playerProjectileManager;
 	ShipManager enemyShipsManager;
 	UIManager uiManager(playerShip, font, WORLD_BOUNDS);
-	uiManager.addUiText(levelIntoText);
-	uiManager.addUiText(levelIntoTextB);
+	uiManager.initializeLevelIntroText(levelIntoTextPrimary, levelIntoTextSecondary);
 	BackgroundManager backgroundManager(WORLD_BOUNDS);
 	backgroundManager.addForegroundPlanet(planet);
 	
@@ -217,17 +201,21 @@ int main(int, char const**)
 	KeyboardController playerController{};
 	StateMachineController enemyController;
 
+	float backgroundSpeed = .25f;
+
 	//counters
 	int timeOfLastGameLoop = 0;
 	int timeOfLastEnemyShip = -1000;
 	int deltaTillNextEnemyShip = 6000;
 	int killCounter = 0;
 	int gameCycleCounter = 0;
+	int levelOutroDelay = -1;
 
 	bool isPaused = false;
 	bool isPausedPressed = false;
 	bool isGameOver = false;	
 	bool isBossCreated = false;
+	bool isBossDestroyed = false;
 
 	while (window.isOpen())
 	{ 
@@ -243,7 +231,7 @@ int main(int, char const**)
 		window.display();
 
 		//Run game loop every X milliseconds
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= 20) {
+		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= GAME_SPEED) {
 			continue;
 		}
 		timeOfLastGameLoop = clock.getElapsedTime().asMilliseconds();
@@ -301,7 +289,7 @@ int main(int, char const**)
 
 
 		//updateBackground
-		backgroundManager.moveBackground(.25f);
+		backgroundManager.moveBackground(backgroundSpeed);
 
 		//projectile calls
 		playerProjectileManager.collectProjectile(playerShip);
@@ -317,11 +305,26 @@ int main(int, char const**)
 
 			if (isOutOfLives) {
 				isGameOver = true;
+				uiManager.updateUI(SCORE_VALUE_AS_INT);
 				uiManager.gameOver();
 				continue;
 			}
 			uiManager.playerLostLife();
 			playerShip.respawnShip();
+		}
+		if(isBossCreated && enemyShipsManager.isEmpty() && !isBossDestroyed)
+		{
+			killCounter += 8;
+			isBossDestroyed = true;
+			levelOutroDelay = 40;
+		}
+		if (levelOutroDelay > -20)
+			levelOutroDelay--;
+		if(levelOutroDelay == 0)
+		{
+			levelOutroDelay--;
+			uiManager.initializeLevelOutroText(levelOutroTextPrimary, levelOutroTextSecondary);
+		
 		}
 
 		//UI Update

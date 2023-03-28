@@ -64,20 +64,21 @@ void Ship::setTextureRectBasedOnShipState()
 
 bool Ship::detectCollision(ProjectileManager& projectileManager)
 {
-	auto gbounds = hasShield() ? m_shield.getGlobalBounds() : getGlobalBounds();
-	if (projectileManager.detectCollisionAndDestroyProjectile(gbounds)) {
-		if (hasShield())
-		{
+	if (hasShield())
+	{
+		if (projectileManager.detectCollisionAndDestroyProjectile(m_shield)) {
 			decrementShieldHealth();
+			return true;
+		}
 
-		}
-		else if (hasHealth())
-		{
-			decrementHealth();
-		}
-		return true;
 	}
-
+	else if (hasHealth())
+	{
+		if (projectileManager.detectCollisionAndDestroyProjectile(*this)) {
+			decrementHealth();
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -387,6 +388,11 @@ bool Ship::hasHealth() const
 void Ship::setHealth(int healthTotal)
 {
 	m_shipHealth = healthTotal;
+}
+
+const int& Ship::getHealth() const
+{
+	return m_shipHealth;
 }
 
 

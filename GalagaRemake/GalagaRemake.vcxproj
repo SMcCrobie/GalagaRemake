@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="BackgroundManager.cpp" />
     <ClCompile Include="BoundedFloatRect.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="ShipManager.cpp" />
@@ -159,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="BackgroundManager.h" />
     <ClInclude Include="BoundedFloatRect.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="ControllerConfigs.h" />
     <ClInclude Include="DebugMacros.h" />
@@ -178,6 +180,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Image>
     <Image Include="meteor.png" />
+    <Image Include="Planets(1).png" />
     <Image Include="Planets.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

@@ -18,9 +18,9 @@ enum ShipControl
 	InvalidShipControl
 };
 
-const float SINGLE_THRUST_DIRECTION_INCREMENT = .20f;
-const float HORIZONTAL_DIRECTION_INCREMENT = .30f;
-const float RESISTENCE_MULTIPLIER = .975f;
+const float SINGLE_THRUST_DIRECTION_INCREMENT = .25f;
+const float HORIZONTAL_DIRECTION_INCREMENT = .35f;
+const float RESISTENCE_MULTIPLIER = .965f;
 float const MAX_HORIZONTAL_SPEED = 14.0f;
 const float MAX_VERTICAL_SPEED = 10.0f;
 const float WORLD_BOUNDS_MARGIN = 10.0f;
@@ -65,6 +65,7 @@ public:
 	bool hasHealth() const;
 	void decrementHealth();
 	void setHealth(int healthTotal);
+	const int& getHealth() const;
 	void setShipColor(const sf::Color& color);
 
 protected:
