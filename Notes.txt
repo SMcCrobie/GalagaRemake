@@ -1,0 +1,86 @@
+Notes For Game
+==========================
+
+"Level" Class
+
+Premise
+---------------
+	Make a copy of each enemy within the class
+	load those pass those enemys by reference to be copied into arrays by ship manager, when the level decides its ready
+
+
+member functions
+- SummonEnemyOne()
+- SummonEnemyTwo()
+- CopyAndBindEnemyOne(const Ship& ship, )
+- GetKillCompletionPercentage()
+
+
+
+"LevelConfigurer" Class
+
+PREMISE: 
+- manage the config if each level object
+
+
+
+"Game" Class
+
+PREMISE: 
+- Real simple object, prob a singlton, or just run one instance and put all the main code in their
+- Could make it abstract to help regulate and enforce what it looks like at high level
+
+member functions
+	virtual Intialize() = 0 ;
+	virtual Run();
+	
+member fields
+	Vector<LevelConfigurers> LevelConfigurers;
+	
+
+"GalagaGame"
+
+member functions
+	Intialize() override ;
+		LoadFirstLevel();
+	virtual Run();		
+		RenderLevel();
+		m_level.RunLevel();
+		
+	
+private:
+	intialzeNextLevel();
+	loadNextLevel()
+	DeleteCurrentLevel();//what happens on the screen, player object remains in the darkenss, can pull up stats
+	LoadScoreScreen(); OR LoadTransitionScreen();
+	MovePlayerToNextLevel()
+	
+	PointCurrentLevelPointerAtNext();
+	
+	DeleteCurrentLevel();
+	LoadNext
+
+	
+member fields
+	Vector<LevelConfigurers> LevelConfigurers;
+	shared_pointer<Level> m_currentLevel;
+	shared_pointer<Level> m_NextLevel;
+	PlayerShip PlayerShip;//this way, you can hold the player when you delete levels
+						  //enemys belong to levels but not the player object
+						  //if I make it a pointer I can swap other ships in more easily or buiild off configurers and build it here
+	
+	
+
+PREMISE: 
+ - inherits from above class and writes had can have internal functions, apart from highlevel game class, that are uber specific to galaga
+ 
+ 
+ 
+ "PlayerShipConfigurer"
+ 
+ PREMISE: Make this an interface(abstract class) build specific configurations by deriving from it
+ 
+ AlphaPlayerShipConfigurer
+ 
+ 
+ 
