@@ -365,6 +365,12 @@ void Ship::respawnShip()
 	m_gameCyclesTillRespawned = 100;
 }
 
+void Ship::respawnShip(const int respawnTimer)
+{
+	m_shipHealth = 3;
+	m_gameCyclesTillRespawned = respawnTimer;
+}
+
 bool Ship::isBackwards() const
 {
 	return m_isBackwards;

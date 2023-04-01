@@ -55,6 +55,7 @@ public:
 	void moveShip();
 	virtual void rotate180();
 	void respawnShip();
+	void respawnShip(int respawnTimer);
 	bool isBackwards() const;
 	bool isRespawning() const;
 	bool hasShield() const;

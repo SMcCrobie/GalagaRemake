@@ -33,7 +33,7 @@ bool UIManager::isOutOfLives()
 
 void UIManager::playerLostLife()
 {
-	m_lives.back().respawnShip();
+	m_lives.back().respawnShip(101);
 	m_playerDied = true;
 }
 

@@ -1,32 +1,31 @@
 #include "ShipManager.h"
 #include <iostream>
 
-void ShipManager::createShip(Ship& ship)
+void ShipManager::createShip(const Ship& ship)
 {
-
 	m_ships.emplace_back(ship, StateMachineController());
 }
 
-void ShipManager::createShip(Ship& ship, StateMachineController& controller)
+void ShipManager::createShip(const Ship& ship, const StateMachineController& controller)
 {
 	m_ships.emplace_back(ship, controller);
 }
 
 void ShipManager::updateShips(const BoundedFloatRect& worldBounds, const sf::Clock& clock)
 {
-	for (auto it = m_ships.begin(); it != m_ships.end(); it++) {
-		it->second.updateControllerStateAndShipState(clock, it->first);
-		it->first.setTextureRectBasedOnShipState();
-		it->first.updateShip(worldBounds);
-		//it->first.moveShip();
+	for (auto&[ship, controller] : m_ships)
+	{
+		controller.updateControllerStateAndShipState(clock, ship);
+		ship.setTextureRectBasedOnShipState();
+		ship.updateShip(worldBounds);
 
-		const BoundedFloatRect shipBounds = it->first.getGlobalBounds();
-		if (shipBounds.top > worldBounds.bottom && it->first.isBackwards()) {
-			it->first.rotate180();
+		const BoundedFloatRect shipBounds = ship.getGlobalBounds();
+		if (shipBounds.top > worldBounds.bottom && ship.isBackwards()) {
+			ship.rotate180();
 		}
 
-		if (shipBounds.bottom < worldBounds.top && !it->first.isBackwards()) {
-			it->first.rotate180();
+		if (shipBounds.bottom < worldBounds.top && !ship.isBackwards()) {
+			ship.rotate180();
 		}
 
 	}

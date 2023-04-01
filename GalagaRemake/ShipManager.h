@@ -9,8 +9,8 @@ class ShipManager
 	: public sf::Drawable
 {
 public:
-	void createShip(Ship& ship);
-	void createShip(Ship& ship, StateMachineController& controller);
+	void createShip(const Ship& ship);
+	void createShip(const Ship& ship, const StateMachineController& controller);
 	void updateShips(const BoundedFloatRect& worldBounds, const sf::Clock& clock);
 	void detectCollision(ProjectileManager& projectileManager, int& killCounter);
 	void offloadProjectiles(ProjectileManager& projectileManager);
