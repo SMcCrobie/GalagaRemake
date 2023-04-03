@@ -32,7 +32,7 @@ class KeyboardController
 {
 public:
 	KeyboardController();
-	bool PollEventsAndUpdateShipState(sf::Window& window, Ship& ship);
+	void PollEventsAndUpdateShipState(sf::Window& window, Ship& ship);
 
 private:
 	std::map<sf::Keyboard::Key, ShipControl> m_keyboardToShipControlMap;
@@ -47,8 +47,8 @@ public:
 	                       std::map<State, std::map<Input, State>> stateWithInputToStateMap,
 	                       int totalInputs,
 	                       int deltaBeforeStateChange = 200);
-	bool isItTimeToUpdateState(const sf::Clock& clock, const sf::Int32& currentTime) const;
-	void updateControllerStateAndShipState(const sf::Clock& clocks, Ship& ship);
+	bool isItTimeToUpdateState(const sf::Int32& currentTime) const;
+	void updateControllerStateAndShipState(Ship& ship);
 private:
 	State m_currentState;
 	State m_previousState;

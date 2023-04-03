@@ -1,17 +1,32 @@
 #include "PlayerShip.h"
 
-PlayerShip::PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensions)
+void PlayerShip::initStartState()
+{
+	if (isBackwards())
+		rotate180();
+	m_gameCyclesTillRespawned = 0;
+	setShipColor(sf::Color::White);
+	m_velocity = sf::Vector2f(0.0f, 0.0f);
+	m_shipHealth = 3;
+	setPosition(m_startPosition);
+}
+
+void PlayerShip::calculateStartPosition(const BoundedFloatRect& worldDimensions)
+{
+	const sf::FloatRect shipSize = getGlobalBounds();
+	const float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
+	const float yPos = worldDimensions.height / 3 * 2;
+	m_startPosition = sf::Vector2f(xPos, yPos);
+}
+
+PlayerShip::PlayerShip(const sf::Texture& texture, const BoundedFloatRect& worldDimensions)
 	: Ship()
 {
 	setTexture(texture);
 	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 
-	const sf::FloatRect shipSize = getGlobalBounds();
-	const float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
-	const float yPos = worldDimensions.height/3 * 2;
-	m_shipHealth = 3;
-	
-	setPosition(xPos, yPos);
+	calculateStartPosition(worldDimensions);
+	initStartState();
 }
 
 void PlayerShip::updateShip(BoundedFloatRect worldBounds)
@@ -136,6 +151,11 @@ void PlayerShip::rotate180()
 		move(localBounds.width, localBounds.height);
 	else
 		move(-localBounds.width, -localBounds.height);
+}
+
+void PlayerShip::resetManager()
+{
+	initStartState();
 }
 
 

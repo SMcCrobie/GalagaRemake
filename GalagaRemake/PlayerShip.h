@@ -3,16 +3,19 @@
 #include "ProjectileManager.h"
 
 class PlayerShip :
-    public Ship
+    public Ship, public Manager
 {
 public:
-    PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensions);
+	void initStartState();
+	void calculateStartPosition(const BoundedFloatRect& worldDimensions);
+	PlayerShip(const sf::Texture& texture, const BoundedFloatRect& worldDimensions);
     void updateShip(BoundedFloatRect worldBounds) override;
     void setTextureRectBasedOnShipState() override;
 
 
     void rotateIfTriggered() override;
     void rotate180() override;
+    void resetManager() override;
    
 private:
     void updateShipVelocity(BoundedFloatRect worldBounds) override;
@@ -23,5 +26,7 @@ private:
     bool isShipwithBottomCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
     void testAndApplyVerticalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
     void testAndApplyHorizontalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
+
+    sf::Vector2f m_startPosition;
 };
 

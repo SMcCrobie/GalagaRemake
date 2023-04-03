@@ -1,18 +1,21 @@
 #include "UIManager.h"
 
+#include "GameState.h"
+
 
 #define ELEMENT_BUFFER 5.F
 
 UIManager::UIManager(const PlayerShip& playerShip, const sf::Font& font,
                      const BoundedFloatRect& windowDimensions, int totalExtraLives, float windowMargin)
 	: m_font(font), m_baseScale(sf::Vector2f(.45f, .55f)), 
-	  m_windowDimensions(windowDimensions), m_windowMargin(windowMargin), m_playerHealth(playerShip.getHealth())
+	  m_windowDimensions(windowDimensions), m_windowMargin(windowMargin), m_playerHealth(playerShip.getHealth()),
+	  m_lifeSymbol(playerShip), m_totalExtraLives(totalExtraLives)
 {
 	initializeScore();
 	initializeGameOverText();
 	initializeExtraLivesText();
-	initializePlayerHealth(playerShip);
-	initializeLives(playerShip, totalExtraLives);
+	initializePlayerHealth();
+	initializeLives();
 }
 
 void UIManager::addUiText(TempText text)
@@ -21,12 +24,7 @@ void UIManager::addUiText(TempText text)
 }
 
 
-void UIManager::gameOver()
-{
-	m_isGameOver = true;
-}
-
-bool UIManager::isOutOfLives()
+bool UIManager::isOutOfLives() const
 {
 	return m_lives.empty();
 }
@@ -34,7 +32,7 @@ bool UIManager::isOutOfLives()
 void UIManager::playerLostLife()
 {
 	m_lives.back().respawnShip(101);
-	m_playerDied = true;
+	GameState::isPlayerDead = true;
 }
 
 void UIManager::updateTempText()
@@ -70,12 +68,12 @@ void UIManager::updateUI(int currentScore)
 	m_scoreText.setString("Score  " + std::to_string(currentScore));
 	if (m_lives.empty())
 		return;
-	if (!m_lives.back().isRespawning() && !m_playerDied)
+	if (!m_lives.back().isRespawning() && !GameState::isPlayerDead)
 		return;
-	if (!m_lives.back().isRespawning() && m_playerDied) {
-		m_playerDied = false;
+	if (!m_lives.back().isRespawning() && GameState::isPlayerDead) {
+		GameState::isPlayerDead = false;
 		m_lives.pop_back();
-		reinitializePlayerHealth();
+		initializePlayerHealth();
 	}
 	else {
 		m_lives.back().updateRespawnTimer();
@@ -91,6 +89,7 @@ void UIManager::initializeLevelIntroText(TempText& primaryText, TempText& second
 	primaryText.setPosition(windowPosition);
 	primaryText.setDuration(200);
 	primaryText.addFadeOut(80);
+	m_introPrimaryText = primaryText;
 	m_texts.push_back(primaryText);
 
 
@@ -100,6 +99,7 @@ void UIManager::initializeLevelIntroText(TempText& primaryText, TempText& second
 	secondaryText.setPosition(windowPosition);
 	secondaryText.setDuration(200);
 	secondaryText.addFadeOut(80);
+	m_introSecondaryText = secondaryText;
 	m_texts.push_back(secondaryText);
 }
 
@@ -124,6 +124,16 @@ void UIManager::initializeLevelOutroText(TempText& primaryText, TempText& second
 
 }
 
+void UIManager::resetManager()
+{
+	initializePlayerHealth();
+	initializeLives();
+
+	m_texts.clear();
+	m_texts.push_back(m_introPrimaryText);
+	m_texts.push_back(m_introSecondaryText);
+}
+
 sf::Vector2f UIManager::centerElement(const sf::FloatRect rect) const
 {
 	const float xPos = (m_windowDimensions.width - rect.width) / 2;
@@ -132,10 +142,13 @@ sf::Vector2f UIManager::centerElement(const sf::FloatRect rect) const
 	return {xPos, yPos};
 }
 
-void UIManager::initializeLives(const Ship& livesShipRepresentation, int totalExtraLives)
+
+void UIManager::initializeLives()
 {
-	m_lives.push_back(livesShipRepresentation);
+	m_lives.clear();
+	m_lives.push_back(m_lifeSymbol);
 	auto& lifeSymbol = m_lives.back();
+
 	lifeSymbol.setScale(.4f, .4f);
 	auto temp = lifeSymbol.getTextureRect();
 	temp.left = temp.width;
@@ -144,13 +157,13 @@ void UIManager::initializeLives(const Ship& livesShipRepresentation, int totalEx
 	sf::FloatRect extraLivesTextSize = m_extraLivesText.getGlobalBounds();
 	sf::FloatRect lifeSymbolSize = lifeSymbol.getGlobalBounds();
 	float xPos = extraLivesTextSize.left + extraLivesTextSize.width + ELEMENT_BUFFER;
-	float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - (lifeSymbolSize.height);//extraLivesTextSize.top + ((extraLivesTextSize.height - lifeSymbolSize.height) / 2);
+	float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - (lifeSymbolSize.height);
 	float lifeXOffest = lifeSymbolSize.width + ELEMENT_BUFFER;
 
 	lifeSymbol.setPosition(xPos, yPos);
 	lifeSymbol.setVelocity(0, 0);
 	lifeSymbol.setStatic();
-	for (int i = 1; i < totalExtraLives; i++) {
+	for (int i = 1; i < m_totalExtraLives; i++) {
 		m_lives.push_back(m_lives[0]);
 		m_lives[i].move(lifeXOffest *(float)i, 0.f);
 	}
@@ -197,6 +210,7 @@ void UIManager::initializeExtraLivesText()
 
 void UIManager::initializeHealthSegments()
 {
+	m_healthBarSegments.clear();
 	const float xPos = m_windowDimensions.left + m_windowDimensions.width - m_healthBarSegment.getGlobalBounds().width - m_windowMargin;
 	const float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - m_healthBarSegment.getGlobalBounds().height;
 
@@ -214,21 +228,14 @@ void UIManager::initializeHealthBarSegment()
 	sf::RectangleShape healthBarSegment;
 	healthBarSegment.setFillColor(sf::Color::White);
 	healthBarSegment.setSize(sf::Vector2f(30.f, 6.f));
-	/*healthBarSegment.setOutlineColor(sf::Color(0xffffff4c));
-	healthBarSegment.setOutlineThickness(4.f);*/
 
 	m_healthBarSegment = healthBarSegment;
 }
 
-void UIManager::initializePlayerHealth(const PlayerShip& playerShip)
+void UIManager::initializePlayerHealth()
 {
-	initializeHealthBarSegment();
-	initializeHealthSegments();
-
-}
-
-void UIManager::reinitializePlayerHealth()
-{
+	if (m_healthBarSegment.getSize().x < 1.f)
+		initializeHealthBarSegment();
 	initializeHealthSegments();
 }
 
@@ -238,7 +245,7 @@ void UIManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(m_scoreText);
 	target.draw(m_extraLivesText);
-	if (m_isGameOver)
+	if (GameState::isGameOver)
 		target.draw(m_gameOverText);
 	for (auto& life : m_lives) 
 		target.draw(life);

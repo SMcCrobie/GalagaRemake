@@ -11,11 +11,11 @@ void ShipManager::createShip(const Ship& ship, const StateMachineController& con
 	m_ships.emplace_back(ship, controller);
 }
 
-void ShipManager::updateShips(const BoundedFloatRect& worldBounds, const sf::Clock& clock)
+void ShipManager::updateShips(const BoundedFloatRect& worldBounds)
 {
 	for (auto&[ship, controller] : m_ships)
 	{
-		controller.updateControllerStateAndShipState(clock, ship);
+		controller.updateControllerStateAndShipState(ship);
 		ship.setTextureRectBasedOnShipState();
 		ship.updateShip(worldBounds);
 
@@ -58,6 +58,11 @@ void ShipManager::offloadProjectiles(ProjectileManager& projectileManager)
 bool ShipManager::isEmpty() const
 {
 	return m_ships.empty();
+}
+
+void ShipManager::resetManager()
+{
+	m_ships.clear();
 }
 
 void ShipManager::draw(sf::RenderTarget& target, sf::RenderStates states) const

@@ -137,3 +137,8 @@ void ProjectileManager::draw(sf::RenderTarget& target, sf::RenderStates states) 
 	}
 }
 
+void ProjectileManager::resetManager()
+{
+	m_projectiles.clear();
+}
+

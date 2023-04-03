@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "GameState.h"
 
 KeyboardController::KeyboardController()
 {
@@ -24,20 +25,31 @@ KeyboardController::KeyboardController()
 }
 
 
-bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
+void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
 {
 	sf::Event event{};
 
 	//Poll all game inputs and map
 	while (window.pollEvent(event)) {
 
-		if (event.type == sf::Event::Closed) {
+		if (event.type == sf::Event::Closed ||
+			(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
 			window.close();
 		}
 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
-			return true;
+			GameState::isPaused = !GameState::isPaused;
 		}
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2) {
+			GameState::requiresLevelRestart = true;
+			return;
+		}
+
+
+		/*can be used to disallow input while paused, feels weird with movement when enabled
+		 *kinda bs with firing your weapon though when disabled
+		 *if(GameState::isPaused)
+			continue;*/
 
 		if (event.type == sf::Event::MouseButtonPressed) {
 			if (event.key.code == sf::Mouse::Left) {
@@ -63,8 +75,6 @@ bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 		}
 
 	}
-
-	return false;
 }
 
 StateMachineController::StateMachineController() :
@@ -116,17 +126,17 @@ StateMachineController::StateMachineController(std::map<State, std::vector<ShipC
 {
 }
 
-bool StateMachineController::isItTimeToUpdateState(const sf::Clock& clock, const sf::Int32& currentTime) const
+bool StateMachineController::isItTimeToUpdateState(const sf::Int32& currentTime) const
 {
 	if (currentTime - m_timeOfLastStateChange < m_deltaBeforeStateChange)
 		return true;
 	return false;
 }
 
-void StateMachineController::updateControllerStateAndShipState(const sf::Clock& clock, Ship& ship)
+void StateMachineController::updateControllerStateAndShipState(Ship& ship)
 {
-	const sf::Int32 currentTime = clock.getElapsedTime().asMilliseconds();
-	if (isItTimeToUpdateState(clock, currentTime)) return;
+	const sf::Int32 currentTime = GameState::clock.getElapsedTime().asMilliseconds();
+	if (isItTimeToUpdateState(currentTime)) return;
 
 	m_timeOfLastStateChange = currentTime;
 	const auto newInput = static_cast<Input>(rand() % m_totalInputs);
@@ -136,7 +146,7 @@ void StateMachineController::updateControllerStateAndShipState(const sf::Clock& 
 	if (inputToStateEntry != m_stateWithInputToStateMap.at(m_currentState).end())
 		m_currentState = inputToStateEntry->second;//if current state is new state, mov not reassigned
 
-	//Can't do this currently because the ship currently shuts its own fire1 off
+	//Can't do this currently because the ship turns its own fire1 off
 	//if (m_currentState == m_previousState)
 	//	return;
 

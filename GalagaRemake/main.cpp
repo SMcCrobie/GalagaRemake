@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <cstdlib> 
 #include <ctime>
 #include <iostream>
@@ -11,6 +10,8 @@
 #include "Controller.h"
 #include "ControllerConfigs.h"
 #include "DebugMacros.h"
+#include "GameState.h"
+#include "Level.h"
 #include "PlayerShip.h"
 #include "Projectile.h"
 #include "ProjectileManager.h"
@@ -19,7 +20,7 @@
 #include "ShipManager.h"
 #include "UIManager.h"
 
-//YOU HAVE TODO TODOS
+//YOU HAVE TODOS TODO
 template<typename LoaderClass>
 void LOAD_SAFELY(LoaderClass& loader, const std::string& filePath)
 {
@@ -30,12 +31,15 @@ void LOAD_SAFELY(LoaderClass& loader, const std::string& filePath)
 	}
 }
 
-#define SCORE_VALUE_AS_INT ((gameCycleCounter/20) + (killCounter * 100))
+#define SCORE_VALUE_AS_INT ((GameState::gameCycleCounter/20) + (GameState::killCounter * 100))
 #define GAME_SPEED 20
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
+
+
+
 
 
 int main(int, char const**)
@@ -55,9 +59,7 @@ int main(int, char const**)
 		static_cast<int>(WORLD_BOUNDS.height)), "Galaga!");
 	window.setKeyRepeatEnabled(false);
 	window.setView(WORLD_VIEW);
-
-	//Clock
-	sf::Clock clock;
+	window.display();
 
 	//textures
 	sf::Texture shipAnimations;
@@ -109,7 +111,7 @@ int main(int, char const**)
 	TempText levelOutroTextSecondary("Exiting Tarkion III Orbit", font2);
 
 	//intialize ships
-	PlayerShip playerShip(shipAnimations, WORLD_BOUNDS);
+	auto playerShip = std::make_shared<PlayerShip>(shipAnimations, WORLD_BOUNDS);
 
 	Ship enemyShip;
 	enemyShip.setIsHorizontallyWorldBound(false);
@@ -190,148 +192,139 @@ int main(int, char const**)
 
 
 	//Managers Class intialization
-	ProjectileManager enemyProjectileManager;
-	ProjectileManager playerProjectileManager;
-	ShipManager enemyShipsManager;
-	UIManager uiManager(playerShip, font, WORLD_BOUNDS);
-	uiManager.initializeLevelIntroText(levelIntoTextPrimary, levelIntoTextSecondary);
-	BackgroundManager backgroundManager(WORLD_BOUNDS);
-	backgroundManager.addForegroundPlanet(planet);
+	auto enemyProjectileManager = std::make_shared<ProjectileManager>();
+	auto playerProjectileManager = std::make_shared<ProjectileManager>();
+	auto enemyShipsManager = std::make_shared<ShipManager>();
+	auto uiManager = std::make_shared<UIManager>(*playerShip, font, WORLD_BOUNDS);
+	auto backgroundManager = std::make_shared<BackgroundManager>(WORLD_BOUNDS);
+
+	uiManager->initializeLevelIntroText(levelIntoTextPrimary, levelIntoTextSecondary);
+	backgroundManager->addForegroundPlanet(planet);
+
+
+	//Level Manager
+	Level level;
+	level.addDrawable(backgroundManager)
+		 .addDrawable(playerProjectileManager)
+		 .addDrawable(enemyProjectileManager)
+		 .addDrawable(enemyShipsManager)
+		 .addDrawable(playerShip)
+		 .addDrawable(uiManager);
 	
+	level.addManager(backgroundManager)
+		 .addManager(playerProjectileManager)
+		 .addManager(enemyProjectileManager)
+		 .addManager(enemyShipsManager)
+		 .addManager(playerShip)
+		 .addManager(uiManager);
+
+
 	//intialize controller
 	KeyboardController playerController{};
 	StateMachineController enemyController;
 
 	float backgroundSpeed = .25f;
 
-	//counters
-	int timeOfLastGameLoop = 0;
-	int timeOfLastEnemyShip = -1000;
-	int deltaTillNextEnemyShip = 6000;
-	int killCounter = 0;
-	int gameCycleCounter = 0;
-	int levelOutroDelay = -1;
-
-	bool isPaused = false;
-	bool isPausedPressed = false;
-	bool isGameOver = false;	
-	bool isBossCreated = false;
-	bool isBossDestroyed = false;
-
 	while (window.isOpen())
 	{ 
 
 		// Update the window, 
 		window.clear();
-		window.draw(backgroundManager);
-		window.draw(playerProjectileManager);
-		window.draw(enemyProjectileManager);
-		window.draw(playerShip);
-		window.draw(enemyShipsManager);
-		window.draw(uiManager);
+		window.draw(level);
 		window.display();
 
 		//Run game loop every X milliseconds
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastGameLoop <= GAME_SPEED) {
+		if (GameState::clock.getElapsedTime().asMilliseconds() - GameState::timeOfLastGameLoop <= GAME_SPEED)
 			continue;
-		}
-		timeOfLastGameLoop = clock.getElapsedTime().asMilliseconds();
+
+		GameState::timeOfLastGameLoop = GameState::clock.getElapsedTime().asMilliseconds();
 		
 		//Poll for events
-		isPausedPressed = playerController.PollEventsAndUpdateShipState(window, playerShip);
-		enemyController.updateControllerStateAndShipState(clock, enemyShip);
+		playerController.PollEventsAndUpdateShipState(window, *playerShip);
+		//enemyController.updateControllerStateAndShipState(enemyShip);
 
-		if (isGameOver) {
+		if (level.checkForGameEvent())
 			continue;
-		}
-		
-		//Pause check
-		if (isPausedPressed)
-			isPaused = !isPaused;
-		if (isPaused)
-			continue;
-
 		
 		//enemyShipCreation - currently based off time, should be based off gamecycles
-		if (clock.getElapsedTime().asMilliseconds() - timeOfLastEnemyShip >= deltaTillNextEnemyShip) {
-			if (killCounter <= 30) {
+		if (GameState::clock.getElapsedTime().asMilliseconds() - GameState::timeOfLastEnemyShip >= GameState::deltaTillNextEnemyShip) {
+			if (GameState::killCounter <= 30) {
 				float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
-				enemyShipsManager.createShip(enemyShip);
+				enemyShipsManager->createShip(enemyShip);
 
 
 				//enemyship Upgrade
-				if (killCounter > 8) {
+				if (GameState::killCounter > 8) {
 					xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);
 					enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
 					enemyShip.rotate180();
-					enemyShipsManager.createShip(enemyShip);
+					enemyShipsManager->createShip(enemyShip);
 					enemyShip.rotate180();
 				}
 			}
-			if (killCounter > 30 && !isBossCreated && enemyShipsManager.isEmpty()) {
-				isBossCreated = true;
-				enemyShipsManager.createShip(bossShip, bossController);
-				enemyShipsManager.createShip(bossSideKicks, bossSideKicksController);
+			if (GameState::killCounter > 30 && !GameState::isBossCreated && enemyShipsManager->isEmpty()) {
+				GameState::isBossCreated = true;
+				enemyShipsManager->createShip(bossShip, bossController);
+				enemyShipsManager->createShip(bossSideKicks, bossSideKicksController);
 				bossSideKicks.move(300.f, 0.f);
-				enemyShipsManager.createShip(bossSideKicks, bossSideKicksControllerB);
+				enemyShipsManager->createShip(bossSideKicks, bossSideKicksControllerB);
 			}
 
-			timeOfLastEnemyShip = clock.getElapsedTime().asMilliseconds();
-			deltaTillNextEnemyShip = deltaTillNextEnemyShip - 40;
+			GameState::timeOfLastEnemyShip = GameState::clock.getElapsedTime().asMilliseconds();
+			GameState::deltaTillNextEnemyShip = GameState::deltaTillNextEnemyShip - 40;
 		}
 	
 		//apply texture, based on events from player controller
-		playerShip.setTextureRectBasedOnShipState();
+		playerShip->setTextureRectBasedOnShipState();
 
 		//update ships based on inputs from controllers
-		playerShip.updateShip(WORLD_BOUNDS);
-		enemyShipsManager.updateShips(WORLD_BOUNDS, clock);
+		playerShip->updateShip(WORLD_BOUNDS);
+		enemyShipsManager->updateShips(WORLD_BOUNDS);
 
 
 		//updateBackground
-		backgroundManager.moveBackground(backgroundSpeed);
+		backgroundManager->moveBackground(backgroundSpeed);
 
 		//projectile calls
-		playerProjectileManager.collectProjectile(playerShip);
-		enemyShipsManager.offloadProjectiles(enemyProjectileManager);
+		playerProjectileManager->collectProjectile(*playerShip);
+		enemyShipsManager->offloadProjectiles(*enemyProjectileManager);
 
-		playerProjectileManager.updateProjectiles(WORLD_BOUNDS);
-		enemyProjectileManager.updateProjectiles(WORLD_BOUNDS);
+		playerProjectileManager->updateProjectiles(WORLD_BOUNDS);
+		enemyProjectileManager->updateProjectiles(WORLD_BOUNDS);
 
-		enemyShipsManager.detectCollision(playerProjectileManager, killCounter);
-		bool isOutOfLives = uiManager.isOutOfLives();
-		if (!playerShip.isRespawning() && playerShip.detectCollision(enemyProjectileManager)
-			&& !playerShip.hasHealth()) {
+		enemyShipsManager->detectCollision(*playerProjectileManager, GameState::killCounter);
+		bool isOutOfLives = uiManager->isOutOfLives();
+		if (!playerShip->isRespawning() && playerShip->detectCollision(*enemyProjectileManager)
+			&& !playerShip->hasHealth()) {
 
 			if (isOutOfLives) {
-				isGameOver = true;
-				uiManager.updateUI(SCORE_VALUE_AS_INT);
-				uiManager.gameOver();
+				GameState::isGameOver = true;
+				uiManager->updateUI(SCORE_VALUE_AS_INT);
 				continue;
 			}
-			uiManager.playerLostLife();
-			playerShip.respawnShip();
+			uiManager->playerLostLife();
+			playerShip->respawnShip();
 		}
-		if(isBossCreated && enemyShipsManager.isEmpty() && !isBossDestroyed)
+		if(GameState::isBossCreated && enemyShipsManager->isEmpty() && !GameState::isBossDestroyed)
 		{
-			killCounter += 8;
-			isBossDestroyed = true;
-			levelOutroDelay = 40;
+			GameState::killCounter += 8;
+			GameState::isBossDestroyed = true;
+			GameState::levelOutroDelay = 40;
 		}
-		if (levelOutroDelay > -20)
-			levelOutroDelay--;
-		if(levelOutroDelay == 0)
+		if (GameState::levelOutroDelay > -20)
+			GameState::levelOutroDelay--;
+		if(GameState::levelOutroDelay == 0)
 		{
-			levelOutroDelay--;
-			uiManager.initializeLevelOutroText(levelOutroTextPrimary, levelOutroTextSecondary);
+			GameState::levelOutroDelay--;
+			uiManager->initializeLevelOutroText(levelOutroTextPrimary, levelOutroTextSecondary);
 		
 		}
 
 		//UI Update
-		uiManager.updateUI(SCORE_VALUE_AS_INT);
+		uiManager->updateUI(SCORE_VALUE_AS_INT);
 
-		gameCycleCounter++;
+		GameState::gameCycleCounter++;
 
 	}
 	return EXIT_SUCCESS;

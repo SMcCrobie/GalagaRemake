@@ -6,15 +6,16 @@
 #include "ProjectileManager.h"
 
 class ShipManager
-	: public sf::Drawable
+	: public sf::Drawable, public Manager
 {
 public:
 	void createShip(const Ship& ship);
 	void createShip(const Ship& ship, const StateMachineController& controller);
-	void updateShips(const BoundedFloatRect& worldBounds, const sf::Clock& clock);
+	void updateShips(const BoundedFloatRect& worldBounds);
 	void detectCollision(ProjectileManager& projectileManager, int& killCounter);
 	void offloadProjectiles(ProjectileManager& projectileManager);
 	bool isEmpty() const;
+	void resetManager() override;
 
 private:
 	std::list<std::pair<Ship, StateMachineController>> m_ships;
