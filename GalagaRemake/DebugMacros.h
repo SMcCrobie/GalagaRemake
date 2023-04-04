@@ -2,9 +2,9 @@
 #include <Windows.h>
 //#define Seans_Debug
 #ifdef Seans_Debug
-int allocation_counter = 0;
+inline int allocation_counter = 0;
 
-void* operator new(size_t size)
+inline void* operator new(size_t size)
 {
 	//std::cout << "allocating  " << size << " bytes of memory" << std::endl;
 	allocation_counter++;
@@ -15,7 +15,7 @@ void* operator new(size_t size)
 	return p;
 }
 
-void operator delete(void* p)
+inline void operator delete(void* p)
 {
 	//std::cout << "Deleting Memory" << std::endl;
 	allocation_counter--;
@@ -23,7 +23,7 @@ void operator delete(void* p)
 	free(p);
 }
 
-void* operator new[](size_t size)
+inline void* operator new[](size_t size)
 {
 	//std::cout << "allocating  " << size << " bytes of memory" << std::endl;
 	/*if (size > 1000)
@@ -34,7 +34,7 @@ void* operator new[](size_t size)
 	return p;
 }
 
-void operator delete[](void* p)
+inline void operator delete[](void* p)
 {
 	allocation_counter--;
 	std::cout << "Deleting, current counter: " << allocation_counter << std::endl;
@@ -44,11 +44,11 @@ void operator delete[](void* p)
 
 #endif // Seans_Debug
 
-void ShowConsole()
+inline void ShowConsole()
 {
 	::ShowWindow(::GetConsoleWindow(), SW_SHOW);
 }
-void HideConsole()
+inline void HideConsole()
 {
 	::ShowWindow(::GetConsoleWindow(), SW_HIDE);
 }

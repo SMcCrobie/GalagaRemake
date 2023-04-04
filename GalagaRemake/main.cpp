@@ -19,17 +19,10 @@
 #include "Ship.h"
 #include "ShipManager.h"
 #include "UIManager.h"
+#include "Fonts.h"
+#include "Loader.h"
 
 //YOU HAVE TODOS TODO
-template<typename LoaderClass>
-void LOAD_SAFELY(LoaderClass& loader, const std::string& filePath)
-{
-	if (!loader.loadFromFile(filePath))
-	{
-		ShowConsole();
-		throw std::invalid_argument("Failed to load " + filePath);
-	}
-}
 
 #define SCORE_VALUE_AS_INT ((GameState::gameCycleCounter/20) + (GameState::killCounter * 100))
 #define GAME_SPEED 20
@@ -71,24 +64,18 @@ int main(int, char const**)
 	bossProjectileTexture->setSmooth(true);
 	auto meteorTexture = std::make_shared<sf::Texture>();
 
-	//fonts
-	sf::Font font;
-	sf::Font font2;
-
-
 	//LOADING
 	try {
 		//textures
-		LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
-		LOAD_SAFELY(bossAnimations, "bossAnimations.png");
-		LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
-		LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
-		LOAD_SAFELY(planetsSheet, "Planets(1).png");
-		LOAD_SAFELY(*meteorTexture, "meteor.png");
+		Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
+		Loader::LOAD_SAFELY(bossAnimations, "bossAnimations.png");
+		Loader::LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
+		Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
+		Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
+		Loader::LOAD_SAFELY(*meteorTexture, "meteor.png");
 
-		//Fonts
-		LOAD_SAFELY(font, "ClimateCrisis-Regular.ttf");
-		LOAD_SAFELY(font2, "PlayfairDisplay.ttf");
+		Fonts::load();
+
 	}
 	catch (std::invalid_argument& e) {
 		std::cout << e.what() << std::endl;
@@ -104,11 +91,11 @@ int main(int, char const**)
 
 
 	//tempt text
-	TempText levelIntoTextPrimary("Level 1", font);
-	TempText levelIntoTextSecondary("Entering Tarkion III Orbit", font2);
+	TempText levelIntoTextPrimary("Level 1", Fonts::galaxus);
+	TempText levelIntoTextSecondary("Entering Tarkion III Orbit", Fonts::playFair);
 
-	TempText levelOutroTextPrimary("Level Complete", font);
-	TempText levelOutroTextSecondary("Exiting Tarkion III Orbit", font2);
+	TempText levelOutroTextPrimary("Level Complete", Fonts::galaxus);
+	TempText levelOutroTextSecondary("Exiting Tarkion III Orbit", Fonts::playFair);
 
 	//intialize ships
 	auto playerShip = std::make_shared<PlayerShip>(shipAnimations, WORLD_BOUNDS);
@@ -195,7 +182,7 @@ int main(int, char const**)
 	auto enemyProjectileManager = std::make_shared<ProjectileManager>();
 	auto playerProjectileManager = std::make_shared<ProjectileManager>();
 	auto enemyShipsManager = std::make_shared<ShipManager>();
-	auto uiManager = std::make_shared<UIManager>(*playerShip, font, WORLD_BOUNDS);
+	auto uiManager = std::make_shared<UIManager>(*playerShip, WORLD_BOUNDS);
 	auto backgroundManager = std::make_shared<BackgroundManager>(WORLD_BOUNDS);
 
 	uiManager->initializeLevelIntroText(levelIntoTextPrimary, levelIntoTextSecondary);
@@ -204,12 +191,12 @@ int main(int, char const**)
 
 	//Level Manager
 	Level level;
-	level.addDrawable(backgroundManager)
-		 .addDrawable(playerProjectileManager)
-		 .addDrawable(enemyProjectileManager)
-		 .addDrawable(enemyShipsManager)
-		 .addDrawable(playerShip)
-		 .addDrawable(uiManager);
+	level.addDrawableLayer(backgroundManager)
+		 .addDrawableLayer(playerProjectileManager)
+		 .addDrawableLayer(enemyProjectileManager)
+		 .addDrawableLayer(enemyShipsManager)
+		 .addDrawableLayer(playerShip)
+		 .addDrawableLayer(uiManager);
 	
 	level.addManager(backgroundManager)
 		 .addManager(playerProjectileManager)
@@ -256,7 +243,7 @@ int main(int, char const**)
 
 				//enemyship Upgrade
 				if (GameState::killCounter > 8) {
-					xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);
+					xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(100.F, 500.F);
 					enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
 					enemyShip.rotate180();
 					enemyShipsManager->createShip(enemyShip);

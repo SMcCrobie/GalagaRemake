@@ -147,6 +147,7 @@
     <ClCompile Include="BoundedFloatRect.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Fonts.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="ShipManager.cpp" />
@@ -165,7 +166,9 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="ControllerConfigs.h" />
     <ClInclude Include="DebugMacros.h" />
+    <ClInclude Include="Fonts.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="Loader.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="PlayerShip.h" />

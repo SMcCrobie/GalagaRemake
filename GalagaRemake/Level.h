@@ -9,7 +9,7 @@ class Level
 {
 public:
 	Level& addManager(const std::shared_ptr<Manager>& manager);
-	Level& addDrawable(const std::shared_ptr<sf::Drawable>& drawable);
+	Level& addDrawableLayer(const std::shared_ptr<sf::Drawable>& drawable);
 	bool checkForGameEvent() const;
 	void reset() const;
 

@@ -1,16 +1,28 @@
 #include "UIManager.h"
-
 #include "GameState.h"
 
 
+#define CENTER_ELEMENT_HORIZONTALLY(elementWidth) ((m_windowDimensions.width - (elementWidth)) / 2)
 #define ELEMENT_BUFFER 5.F
 
-UIManager::UIManager(const PlayerShip& playerShip, const sf::Font& font,
+void UIManager::initializePauseText()
+{
+	m_pauseText = sf::Text("Game Paused", Fonts::galaxus);
+	m_pauseText.setFillColor(sf::Color(255,255,255,255));
+	m_pauseText.setScale(1.6f, 1.6f);
+	//m_pauseText.setOutlineColor(sf::Color::Black);
+	//m_pauseText.setOutlineThickness(1.5f);
+	m_pauseText.setPosition(centerElement(m_pauseText.getGlobalBounds()));
+	m_pauseText.move(0.f, -50.f);
+}
+
+UIManager::UIManager(const PlayerShip& playerShip,
                      const BoundedFloatRect& windowDimensions, int totalExtraLives, float windowMargin)
-	: m_font(font), m_baseScale(sf::Vector2f(.45f, .55f)), 
+	: m_baseScale(sf::Vector2f(.45f, .55f)),
 	  m_windowDimensions(windowDimensions), m_windowMargin(windowMargin), m_playerHealth(playerShip.getHealth()),
 	  m_lifeSymbol(playerShip), m_totalExtraLives(totalExtraLives)
 {
+	initializePauseText();
 	initializeScore();
 	initializeGameOverText();
 	initializeExtraLivesText();
@@ -136,7 +148,7 @@ void UIManager::resetManager()
 
 sf::Vector2f UIManager::centerElement(const sf::FloatRect rect) const
 {
-	const float xPos = (m_windowDimensions.width - rect.width) / 2;
+	const float xPos = CENTER_ELEMENT_HORIZONTALLY(rect.width);
 	const float yPos = (m_windowDimensions.height / 2.5f) - rect.height;
 
 	return {xPos, yPos};
@@ -171,7 +183,7 @@ void UIManager::initializeLives()
 
 void UIManager::initializeScore()
 {
-	m_scoreText = sf::Text("Score  0", m_font);
+	m_scoreText = sf::Text("Score  0", Fonts::galaxus);
 
 	const float xPos = m_windowDimensions.left + m_windowMargin;
 	const float yPos = m_windowDimensions.top + m_windowMargin;
@@ -183,7 +195,7 @@ void UIManager::initializeScore()
 
 void UIManager::initializeGameOverText()
 {
-	m_gameOverText = sf::Text("Game Over", m_font);
+	m_gameOverText = sf::Text("Game Over", Fonts::galaxus);
 	m_gameOverText.setScale(m_baseScale * 4.61f);
 
 	const BoundedFloatRect textSize = m_gameOverText.getGlobalBounds();
@@ -196,7 +208,7 @@ void UIManager::initializeGameOverText()
 
 void UIManager::initializeExtraLivesText()
 {
-	m_extraLivesText = sf::Text("Lives ", m_font);
+	m_extraLivesText = sf::Text("Lives ", Fonts::galaxus);
 	m_extraLivesText.setScale(m_baseScale);
 
 	const sf::FloatRect textSize = m_extraLivesText.getGlobalBounds();
@@ -245,12 +257,16 @@ void UIManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(m_scoreText);
 	target.draw(m_extraLivesText);
-	if (GameState::isGameOver)
-		target.draw(m_gameOverText);
 	for (auto& life : m_lives) 
 		target.draw(life);
 	for (auto& text : m_texts) 
 		target.draw(text);
 	for (auto& healthBarSegment : m_healthBarSegments)
 		target.draw(healthBarSegment);
+
+
+	if (GameState::isGameOver)
+		target.draw(m_gameOverText);
+	if (GameState::isPaused)
+		target.draw(m_pauseText);
 }

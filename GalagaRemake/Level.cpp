@@ -2,7 +2,7 @@
 
 #include "GameState.h"
 
-Level& Level::addDrawable(const std::shared_ptr<sf::Drawable>& drawable)
+Level& Level::addDrawableLayer(const std::shared_ptr<sf::Drawable>& drawable)
 {
 	m_drawables.push_back(drawable);
 	return *this;

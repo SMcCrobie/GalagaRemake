@@ -196,6 +196,7 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 
 
 	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
+	//ALSO, currently breaks if the ship is spawned outside the world bounds, should prob just manage that in ship spawning
 	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
 		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
 
