@@ -2,21 +2,8 @@
 
 namespace GameState
 {
-	inline bool isGameOver = false;
-	inline bool isPaused = false;
-	inline bool requiresLevelRestart = false;
-	inline bool isBossCreated = false;
-	inline bool isBossDestroyed = false;
-	inline bool isPlayerDead = false;
-
-	inline int killCounter = 0;
-	inline int gameCycleCounter = 0;
-	inline int timeOfLastGameLoop = 0;
-	inline int timeOfLastEnemyShip = -1000;
-	inline int deltaTillNextEnemyShip = 6000;
-	inline int levelOutroDelay = -1;
-
-	//Clock
+	inline bool isGameOver, isPaused, requiresLevelRestart, isBossCreated, isBossDestroyed, isPlayerDead, isKeyTrapActivated, isIntroDone;
+	inline int killCounter, gameCycleCounter, timeOfLastGameLoop, timeOfLastEnemyShip, deltaTillNextEnemyShip, levelOutroDelay;
 	inline sf::Clock clock;
 
 
@@ -28,12 +15,14 @@ namespace GameState
 		isBossCreated = false;
 		isBossDestroyed = false;
 		isPlayerDead = false;
+		isKeyTrapActivated = false;
+		isIntroDone = false;
 
 		killCounter = 0;
 		gameCycleCounter = 0;
 		timeOfLastGameLoop = 0;
-		timeOfLastEnemyShip = -1000;
-		deltaTillNextEnemyShip = 6000;
+		timeOfLastEnemyShip = 0;
+		deltaTillNextEnemyShip = 300;
 		levelOutroDelay = -1; 
 
 		clock.restart();

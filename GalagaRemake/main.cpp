@@ -4,6 +4,7 @@
 #include <list>
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include <climits>
 
 #include "BackgroundManager.h"
 #include "BoundedFloatRect.h"
@@ -24,7 +25,7 @@
 
 //YOU HAVE TODOS TODO
 
-#define SCORE_VALUE_AS_INT ((GameState::gameCycleCounter/20) + (GameState::killCounter * 100))
+#define SCORE_VALUE_AS_INT ((GameState::killCounter * 100))
 #define GAME_SPEED 20
 
 //Global Variables
@@ -61,7 +62,7 @@ int main(int, char const**)
 	sf::Texture planetsSheet;
 
 	auto bossProjectileTexture = std::make_shared<sf::Texture>();
-	bossProjectileTexture->setSmooth(true);
+	//bossProjectileTexture->setSmooth(true);
 	auto meteorTexture = std::make_shared<sf::Texture>();
 
 	//LOADING
@@ -74,6 +75,7 @@ int main(int, char const**)
 		Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
 		Loader::LOAD_SAFELY(*meteorTexture, "meteor.png");
 
+		//fonts
 		Fonts::load();
 
 	}
@@ -118,10 +120,11 @@ int main(int, char const**)
 	bossSideKicks.setIsHorizontallyWorldBound(false);
 	bossSideKicks.setTexture(bossSideKicksAnimations);
 	bossSideKicks.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
-	bossSideKicks.setPosition(sf::Vector2f(150.f, 1050.f));
 	bossSideKicks.scale(1.2f, 1.2f);
 	bossSideKicks.setHealth(15);
-	bossSideKicks.rotate180();
+	//bossSideKicks.rotate180();
+	bossSideKicks.setPosition(sf::Vector2f(150.f, 1050.f));
+	
 
 
 	CircleProjectile bossProjectile = CircleProjectile();
@@ -135,11 +138,13 @@ int main(int, char const**)
 	bossShip.setProjectile1(bossProjectile);
 
 	auto shieldColor = sf::Color::Red;
-	shieldColor.a = 100;
+	shieldColor.a = 125;
 
 	auto radius = 56.f;
 	bossProjectile.setRadius(radius);
 	bossProjectile.setShieldColor(shieldColor);
+	/*bossProjectile.setOutlineColor(sf::Color(0xa91e25ff));
+	bossProjectile.setOutlineThickness(2.5f);*/
 	bossProjectile.setOrigin(radius, radius);
 	bossShip.setHealth(30);
 	bossShip.setShield(bossProjectile,50);
@@ -171,8 +176,8 @@ int main(int, char const**)
 		bossSideKicksStateWithInputToStateMap, 3, 200);
 
 
-	std::map<State, std::vector<ShipControl>> bossStateToShipControlInputsMap{BOSS_STATE_TO_SHIP_CONTROL_INPUT_MAP_CONFIG};
-	std::map<State, std::map<Input, State>> bossStateWithInputToStateMap{ BOSS_STATE_WITH_INPUT_TO_STATE_MAP_CONFIG };
+	std::map<State, std::vector<ShipControl>> bossStateToShipControlInputsMap{BOSS_STATE_TO_SHIP_CONTROL_INPUT_MAP};
+	std::map<State, std::map<Input, State>> bossStateWithInputToStateMap{ BOSS_STATE_WITH_INPUT_TO_STATE_MAP };
 
 	auto bossController = StateMachineController(bossStateToShipControlInputsMap, 
 												 bossStateWithInputToStateMap, 4);
@@ -211,6 +216,7 @@ int main(int, char const**)
 	StateMachineController enemyController;
 
 	float backgroundSpeed = .25f;
+	GameState::init();
 
 	while (window.isOpen())
 	{ 
@@ -234,32 +240,53 @@ int main(int, char const**)
 			continue;
 		
 		//enemyShipCreation - currently based off time, should be based off gamecycles
-		if (GameState::clock.getElapsedTime().asMilliseconds() - GameState::timeOfLastEnemyShip >= GameState::deltaTillNextEnemyShip) {
-			if (GameState::killCounter <= 30) {
+		if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip >= GameState::deltaTillNextEnemyShip) {
+			int size = enemyShipsManager->count();
+			if (GameState::killCounter < 8 && enemyShipsManager->count() < 2  ) {
 				float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
 				enemyShipsManager->createShip(enemyShip);
-
-
-				//enemyship Upgrade
-				if (GameState::killCounter > 8) {
-					xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(100.F, 500.F);
-					enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
-					enemyShip.rotate180();
-					enemyShipsManager->createShip(enemyShip);
-					enemyShip.rotate180();
-				}
 			}
-			if (GameState::killCounter > 30 && !GameState::isBossCreated && enemyShipsManager->isEmpty()) {
+
+			if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager->count() < 4) {
+				float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
+				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
+				enemyShipsManager->createShip(enemyShip);
+			}
+
+			if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager->count() < INT_MAX) {
+				float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
+				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.top - 50.f));
+				enemyShipsManager->createShip(enemyShip);
+			} 
+			//enemyship Upgrade
+			if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager->count() < 4) {
+				float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 546.F);
+				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
+				enemyShip.rotate180();
+				enemyShipsManager->createShip(enemyShip);
+				enemyShip.rotate180();
+			}
+			if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager->count() < INT_MAX) {
+				float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 546.F);
+				enemyShip.setPosition(sf::Vector2f(xCoordinate, WORLD_BOUNDS.bottom + 50.f));
+				enemyShip.rotate180();
+				enemyShipsManager->createShip(enemyShip);
+				enemyShip.rotate180();
+			}
+			//boss
+			if (GameState::killCounter >= 32 && !GameState::isBossCreated && enemyShipsManager->isEmpty()) {
 				GameState::isBossCreated = true;
 				enemyShipsManager->createShip(bossShip, bossController);
 				enemyShipsManager->createShip(bossSideKicks, bossSideKicksController);
 				bossSideKicks.move(300.f, 0.f);
 				enemyShipsManager->createShip(bossSideKicks, bossSideKicksControllerB);
+				//this is why you need to standardize ship creation, prob set position before any creation period
+				bossSideKicks.move(-300.f, 0.f);
 			}
-
-			GameState::timeOfLastEnemyShip = GameState::clock.getElapsedTime().asMilliseconds();
-			GameState::deltaTillNextEnemyShip = GameState::deltaTillNextEnemyShip - 40;
+			GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
+			if(size < enemyShipsManager->count())
+				GameState::deltaTillNextEnemyShip -= 5;
 		}
 	
 		//apply texture, based on events from player controller

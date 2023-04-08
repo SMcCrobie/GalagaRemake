@@ -15,6 +15,7 @@ public:
 	void detectCollision(ProjectileManager& projectileManager, int& killCounter);
 	void offloadProjectiles(ProjectileManager& projectileManager);
 	bool isEmpty() const;
+	int	 count() const;
 	void resetManager() override;
 
 private:

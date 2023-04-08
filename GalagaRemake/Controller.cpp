@@ -36,8 +36,13 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 			(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
 			window.close();
 		}
+		if(event.type == sf::Event::LostFocus){
+			ship.disableCurrentShipStates();
+			GameState::isPaused = true;
+		}
 
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P ) {
+			ship.disableCurrentShipStates();
 			GameState::isPaused = !GameState::isPaused;
 		}
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2) {
@@ -46,10 +51,8 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 		}
 
 
-		/*can be used to disallow input while paused, feels weird with movement when enabled
-		 *kinda bs with firing your weapon though when disabled
-		 *if(GameState::isPaused)
-			continue;*/
+		 if(GameState::isPaused)
+			continue;
 
 		if (event.type == sf::Event::MouseButtonPressed) {
 			if (event.key.code == sf::Mouse::Left) {
@@ -60,6 +63,13 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 		//continue if key isn't mapped
 		if (m_keyboardToShipControlMap.find(event.key.code) == m_keyboardToShipControlMap.end())
 			continue;
+
+		if (!GameState::isKeyTrapActivated )
+		{
+			ship.disableCurrentShipStates();
+			GameState::isKeyTrapActivated = true;
+		}
+			
 
 		// KEY PRESSED, Runs oen Key input at a time
 		if (event.type == sf::Event::KeyPressed) {
@@ -136,7 +146,9 @@ bool StateMachineController::isItTimeToUpdateState(const sf::Int32& currentTime)
 void StateMachineController::updateControllerStateAndShipState(Ship& ship)
 {
 	const sf::Int32 currentTime = GameState::clock.getElapsedTime().asMilliseconds();
-	if (isItTimeToUpdateState(currentTime)) return;
+
+	if (isItTimeToUpdateState(currentTime)) 
+		return;
 
 	m_timeOfLastStateChange = currentTime;
 	const auto newInput = static_cast<Input>(rand() % m_totalInputs);

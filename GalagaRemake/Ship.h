@@ -59,7 +59,7 @@ public:
 	bool isBackwards() const;
 	bool isRespawning() const;
 	bool hasShield() const;
-	void setShield(const CircleProjectile& shield, const int shieldHealth = 10);
+	void setShield(const CircleProjectile& shield, int shieldHealth = 10);
 	const CircleProjectile& getShield();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
 	virtual void rotateIfTriggered();
@@ -68,6 +68,7 @@ public:
 	void setHealth(int healthTotal);
 	const int& getHealth() const;
 	void setShipColor(const sf::Color& color);
+	void disableCurrentShipStates();
 
 protected:
 	void updateShadingIfRespawning();
@@ -84,7 +85,7 @@ protected:
 	bool m_isBackwards;
 	bool m_isStatic = false;
 	int m_gameCyclesTillRespawned{};
-	bool m_isHorizontallyWorldBound;
+	bool m_isVerticallyWorldBound;
 	float m_horizontalDirectionIncrement;
 	float m_verticalDirectionIncrement;
 	sf::Vector2i m_shipAnimationFrame;

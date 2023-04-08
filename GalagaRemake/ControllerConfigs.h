@@ -35,7 +35,7 @@
 
 
 
-#define BOSS_STATE_WITH_INPUT_TO_STATE_MAP_CONFIG \
+#define BOSS_STATE_WITH_INPUT_TO_STATE_MAP \
 			{State0, {	\
 				{Hold,	State3},								\
 				{Input1,	State0},							\
@@ -74,7 +74,7 @@
 			}
 
 
-#define BOSS_STATE_TO_SHIP_CONTROL_INPUT_MAP_CONFIG \
+#define BOSS_STATE_TO_SHIP_CONTROL_INPUT_MAP \
 		{ State0, std::vector{ MoveUp, FireWeapon1}},\
 		{ State1, std::vector{ MoveLeft, FireWeapon1 }},	\
 		{ State2, std::vector{ MoveRight, FireWeapon1 } },	\

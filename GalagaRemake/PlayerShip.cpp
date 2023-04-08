@@ -1,4 +1,5 @@
 #include "PlayerShip.h"
+#include "GameState.h"
 
 void PlayerShip::initStartState()
 {
@@ -6,16 +7,19 @@ void PlayerShip::initStartState()
 		rotate180();
 	m_gameCyclesTillRespawned = 0;
 	setShipColor(sf::Color::White);
-	m_velocity = sf::Vector2f(0.0f, 0.0f);
+	m_velocity = sf::Vector2f(0.0f, -6.0f);
 	m_shipHealth = 3;
 	setPosition(m_startPosition);
+	disableCurrentShipStates();
+	m_isVerticallyWorldBound = false;
+	m_shipControlsStateMappings[MoveUp] = true;
 }
 
 void PlayerShip::calculateStartPosition(const BoundedFloatRect& worldDimensions)
 {
 	const sf::FloatRect shipSize = getGlobalBounds();
 	const float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
-	const float yPos = worldDimensions.height / 3 * 2;
+	const float yPos = 1050.f;//worldDimensions.height / 3 * 2;
 	m_startPosition = sf::Vector2f(xPos, yPos);
 }
 
@@ -31,6 +35,14 @@ PlayerShip::PlayerShip(const sf::Texture& texture, const BoundedFloatRect& world
 
 void PlayerShip::updateShip(BoundedFloatRect worldBounds)
 {
+	if(GameState::gameCycleCounter > 24 && !GameState::isIntroDone)
+	{
+		if(!GameState::isKeyTrapActivated)
+			disableCurrentShipStates();
+		m_isVerticallyWorldBound = true;
+		GameState::isIntroDone = true;
+	}
+
 	Ship::updateShip(worldBounds);
 }
 
@@ -70,7 +82,7 @@ void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
 
 	testAndApplyHorizontalWorldBounds(shipBounds, worldBounds);
 
-	if (!m_isHorizontallyWorldBound)
+	if (!m_isVerticallyWorldBound)
 		return;
 
 	testAndApplyVerticalWorldBounds(shipBounds, worldBounds);

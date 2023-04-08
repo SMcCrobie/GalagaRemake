@@ -162,4 +162,7 @@
       <Filter>Source Files\Configs</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
 </Project>

@@ -60,6 +60,11 @@ bool ShipManager::isEmpty() const
 	return m_ships.empty();
 }
 
+int ShipManager::count() const
+{
+	return m_ships.size();
+}
+
 void ShipManager::resetManager()
 {
 	m_ships.clear();

@@ -15,7 +15,7 @@ Ship::Ship() : sf::Sprite()
 	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
 	m_verticalDirectionIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
 	m_isBackwards = false;
-	m_isHorizontallyWorldBound = true;
+	m_isVerticallyWorldBound = true;
 	m_shieldHealth = 0;
 	m_shipHealth = 1;
 	m_shipHitTimer = 0;
@@ -104,7 +104,7 @@ void Ship::setProjectile2(const CircleProjectile& projectile)
 
 void Ship::setIsHorizontallyWorldBound(const bool isHorizontallyWorldBound)
 {
-	m_isHorizontallyWorldBound = isHorizontallyWorldBound;
+	m_isVerticallyWorldBound = isHorizontallyWorldBound;
 }
 
 void Ship::setVelocity(const float x, const float y)
@@ -129,6 +129,14 @@ void Ship::setShipColor(const sf::Color& color)
 {
 	setColor(color);
 	m_shipColor = color;
+}
+
+void Ship::disableCurrentShipStates()
+{
+	for (auto& [shipControl, state] : m_shipControlsStateMappings)
+	{
+		state = false;
+	}
 }
 
 
@@ -197,6 +205,8 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 
 	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
 	//ALSO, currently breaks if the ship is spawned outside the world bounds, should prob just manage that in ship spawning
+	//Think each bound needs its own loop with a break if your already past it,
+	//if the velocity is to get out leave it, if its to go against it, zero it out
 	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
 		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
 
@@ -209,7 +219,7 @@ void Ship::updateShipVelocity(BoundedFloatRect worldBounds)
 
 	}
 
-	if (!m_isHorizontallyWorldBound)
+	if (!m_isVerticallyWorldBound)
 		return;
 
 	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
