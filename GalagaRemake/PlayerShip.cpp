@@ -52,39 +52,24 @@ void PlayerShip::setTextureRectBasedOnShipState()
 		setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, 0), m_shipAnimationFrame));
 		return;
 	}
-	if (m_isBackwards) {
-		applyBackwardsTexture();
-	}
-	else {
-		applyStandardTexture();
-	}
+	applyTexture();
 }
 
 void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
 {
+
+	applyStandardResistance();
+	applyPlayerVelocity();
+
+
+	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
+	//ALSO, currently breaks if the ship is spawned outside the world bounds, should prob just manage that in ship spawning
+	//Think each bound needs its own loop with a break if your already past it,
+	//if the velocity is to get out leave it, if its to go against it, zero it out
 	BoundedFloatRect shipBounds = getGlobalBounds();
-	//apply resistence
-	if (m_velocity.y != 0)
-		m_velocity.y = m_velocity.y * RESISTENCE_MULTIPLIER;
-
-	if (m_velocity.x != 0)
-		m_velocity.x = m_velocity.x * RESISTENCE_MULTIPLIER;
-
-	//apply thrust to shipVelocity, after State update, opposing Thrusts cancel
-	if (m_isBackwards) {
-		applyBackwardsVelocity();
-	}
-	else {
-		applyStandardVelocity();
-	}
-	//Need to figure out why right and top cushions won't work
-	//testAndApplyCushion(shipBounds, worldBounds, 100.f);
-
 	testAndApplyHorizontalWorldBounds(shipBounds, worldBounds);
-
 	if (!m_isVerticallyWorldBound)
 		return;
-
 	testAndApplyVerticalWorldBounds(shipBounds, worldBounds);
 
 }
@@ -107,54 +92,35 @@ void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatR
 
 }
 
-void PlayerShip::testAndApplyVerticalWorldBounds(BoundedFloatRect & shipBounds, BoundedFloatRect & worldBounds)
-{
-	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
-		|| shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN) {
-
-		if (shipBounds.bottom > worldBounds.bottom - WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = 0;// (worldBounds.bottom - WORLD_BOUNDS_MARGIN) - shipBounds.bottom;
-			break;
-		}
-		if (shipBounds.top < worldBounds.top + WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = 0;// shipBounds.top - (worldBounds.top + WORLD_BOUNDS_MARGIN);
-			break;
-		}
-		m_velocity.y = m_velocity.y * .5f;
-
-	}
-}
-
-void PlayerShip::testAndApplyHorizontalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
-{
-	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
-		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
-
-
-
-		if (abs(shipBounds.right - worldBounds.right - WORLD_BOUNDS_MARGIN) < .01f
-			|| (abs(shipBounds.left - worldBounds.left + WORLD_BOUNDS_MARGIN) < .01f)) {
-			m_velocity.x = 0;
-			break;
-		}
-		m_velocity.x = m_velocity.x * .5f;
-
-
-
-	}
-}
-
 void PlayerShip::rotateIfTriggered()
 {
 	if (!m_shipControlsStateMappings.at(Rotate))
 		return;
 	m_shipControlsStateMappings[Rotate] = false;
+	
 	rotate180();
+}
+
+void PlayerShip::changeDirectionIncrementsBasedOnMovementControl()
+{
+	using namespace GameState;
+	switch (movementControlSetting)
+	{
+	case full_window_orientation:
+		break;
+	case full_ship_orientation:
+		m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+		m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
+		break;
+	case window_and_ship_orientation:
+		m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+	}
 }
 
 void PlayerShip::rotate180()
 {
 	m_isBackwards = !m_isBackwards;
+	changeDirectionIncrementsBasedOnMovementControl();
 	
 	m_weapon1Projectile->setVelocity(sf::Vector2f(0, -m_weapon1Projectile->getVelocity().y));
 	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left

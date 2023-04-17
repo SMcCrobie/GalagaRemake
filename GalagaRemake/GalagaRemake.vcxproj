@@ -173,6 +173,7 @@
     <ClInclude Include="Manager.h" />
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="RandMacros.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="ShipManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Projectile.h" />
@@ -183,9 +184,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\BossSideKicksAnimations.png" />
+    <Image Include="BossAnimations.ico" />
     <Image Include="BossAnimations.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Image>
+    <Image Include="icon1.ico" />
     <Image Include="meteor.png" />
     <Image Include="Planets(1).png" />
     <Image Include="Planets.png">
@@ -209,6 +212,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GalagaRemake.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

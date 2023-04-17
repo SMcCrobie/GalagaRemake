@@ -13,8 +13,9 @@ public:
     void setTextureRectBasedOnShipState() override;
 
 
-    void rotateIfTriggered() override;
-    void rotate180() override;
+	void rotateIfTriggered() override;
+	void changeDirectionIncrementsBasedOnMovementControl();
+	void rotate180() override;
     void resetManager() override;
    
 private:
@@ -24,9 +25,6 @@ private:
     bool isWithinRightCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
     bool isShipWithinTopCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
     bool isShipwithBottomCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
-    void testAndApplyVerticalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
-    void testAndApplyHorizontalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
-
     sf::Vector2f m_startPosition;
 };
 

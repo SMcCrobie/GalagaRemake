@@ -25,7 +25,7 @@ KeyboardController::KeyboardController()
 }
 
 
-void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
+void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, PlayerShip& ship)
 {
 	sf::Event event{};
 
@@ -139,37 +139,47 @@ StateMachineController::StateMachineController(std::map<State, std::vector<ShipC
 bool StateMachineController::isItTimeToUpdateState(const sf::Int32& currentTime) const
 {
 	if (currentTime - m_timeOfLastStateChange < m_deltaBeforeStateChange)
-		return true;
-	return false;
+		return false;
+	return true;
 }
 
 void StateMachineController::updateControllerStateAndShipState(Ship& ship)
 {
 	const sf::Int32 currentTime = GameState::clock.getElapsedTime().asMilliseconds();
+	bool isNewState = false;
+	if (isItTimeToUpdateState(currentTime))
+	{
+		isNewState = true;
+		m_timeOfLastStateChange = currentTime;
+		const auto newInput = static_cast<Input>(rand() % m_totalInputs);
 
-	if (isItTimeToUpdateState(currentTime)) 
+		//update state
+		const auto inputToStateEntry = m_stateWithInputToStateMap.at(m_currentState).find(newInput);
+		if (inputToStateEntry != m_stateWithInputToStateMap.at(m_currentState).end())
+			m_currentState = inputToStateEntry->second;//if current state is new state, mov not reassigned
+	}
+	const std::vector<ShipControl>& currentShipControlVec = m_stateToShipControlInputsMap.at(m_currentState);
+
+	if (!isNewState)
+	{
+		for (auto& shipControl : currentShipControlVec)
+		{
+			if(shipControl == FireWeapon1 || shipControl == FireWeapon2)
+				ship.m_shipControlsStateMappings[shipControl] = true;
+		}
 		return;
-
-	m_timeOfLastStateChange = currentTime;
-	const auto newInput = static_cast<Input>(rand() % m_totalInputs);
-
-	//update state
-	const auto inputToStateEntry = m_stateWithInputToStateMap.at(m_currentState).find(newInput);
-	if (inputToStateEntry != m_stateWithInputToStateMap.at(m_currentState).end())
-		m_currentState = inputToStateEntry->second;//if current state is new state, mov not reassigned
-
-	//Can't do this currently because the ship turns its own fire1 off
-	//if (m_currentState == m_previousState)
-	//	return;
+	}
+	
 
 	//clear previous states commands
-	for (auto it = ship.m_shipControlsStateMappings.begin(); it != ship.m_shipControlsStateMappings.end(); it++) {
-		it->second = false;
+	for (auto& m_shipControlsStateMapping : ship.m_shipControlsStateMappings)
+	{
+		m_shipControlsStateMapping.second = false;
 	}
-
 	//update ship inputs based on new state
-	std::vector<ShipControl>& currentShipControlVec = m_stateToShipControlInputsMap.at(m_currentState);
-	for (auto it = currentShipControlVec.begin(); it != currentShipControlVec.end(); it++) {
-		ship.m_shipControlsStateMappings[*it] = true;
+	
+	for (auto& shipControl : currentShipControlVec)
+	{
+		ship.m_shipControlsStateMappings[shipControl] = true;
 	}
 }

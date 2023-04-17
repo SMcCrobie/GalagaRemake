@@ -69,14 +69,16 @@ public:
 	const int& getHealth() const;
 	void setShipColor(const sf::Color& color);
 	void disableCurrentShipStates();
+	void setWeaponRechargeTime(int gameCycles);
 
 protected:
 	void updateShadingIfRespawning();
-	void applyBackwardsVelocity();//kinda not needed
-	void applyStandardVelocity();
-	void applyStandardTexture();
-	void applyBackwardsTexture();
-	//sf::IntRect MoveRight();
+	void applyPlayerVelocity();
+	void applyTexture();
+	void applyStandardResistance();
+	void testAndApplyVerticalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
+	void testAndApplyHorizontalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
+
 	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
 
 	virtual std::optional<std::shared_ptr<Projectile>> fireWeapon1IfFired();
@@ -97,11 +99,24 @@ protected:
 	int m_shipHitTimer;
 	sf::Color m_shipColor;
 	std::shared_ptr<Projectile> m_weapon1Projectile;
+	int m_weapon1ProjectileCounter;
 	std::shared_ptr<Projectile> m_weapon2Projectile;
+	int m_weapon2ProjectileCounter;
+	int m_weaponRechargeTime;
     std::map<ShipControl, bool> m_shipControlsStateMappings;
 
 private:
 	void refreshColors();
 	void setColor(const sf::Color& color);//makes higher level function private
+	void applyStandardTexture();
+	void applyBackwardsTexture();
+	void applyBackwardsTexture2();
+
+	void applyBackwardsVerticalVelocity();
+	void applyHorizontalVelocity();
+	void applyVerticalVelocity();
+	void changeBackwardsVelocityBasedOnMovementControl();
+	void changeBackwardsTextureBasedOnMovementControl();
+
 };
 

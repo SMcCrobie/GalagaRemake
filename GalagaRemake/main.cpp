@@ -22,11 +22,12 @@
 #include "UIManager.h"
 #include "Fonts.h"
 #include "Loader.h"
+#include "resource1.h"
 
 //YOU HAVE TODOS TODO
 
 #define SCORE_VALUE_AS_INT ((GameState::killCounter * 100))
-#define GAME_SPEED 20
+#define GAME_SPEED 22
 
 //Global Variables
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
@@ -38,6 +39,11 @@ sf::View WORLD_VIEW(WORLD_BOUNDS);
 
 int main(int, char const**)
 {
+
+	HINSTANCE hInstance = GetModuleHandle(NULL);
+	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	SendMessage(GetConsoleWindow(), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+
 #ifdef NDEBUG
 	HideConsole();
 #endif
@@ -49,10 +55,10 @@ int main(int, char const**)
 
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottoma
-	sf::RenderWindow window(sf::VideoMode(static_cast<int>(WORLD_BOUNDS.width), 
+	sf::RenderWindow window(sf::VideoMode(static_cast<int>(WORLD_BOUNDS.width),
 		static_cast<int>(WORLD_BOUNDS.height)), "Galaga!");
 	window.setKeyRepeatEnabled(false);
-	window.setView(WORLD_VIEW);
+	//window.setView(WORLD_VIEW);
 	window.display();
 
 	//textures
@@ -108,6 +114,7 @@ int main(int, char const**)
 	enemyShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 	enemyShip.setPosition(sf::Vector2f(300.f, -50.f));
 	enemyShip.setShipColor(sf::Color::Magenta);
+	enemyShip.setWeaponRechargeTime(20);
 
 	Ship bossShip;
 	bossShip.setIsHorizontallyWorldBound(false);
@@ -115,6 +122,7 @@ int main(int, char const**)
 	bossShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(42, 48)));
 	bossShip.setPosition(sf::Vector2f(300.f, -150.f));
 	bossShip.scale(2.f, 2.f);
+	bossShip.setWeaponRechargeTime(15);
 
 	Ship bossSideKicks;
 	bossSideKicks.setIsHorizontallyWorldBound(false);
@@ -124,6 +132,7 @@ int main(int, char const**)
 	bossSideKicks.setHealth(15);
 	//bossSideKicks.rotate180();
 	bossSideKicks.setPosition(sf::Vector2f(150.f, 1050.f));
+	bossSideKicks.setWeaponRechargeTime(15);
 	
 
 
