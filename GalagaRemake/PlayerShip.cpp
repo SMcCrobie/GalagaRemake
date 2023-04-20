@@ -55,25 +55,6 @@ void PlayerShip::setTextureRectBasedOnShipState()
 	applyTexture();
 }
 
-void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
-{
-
-	applyStandardResistance();
-	applyPlayerVelocity();
-
-
-	//WORLD BOUNDS, these are better but stil prob not best. Maybe derive sf::FloatRec and add bounds so you dont have to add the top and height or the left and width to get the right coordinate
-	//ALSO, currently breaks if the ship is spawned outside the world bounds, should prob just manage that in ship spawning
-	//Think each bound needs its own loop with a break if your already past it,
-	//if the velocity is to get out leave it, if its to go against it, zero it out
-	BoundedFloatRect shipBounds = getGlobalBounds();
-	testAndApplyHorizontalWorldBounds(shipBounds, worldBounds);
-	if (!m_isVerticallyWorldBound)
-		return;
-	testAndApplyVerticalWorldBounds(shipBounds, worldBounds);
-
-}
-
 void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatRect worldBounds, float cushion)
 {
 	worldBounds += cushion;
@@ -104,16 +85,21 @@ void PlayerShip::rotateIfTriggered()
 void PlayerShip::changeDirectionIncrementsBasedOnMovementControl()
 {
 	using namespace GameState;
+	const auto temp = m_moveUpIncrement;
 	switch (movementControlSetting)
 	{
 	case full_window_orientation:
+		m_moveUpIncrement = m_moveDownIncrement;
+		m_moveDownIncrement = temp;
 		break;
 	case full_ship_orientation:
-		m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+		m_moveUpIncrement = -m_moveUpIncrement;
+		m_moveDownIncrement = -m_moveDownIncrement;
 		m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
 		break;
 	case window_and_ship_orientation:
-		m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+		m_moveUpIncrement = -m_moveUpIncrement;
+		m_moveDownIncrement = -m_moveDownIncrement;
 	}
 }
 

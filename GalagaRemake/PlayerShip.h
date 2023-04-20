@@ -19,7 +19,6 @@ public:
     void resetManager() override;
    
 private:
-    void updateShipVelocity(BoundedFloatRect worldBounds) override;
     void testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatRect worldBounds, float cushion);
     bool isWithinLeftCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
     bool isWithinRightCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);

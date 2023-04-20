@@ -73,7 +73,8 @@ public:
 
 protected:
 	void updateShadingIfRespawning();
-	void applyPlayerVelocity();
+	void applyHorizontalVelocity();
+	void applyVerticalVelocity();
 	void applyTexture();
 	void applyStandardResistance();
 	void testAndApplyVerticalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
@@ -89,7 +90,8 @@ protected:
 	int m_gameCyclesTillRespawned{};
 	bool m_isVerticallyWorldBound;
 	float m_horizontalDirectionIncrement;
-	float m_verticalDirectionIncrement;
+	float m_moveUpIncrement;
+	float m_moveDownIncrement;
 	sf::Vector2i m_shipAnimationFrame;
     sf::Vector2f m_velocity;
     sf::RectangleShape m_collisionBox;
@@ -111,11 +113,6 @@ private:
 	void applyStandardTexture();
 	void applyBackwardsTexture();
 	void applyBackwardsTexture2();
-
-	void applyBackwardsVerticalVelocity();
-	void applyHorizontalVelocity();
-	void applyVerticalVelocity();
-	void changeBackwardsVelocityBasedOnMovementControl();
 	void changeBackwardsTextureBasedOnMovementControl();
 
 };

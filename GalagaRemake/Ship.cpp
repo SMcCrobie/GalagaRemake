@@ -15,7 +15,8 @@ Ship::Ship() : sf::Sprite()
 	/*m_weapon1Projectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	m_weapon1Projectile.setOutlineThickness(3.f);*/
 	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
-	m_verticalDirectionIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
+	m_moveUpIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
+	m_moveDownIncrement = SINGLE_THRUST_DIRECTION_INCREMENT / 4;
 	m_isBackwards = false;
 	m_isVerticallyWorldBound = true;
 	m_shieldHealth = 0;
@@ -287,41 +288,9 @@ void Ship::applyVerticalVelocity()
 {
 
 	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
-		m_velocity.y += -m_verticalDirectionIncrement;
+		m_velocity.y += -m_moveUpIncrement;
 	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
-		m_velocity.y += m_verticalDirectionIncrement / 4.f;
-}
-
-void Ship::applyBackwardsVerticalVelocity()
-{
-	if (m_shipControlsStateMappings.at(MoveUp) && m_velocity.y >= -MAX_VERTICAL_SPEED)
-		m_velocity.y += -m_verticalDirectionIncrement / 4.f;
-	if (m_shipControlsStateMappings.at(MoveDown) && m_velocity.y <= MAX_VERTICAL_SPEED)
-		m_velocity.y += m_verticalDirectionIncrement;
-}
-
-void Ship::changeBackwardsVelocityBasedOnMovementControl()
-{
-	using namespace GameState;
-	switch (movementControlSetting)
-	{
-	case full_window_orientation:
-		applyBackwardsVerticalVelocity();
-		break;
-	case full_ship_orientation:
-	case window_and_ship_orientation:
-		applyVerticalVelocity();
-		break;
-	}
-}
-
-void Ship::applyPlayerVelocity()
-{
-	if (isBackwards()) 
-		changeBackwardsVelocityBasedOnMovementControl();
-	else
-		applyVerticalVelocity();
-	applyHorizontalVelocity();
+		m_velocity.y += m_moveDownIncrement;
 }
 
 void Ship::applyTexture()
@@ -470,7 +439,7 @@ void Ship::rotate180()//need to call after setting projectile
 {
 	m_isBackwards = !m_isBackwards;
 	m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
-	m_verticalDirectionIncrement = -m_verticalDirectionIncrement;
+	m_moveUpIncrement = -m_moveUpIncrement;
 	
 	
 	m_weapon1Projectile->setVelocity(sf::Vector2f(0, -m_weapon1Projectile->getVelocity().y));
