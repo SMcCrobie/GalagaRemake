@@ -34,8 +34,50 @@ BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
 
 
+void posePlayerQuestion()
+{
+	using namespace std;
+	std::cout << "Please Select a Movement Control Option\n(enter associated number)" << endl;
+	std::cout << "[1] Full Window Orientation" << endl;
+	std::cout << "[2] Ship Vertical Orientation with Window Horizontal Orientation(recommended)" << endl;
+	std::cout << "[3] Full Ship Orientation" << endl;
+}
 
+void pollForMovementSetting(sf::RenderWindow& window)
+{
+	if (GameState::isMovementSet)
+		return;
 
+	using namespace std;
+	ShowConsole();
+
+	while (true) {
+		posePlayerQuestion();
+		char playerInput = cin.get();
+		while(cin.get() != '\n') {}
+		const int intValue = playerInput - '1';
+
+		switch (intValue)
+		{
+		case GameState::movement_control::full_ship_orientation:
+		case GameState::movement_control::window_and_ship_orientation:
+		case GameState::movement_control::full_window_orientation:
+			GameState::movementControlSetting = static_cast<GameState::movement_control>(intValue);
+			GameState::isMovementSet = true;
+			#ifdef NDEBUG
+				HideConsole();
+			#endif
+			#ifdef _DEBUG
+				ShowConsole();
+			#endif
+			window.requestFocus();
+			//GameState::init();
+			return;
+		default:
+			cout << "Not a valid option." << endl;
+		}
+	}
+};
 
 int main(int, char const**)
 {
@@ -237,6 +279,8 @@ int main(int, char const**)
 		window.clear();
 		window.draw(level);
 		window.display();
+
+		pollForMovementSetting(window);
 
 		//Run game loop every X milliseconds
 		if (GameState::clock.getElapsedTime().asMilliseconds() - GameState::timeOfLastGameLoop <= GAME_SPEED)

@@ -86,8 +86,12 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 			window.close();
 		}
 		if(event.type == sf::Event::LostFocus){
-			ship.disableCurrentShipStates();
 			GameState::isPaused = true;
+			continue;
+		}
+		if (event.type == sf::Event::GainedFocus) {
+			GameState::isPaused = false;
+			continue;
 		}
 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab ) {
@@ -108,12 +112,15 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 				ship.m_shipControlsStateMappings[FireWeapon1] = true;
 			}
 		}
+		//continue if not a key press or release
+		if (event.type != sf::Event::KeyPressed && event.type != sf::Event::KeyReleased)
+			continue;
 
 		//continue if key isn't mapped
 		if (m_keyboardToShipControlMap.find(event.key.code) == m_keyboardToShipControlMap.end())
 			continue;
 
-		if (!GameState::isKeyTrapActivated )
+		if (!GameState::isKeyTrapActivated && event.key.code != sf::Keyboard::Key::Enter)
 		{
 			ship.disableCurrentShipStates();
 			GameState::isKeyTrapActivated = true;

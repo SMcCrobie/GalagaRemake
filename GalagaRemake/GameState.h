@@ -8,6 +8,7 @@ namespace GameState
 	inline int killCounter, gameCycleCounter, timeOfLastGameLoop, timeOfLastEnemyShip, deltaTillNextEnemyShip, levelOutroDelay;
 	inline sf::Clock clock;
 	inline movement_control movementControlSetting = window_and_ship_orientation;
+	inline bool isMovementSet = false;
 
 
 	inline void init()
@@ -21,7 +22,7 @@ namespace GameState
 		isKeyTrapActivated = false;
 		isIntroDone = false;
 
-		killCounter = 40;
+		killCounter = 0;
 		gameCycleCounter = 0;
 		timeOfLastGameLoop = 0;
 		timeOfLastEnemyShip = 0;
