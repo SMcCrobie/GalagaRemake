@@ -16,7 +16,6 @@ void ShipManager::updateShips(const BoundedFloatRect& worldBounds)
 	for (auto&[ship, controller] : m_ships)
 	{
 		controller.updateControllerStateAndShipState(ship);
-		ship.setTextureRectBasedOnShipState();
 		ship.updateShip(worldBounds);
 
 		const BoundedFloatRect shipBounds = ship.getGlobalBounds();

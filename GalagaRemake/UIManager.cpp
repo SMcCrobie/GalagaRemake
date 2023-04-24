@@ -160,6 +160,7 @@ void UIManager::initializeLives()
 	m_lives.clear();
 	m_lives.push_back(m_lifeSymbol);
 	auto& lifeSymbol = m_lives.back();
+	lifeSymbol.setOrigin(0.f, 0.f);
 
 	lifeSymbol.setScale(.4f, .4f);
 	auto temp = lifeSymbol.getTextureRect();

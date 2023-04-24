@@ -1,4 +1,6 @@
 #include "PlayerShip.h"
+
+#include "Controller.h"
 #include "GameState.h"
 
 void PlayerShip::initStartState()
@@ -33,7 +35,7 @@ PlayerShip::PlayerShip(const sf::Texture& texture, const BoundedFloatRect& world
 	initStartState();
 }
 
-void PlayerShip::updateShip(BoundedFloatRect worldBounds)
+void PlayerShip::handleIntro()
 {
 	if(GameState::gameCycleCounter > 24 && !GameState::isIntroDone)
 	{
@@ -42,18 +44,20 @@ void PlayerShip::updateShip(BoundedFloatRect worldBounds)
 		m_isVerticallyWorldBound = true;
 		GameState::isIntroDone = true;
 	}
-
-	Ship::updateShip(worldBounds);
 }
 
-void PlayerShip::setTextureRectBasedOnShipState()
+void PlayerShip::updateShip(KeyboardController& controller, BoundedFloatRect worldBounds)
 {
-	if (m_gameCyclesTillRespawned == 100) {
-		setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, 0), m_shipAnimationFrame));
-		return;
-	}
-	applyTexture();
+	handleIntro();
+	bool swapControls = false;
+	if (m_shipControlsStateMappings.at(Rotate) && !m_isTransitioning)//should be its own variable
+		swapControls = true;
+	Ship::updateShip(worldBounds);
+	if(swapControls)
+		controller.swapControlsAndStatesBasedOnMovementSetting(*this);
 }
+
+
 
 void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatRect worldBounds, float cushion)
 {
@@ -73,54 +77,12 @@ void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatR
 
 }
 
-void PlayerShip::rotateIfTriggered()
-{
-	if (!m_shipControlsStateMappings.at(Rotate))
-		return;
-	m_shipControlsStateMappings[Rotate] = false;
-	
-	rotate180();
-}
-
-void PlayerShip::changeDirectionIncrementsBasedOnMovementControl()
-{
-	using namespace GameState;
-	const auto temp = m_moveUpIncrement;
-	switch (movementControlSetting)
-	{
-	case full_window_orientation:
-		m_moveUpIncrement = m_moveDownIncrement;
-		m_moveDownIncrement = temp;
-		break;
-	case full_ship_orientation:
-		m_moveUpIncrement = -m_moveUpIncrement;
-		m_moveDownIncrement = -m_moveDownIncrement;
-		m_horizontalDirectionIncrement = -m_horizontalDirectionIncrement;
-		break;
-	case window_and_ship_orientation:
-		m_moveUpIncrement = -m_moveUpIncrement;
-		m_moveDownIncrement = -m_moveDownIncrement;
-	}
-}
-
-void PlayerShip::rotate180()
-{
-	m_isBackwards = !m_isBackwards;
-	changeDirectionIncrementsBasedOnMovementControl();
-	
-	m_weapon1Projectile->setVelocity(sf::Vector2f(0, -m_weapon1Projectile->getVelocity().y));
-	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
-	const sf::FloatRect localBounds = getLocalBounds();
-	if (m_isBackwards)
-		move(localBounds.width, localBounds.height);
-	else
-		move(-localBounds.width, -localBounds.height);
-}
 
 void PlayerShip::resetManager()
 {
 	initStartState();
 }
+
 
 
 bool PlayerShip::isWithinLeftCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)

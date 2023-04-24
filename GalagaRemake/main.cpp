@@ -107,6 +107,7 @@ int main(int, char const**)
 
 	//intialize ships
 	auto playerShip = std::make_shared<PlayerShip>(shipAnimations, WORLD_BOUNDS);
+	playerShip->setOrigin(playerShip->getLocalBounds().width / 2, playerShip->getLocalBounds().height / 2);
 
 	Ship enemyShip;
 	enemyShip.setIsHorizontallyWorldBound(false);
@@ -115,6 +116,7 @@ int main(int, char const**)
 	enemyShip.setPosition(sf::Vector2f(300.f, -50.f));
 	enemyShip.setShipColor(sf::Color::Magenta);
 	enemyShip.setWeaponRechargeTime(20);
+	enemyShip.setOrigin(enemyShip.getLocalBounds().width / 2, enemyShip.getLocalBounds().height / 2);
 
 	Ship bossShip;
 	bossShip.setIsHorizontallyWorldBound(false);
@@ -156,8 +158,9 @@ int main(int, char const**)
 	bossProjectile.setOutlineThickness(2.5f);*/
 	bossProjectile.setOrigin(radius, radius);
 	bossShip.setHealth(30);
-	bossShip.setShield(bossProjectile,50);
 	bossShip.rotate180();
+	bossShip.setOrigin(bossShip.getLocalBounds().width / 2, bossShip.getLocalBounds().height / 2);
+	bossShip.setShield(bossProjectile, 50);
 
 	RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
 	enemyProjectile.setFillColor(sf::Color::Magenta);
@@ -298,11 +301,9 @@ int main(int, char const**)
 				GameState::deltaTillNextEnemyShip -= 5;
 		}
 	
-		//apply texture, based on events from player controller
-		playerShip->setTextureRectBasedOnShipState();
 
 		//update ships based on inputs from controllers
-		playerShip->updateShip(WORLD_BOUNDS);
+		playerShip->updateShip(playerController, WORLD_BOUNDS);
 		enemyShipsManager->updateShips(WORLD_BOUNDS);
 
 

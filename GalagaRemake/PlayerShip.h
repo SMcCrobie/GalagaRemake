@@ -9,13 +9,8 @@ public:
 	void initStartState();
 	void calculateStartPosition(const BoundedFloatRect& worldDimensions);
 	PlayerShip(const sf::Texture& texture, const BoundedFloatRect& worldDimensions);
-    void updateShip(BoundedFloatRect worldBounds) override;
-    void setTextureRectBasedOnShipState() override;
-
-
-	void rotateIfTriggered() override;
-	void changeDirectionIncrementsBasedOnMovementControl();
-	void rotate180() override;
+	void handleIntro();
+	void updateShip(KeyboardController& controller, BoundedFloatRect worldBounds);
     void resetManager() override;
    
 private:

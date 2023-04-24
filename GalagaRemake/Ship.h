@@ -52,8 +52,11 @@ public:
 	void setStatic();
 	void decrementShieldHealth();
 	void setTextureRect(const sf::IntRect& rectangle);
+	void applyVerticalResistance();
+	void applyHorizontalResistance();
 	void moveShip();
 	virtual void rotate180();
+	virtual void initRotation();
 	void respawnShip();
 	void respawnShip(int respawnTimer);
 	bool isBackwards() const;
@@ -62,7 +65,7 @@ public:
 	void setShield(const CircleProjectile& shield, int shieldHealth = 10);
 	const CircleProjectile& getShield();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
-	virtual void rotateIfTriggered();
+	void rotateIfTriggered();
 	bool hasHealth() const;
 	void decrementHealth();
 	void setHealth(int healthTotal);
@@ -70,12 +73,13 @@ public:
 	void setShipColor(const sf::Color& color);
 	void disableCurrentShipStates();
 	void setWeaponRechargeTime(int gameCycles);
+	void flipHorizontalMovementStates();
+	void flipVerticalMovementStates();
 
 protected:
 	void updateShadingIfRespawning();
 	void applyHorizontalVelocity();
 	void applyVerticalVelocity();
-	void applyTexture();
 	void applyStandardResistance();
 	void testAndApplyVerticalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
 	void testAndApplyHorizontalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
@@ -106,14 +110,14 @@ protected:
 	int m_weapon2ProjectileCounter;
 	int m_weaponRechargeTime;
     std::map<ShipControl, bool> m_shipControlsStateMappings;
+	bool m_isTransitioning;
+	float m_rotationIncrement;
 
 private:
+	void incrementRotation();
 	void refreshColors();
 	void setColor(const sf::Color& color);//makes higher level function private
 	void applyStandardTexture();
-	void applyBackwardsTexture();
-	void applyBackwardsTexture2();
-	void changeBackwardsTextureBasedOnMovementControl();
 
 };
 

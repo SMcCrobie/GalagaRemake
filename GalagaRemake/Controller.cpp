@@ -24,6 +24,55 @@ KeyboardController::KeyboardController()
 	};*/
 }
 
+void KeyboardController::flipHorizontalControls()
+{
+	sf::Keyboard::Key leftKey, rightKey;
+	for(auto& [key, shipControl] : m_keyboardToShipControlMap)
+	{
+		if (shipControl == MoveLeft)
+			leftKey = key;
+		if (shipControl == MoveRight)
+			rightKey = key;
+	}
+	m_keyboardToShipControlMap[leftKey] = MoveRight;
+	m_keyboardToShipControlMap[rightKey] = MoveLeft;
+}
+
+void KeyboardController::flipVerticalControls()
+{
+	sf::Keyboard::Key upKey, downKey;
+	for (auto& [key, shipControl] : m_keyboardToShipControlMap)
+	{
+		if (shipControl == MoveUp)
+			upKey = key;
+		if (shipControl == MoveDown)
+			downKey = key;
+	}
+	m_keyboardToShipControlMap[upKey] = MoveDown;
+	m_keyboardToShipControlMap[downKey] = MoveUp;
+}
+
+
+void KeyboardController::swapControlsAndStatesBasedOnMovementSetting(Ship& ship)
+{
+	using namespace GameState;
+	switch (movementControlSetting)
+	{
+	case full_ship_orientation:
+		break;
+	case window_and_ship_orientation:
+		flipHorizontalControls();
+		ship.flipHorizontalMovementStates();
+		break;
+	case full_window_orientation:
+		flipHorizontalControls();
+		ship.flipHorizontalMovementStates();
+		flipVerticalControls();
+		ship.flipVerticalMovementStates();
+		break;
+		
+	}
+}
 
 void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, PlayerShip& ship)
 {
@@ -41,7 +90,7 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 			GameState::isPaused = true;
 		}
 
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P ) {
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab ) {
 			ship.disableCurrentShipStates();
 			GameState::isPaused = !GameState::isPaused;
 		}

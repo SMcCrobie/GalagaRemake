@@ -21,7 +21,7 @@ namespace GameState
 		isKeyTrapActivated = false;
 		isIntroDone = false;
 
-		killCounter = 0;
+		killCounter = 40;
 		gameCycleCounter = 0;
 		timeOfLastGameLoop = 0;
 		timeOfLastEnemyShip = 0;

@@ -32,6 +32,9 @@ class KeyboardController
 {
 public:
 	KeyboardController();
+	void flipHorizontalControls();
+	void flipVerticalControls();
+	void swapControlsAndStatesBasedOnMovementSetting(Ship& ship);
 	void PollEventsAndUpdateShipState(sf::Window& window, PlayerShip& ship);
 
 private:
