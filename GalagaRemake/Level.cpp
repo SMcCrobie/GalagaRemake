@@ -8,12 +8,12 @@ Level& Level::addDrawableLayer(const std::shared_ptr<sf::Drawable>& drawable)
 	return *this;
 }
 
-bool Level::checkForGameEvent() const
+bool Level::checkForGameEvent(KeyboardController& playerController) const
 {
 	if (GameState::requiresLevelRestart)
 	{
 		GameState::init();
-		reset();
+		reset(playerController);
 		return true;
 	}
 	if (GameState::isGameOver || GameState::isPaused)
@@ -27,8 +27,9 @@ Level& Level::addManager(const std::shared_ptr<Manager>& manager)
 	return *this;
 }
 
-void Level::reset() const
+void Level::reset(KeyboardController& playerController) const
 {
+	playerController.initKeyMappings();
 	for(const auto& manager : m_managers)
 	{
 		manager->resetManager();

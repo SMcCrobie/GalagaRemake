@@ -15,6 +15,8 @@ public:
 	bool isOutOfLives() const;
 	void playerLostLife();
 	void updateUI(int currentScore);
+	void stylePrimaryText(sf::Text& primaryText);
+	void styleSecondaryText(sf::Text& secondaryText);
 	void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
 	void initializeLevelOutroText(TempText& primaryText, TempText& secondaryText);
 	void resetManager() override;
@@ -38,6 +40,8 @@ private:
 	std::vector<TempText> m_texts;
 	sf::Text m_gameOverText;
 	sf::Text m_pauseText;
+	sf::Text m_pauseTextByline;
+	sf::Text m_pauseTextByline2;
 	sf::Text m_scoreText;
 	sf::Text m_extraLivesText;
 	sf::Vector2f m_baseScale;
@@ -49,7 +53,8 @@ private:
 	BoundedFloatRect m_windowDimensions;
 	TempText m_introPrimaryText;
 	TempText m_introSecondaryText;
-
+	sf::Text m_gameOverByline;
+	sf::Text m_gameOverByline2;
 
 
 	// Inherited via Drawable

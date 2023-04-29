@@ -31,7 +31,9 @@ enum Input {
 class KeyboardController
 {
 public:
+	void initKeyMappings();
 	KeyboardController();
+
 	void flipHorizontalControls();
 	void flipVerticalControls();
 	void swapControlsAndStatesBasedOnMovementSetting(Ship& ship);

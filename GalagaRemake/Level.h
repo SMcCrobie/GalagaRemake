@@ -2,6 +2,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+#include "Controller.h"
 #include "Manager.h"
 
 class Level
@@ -10,8 +11,8 @@ class Level
 public:
 	Level& addManager(const std::shared_ptr<Manager>& manager);
 	Level& addDrawableLayer(const std::shared_ptr<sf::Drawable>& drawable);
-	bool checkForGameEvent() const;
-	void reset() const;
+	bool checkForGameEvent(KeyboardController& playerController) const;
+	void reset(KeyboardController& playerController) const;
 
 private:
 	std::vector<std::shared_ptr<sf::Drawable>> m_drawables;

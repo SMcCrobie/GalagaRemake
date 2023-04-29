@@ -8,12 +8,20 @@
 void UIManager::initializePauseText()
 {
 	m_pauseText = sf::Text("Game Paused", Fonts::galaxus);
+	stylePrimaryText(m_pauseText);
 	m_pauseText.setFillColor(sf::Color(255,255,255,255));
-	m_pauseText.setScale(1.6f, 1.6f);
-	//m_pauseText.setOutlineColor(sf::Color::Black);
-	//m_pauseText.setOutlineThickness(1.5f);
-	m_pauseText.setPosition(centerElement(m_pauseText.getGlobalBounds()));
-	m_pauseText.move(0.f, -50.f);
+
+	m_pauseTextByline = sf::Text("Press [       ] to resume", Fonts::playFair);
+	styleSecondaryText(m_pauseTextByline);
+
+	m_pauseTextByline2 = sf::Text("tab", Fonts::playFair);
+	styleSecondaryText(m_pauseTextByline2);
+	m_pauseTextByline2.move(-16.f, -1.f);
+	m_pauseTextByline2.setOutlineColor(sf::Color(0x05ecf1ff));
+	m_pauseTextByline2.setFillColor(sf::Color(0x05ecf1ff));
+	m_pauseTextByline2.setOutlineThickness(1.f);
+
+
 }
 
 UIManager::UIManager(const PlayerShip& playerShip,
@@ -93,22 +101,33 @@ void UIManager::updateUI(int currentScore)
 
 }
 
-void UIManager::initializeLevelIntroText(TempText& primaryText, TempText& secondaryText)
+void UIManager::stylePrimaryText(sf::Text& primaryText)
 {
 	primaryText.setScale(1.5f, 1.5f);
 	primaryText.setFillColor(sf::Color(0x05ecf1ff));
 	sf::Vector2f windowPosition = centerElement(primaryText.getGlobalBounds());
 	primaryText.setPosition(windowPosition);
+}
+
+void UIManager::styleSecondaryText(sf::Text& secondaryText)
+{
+	secondaryText.setScale(.5f, .5f);
+	sf::Vector2f windowPosition = centerElement(secondaryText.getGlobalBounds());
+	windowPosition.y += 30.f;
+	secondaryText.setPosition(windowPosition);
+}
+
+void UIManager::initializeLevelIntroText(TempText& primaryText, TempText& secondaryText)
+{
+	//sf::Vector2f windowPosition = centerElement(primaryText.getGlobalBounds());
+	stylePrimaryText(primaryText);
 	primaryText.setDuration(200);
 	primaryText.addFadeOut(80);
 	m_introPrimaryText = primaryText;
 	m_texts.push_back(primaryText);
 
 
-	secondaryText.setScale(.5f, .5f);
-	windowPosition = centerElement(secondaryText.getGlobalBounds());
-	windowPosition.y += 30.f;
-	secondaryText.setPosition(windowPosition);
+	styleSecondaryText(secondaryText);
 	secondaryText.setDuration(200);
 	secondaryText.addFadeOut(80);
 	m_introSecondaryText = secondaryText;
@@ -197,14 +216,18 @@ void UIManager::initializeScore()
 void UIManager::initializeGameOverText()
 {
 	m_gameOverText = sf::Text("Game Over", Fonts::galaxus);
-	m_gameOverText.setScale(m_baseScale * 4.61f);
+	stylePrimaryText(m_gameOverText);
 
-	const BoundedFloatRect textSize = m_gameOverText.getGlobalBounds();
-	const float xPos = (m_windowDimensions.width - textSize.width) / 2;
-	const float yPos = (m_windowDimensions.height / 2.5f) - textSize.height;
 
-	m_gameOverText.setPosition(xPos, yPos);
-	m_gameOverText.setFillColor(sf::Color(0x05ecf1ff));
+	m_gameOverByline = sf::Text("Press [      ] to restart", Fonts::playFair);
+	styleSecondaryText(m_gameOverByline);
+
+	m_gameOverByline2 = sf::Text("F2", Fonts::playFair);
+	styleSecondaryText(m_gameOverByline2);
+	m_gameOverByline2.move(-14.5f, -2.f);
+	m_gameOverByline2.setOutlineColor(sf::Color(0x05ecf1ff));
+	m_gameOverByline2.setFillColor(sf::Color(0x05ecf1ff));
+	m_gameOverByline2.setOutlineThickness(1.f);
 }
 
 void UIManager::initializeExtraLivesText()
@@ -260,14 +283,28 @@ void UIManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	target.draw(m_extraLivesText);
 	for (auto& life : m_lives) 
 		target.draw(life);
-	for (auto& text : m_texts) 
-		target.draw(text);
+	if(!GameState::isPaused && !GameState::isGameOver)
+	{
+		for (auto& text : m_texts)
+			target.draw(text);
+	}
 	for (auto& healthBarSegment : m_healthBarSegments)
 		target.draw(healthBarSegment);
 
 
 	if (GameState::isGameOver)
+	{
 		target.draw(m_gameOverText);
-	if (GameState::isPaused)
+		target.draw(m_gameOverByline);
+		target.draw(m_gameOverByline2);
+
+	}
+		
+	if (GameState::isPaused && !GameState::isGameOver)
+	{
 		target.draw(m_pauseText);
+		target.draw(m_pauseTextByline);
+		target.draw(m_pauseTextByline2);
+	}
+		
 }

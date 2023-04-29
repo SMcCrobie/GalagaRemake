@@ -1,9 +1,8 @@
 #include "Controller.h"
 #include "GameState.h"
 
-KeyboardController::KeyboardController()
+void KeyboardController::initKeyMappings()
 {
-	//Controller A
 	m_keyboardToShipControlMap = {
 		{ sf::Keyboard::W, MoveUp},
 		{ sf::Keyboard::S, MoveDown },
@@ -12,6 +11,12 @@ KeyboardController::KeyboardController()
 		{ sf::Keyboard::Enter, FireWeapon1 },
 		{ sf::Keyboard::Space, Rotate }
 	};
+}
+
+KeyboardController::KeyboardController()
+{
+	//Controller A
+	initKeyMappings();
 
 	//Controller B
 	/*m_keyboardToShipControlMap = {

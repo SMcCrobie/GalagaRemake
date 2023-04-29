@@ -24,17 +24,21 @@
 #include "Loader.h"
 #include "resource1.h"
 
+
+#include <cstdio>
+#include <conio.h>
 //YOU HAVE TODOS TODO
 
 #define SCORE_VALUE_AS_INT ((GameState::killCounter * 100))
-#define GAME_SPEED 22
+#define GAME_SPEED 20
 
 //Global Variables
+//Needs to follow a strict 3/5 ratio to work with dynamic window creation sizing
 BoundedFloatRect WORLD_BOUNDS(0.0f, 0.0f, 600.0f, 1000.0f);
 sf::View WORLD_VIEW(WORLD_BOUNDS);
 
 
-void posePlayerQuestion()
+void pose_player_question()
 {
 	using namespace std;
 	std::cout << "Please Select a Movement Control Option\n(enter associated number)" << endl;
@@ -43,18 +47,16 @@ void posePlayerQuestion()
 	std::cout << "[3] Full Ship Orientation" << endl;
 }
 
-void pollForMovementSetting(sf::RenderWindow& window)
+void poll_for_movement_setting(sf::RenderWindow& window)
 {
 	if (GameState::isMovementSet)
 		return;
 
 	using namespace std;
 	ShowConsole();
-
 	while (true) {
-		posePlayerQuestion();
-		char playerInput = cin.get();
-		while(cin.get() != '\n') {}
+		pose_player_question();
+		auto playerInput = _getch();
 		const int intValue = playerInput - '1';
 
 		switch (intValue)
@@ -79,6 +81,16 @@ void pollForMovementSetting(sf::RenderWindow& window)
 	}
 };
 
+void create_window_dynamically(sf::RenderWindow& window)
+{
+	unsigned int screenHeight = sf::VideoMode::getDesktopMode().height / 10 * 7;//70% of screen height
+	window.create(sf::VideoMode(screenHeight / 5 * 3, screenHeight), "Galaga!");
+	sf::View view(sf::FloatRect(0.f, 0.f, WORLD_BOUNDS.width, WORLD_BOUNDS.height));
+	view.setViewport(sf::FloatRect(0, 0, 1, 1)); // full viewport
+	window.setView(view);
+	window.setKeyRepeatEnabled(false);
+}
+
 int main(int, char const**)
 {
 
@@ -96,11 +108,9 @@ int main(int, char const**)
 	srand(static_cast<unsigned int>(time(nullptr)));
 
 	// X goes right and Y goes down
-	// Y is inverted 0 at the top 1000 at the bottoma
-	sf::RenderWindow window(sf::VideoMode(static_cast<int>(WORLD_BOUNDS.width),
-		static_cast<int>(WORLD_BOUNDS.height)), "Galaga!");
-	window.setKeyRepeatEnabled(false);
-	//window.setView(WORLD_VIEW);
+	// Y is inverted 0 at the top 1000 at the bottoman
+	sf::RenderWindow window;
+	create_window_dynamically(window);
 	window.display();
 
 	//textures
@@ -280,7 +290,7 @@ int main(int, char const**)
 		window.draw(level);
 		window.display();
 
-		pollForMovementSetting(window);
+		poll_for_movement_setting(window);
 
 		//Run game loop every X milliseconds
 		if (GameState::clock.getElapsedTime().asMilliseconds() - GameState::timeOfLastGameLoop <= GAME_SPEED)
@@ -292,7 +302,7 @@ int main(int, char const**)
 		playerController.PollEventsAndUpdateShipState(window, *playerShip);
 		//enemyController.updateControllerStateAndShipState(enemyShip);
 
-		if (level.checkForGameEvent())
+		if (level.checkForGameEvent(playerController))
 			continue;
 		
 		//enemyShipCreation - currently based off time, should be based off gamecycles
