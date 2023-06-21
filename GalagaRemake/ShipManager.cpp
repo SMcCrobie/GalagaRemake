@@ -1,6 +1,8 @@
 #include "ShipManager.h"
 #include <iostream>
 
+#include "GameState.h"
+
 void ShipManager::createShip(const Ship& ship)
 {
 	m_ships.emplace_back(ship, StateMachineController());
@@ -11,26 +13,26 @@ void ShipManager::createShip(const Ship& ship, const StateMachineController& con
 	m_ships.emplace_back(ship, controller);
 }
 
-void ShipManager::updateShips(const BoundedFloatRect& worldBounds)
+void ShipManager::updateShips()
 {
 	for (auto&[ship, controller] : m_ships)
 	{
 		controller.updateControllerStateAndShipState(ship);
-		ship.updateShip(worldBounds);
+		ship.updateShip(GameState::world_bounds);
 
 		const BoundedFloatRect shipBounds = ship.getGlobalBounds();
-		if (shipBounds.top > worldBounds.bottom && ship.isBackwards()) {
+		if (shipBounds.top > GameState::world_bounds.bottom && ship.isBackwards()) {
 			ship.rotate180();
 		}
 
-		if (shipBounds.bottom < worldBounds.top && !ship.isBackwards()) {
+		if (shipBounds.bottom < GameState::world_bounds.top && !ship.isBackwards()) {
 			ship.rotate180();
 		}
 
 	}
 }
 
-void ShipManager::detectCollision(ProjectileManager& projectileManager, int& killCounter)
+void ShipManager::detectCollision(ProjectileManager& projectileManager)
 {
 	auto it = m_ships.begin();
 	while (it != m_ships.end()) {
@@ -43,7 +45,7 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager, int& kil
 
 		it = m_ships.erase(it);//increments the iterator
 		std::cout << "Destroy Ship!" << std::endl;
-		killCounter++;
+		GameState::killCounter++;
 	}
 }
 

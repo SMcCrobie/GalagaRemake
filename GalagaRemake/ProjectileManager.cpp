@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ProjectileManager.h"
 #include "Collision.h"
+#include "GameState.h"
 
 
 void ProjectileManager::collectProjectile(CircleProjectile& projectile)
@@ -19,14 +20,14 @@ void ProjectileManager::collectProjectile(Ship& ship)
 		m_projectiles.push_back(projectile2.value());
 }
 
-void ProjectileManager::updateProjectiles(const BoundedFloatRect& worldBounds)
+void ProjectileManager::updateProjectiles()
 {
 	auto it = m_projectiles.begin();
 	while (it != m_projectiles.end())
 	{
 		(*it)->updateProjectile();
 		sf::FloatRect projectileBounds = (*it)->getGlobalBounds();
-		if (worldBounds.intersects(projectileBounds))
+		if (GameState::world_bounds.intersects(projectileBounds))
 			it++;
 		else {
 			it = m_projectiles.erase(it);

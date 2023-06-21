@@ -11,8 +11,8 @@ class ShipManager
 public:
 	void createShip(const Ship& ship);
 	void createShip(const Ship& ship, const StateMachineController& controller);
-	void updateShips(const BoundedFloatRect& worldBounds);
-	void detectCollision(ProjectileManager& projectileManager, int& killCounter);
+	void updateShips();
+	void detectCollision(ProjectileManager& projectileManager);
 	void offloadProjectiles(ProjectileManager& projectileManager);
 	bool isEmpty() const;
 	int	 count() const;

@@ -9,8 +9,7 @@ class UIManager
 	: public sf::Drawable, public Manager
 {
 public:
-	UIManager(const PlayerShip& playerShip, const BoundedFloatRect& windowDimensions,
-	          int totalExtraLives = 3, float windowMargin = 10.f);
+	UIManager(const PlayerShip& playerShip, int totalExtraLives = 3, float windowMargin = 10.f);
 	void addUiText(TempText text);
 	bool isOutOfLives() const;
 	void playerLostLife();

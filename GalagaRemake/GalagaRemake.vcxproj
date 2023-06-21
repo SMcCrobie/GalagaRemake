@@ -148,7 +148,9 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Fonts.cpp" />
-    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="Level0.cpp" />
+    <ClCompile Include="LevelManager.cpp" />
+    <ClCompile Include="Level1.cpp" />
     <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="ShipManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -161,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackgroundManager.h" />
+    <ClInclude Include="ILevel.h" />
     <ClInclude Include="BoundedFloatRect.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Controller.h" />
@@ -168,8 +171,10 @@
     <ClInclude Include="DebugMacros.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="Level0.h" />
+    <ClInclude Include="Level1.h" />
     <ClInclude Include="Loader.h" />
-    <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelManager.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="RandMacros.h" />

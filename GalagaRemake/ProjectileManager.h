@@ -11,7 +11,7 @@ class ProjectileManager
 public:
 	void collectProjectile(CircleProjectile& projectile);
 	void collectProjectile(Ship& ship);
-	void updateProjectiles(const BoundedFloatRect& worldBounds);
+	void updateProjectiles();
 	bool detectCollision(const sf::FloatRect& gameObject);
 	bool detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject);
 	bool detectCollisionAndDestroyProjectile(const sf::Sprite& sprite);

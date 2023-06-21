@@ -7,10 +7,10 @@ class PlayerShip :
 {
 public:
 	void initStartState();
-	void calculateStartPosition(const BoundedFloatRect& worldDimensions);
-	PlayerShip(const sf::Texture& texture, const BoundedFloatRect& worldDimensions);
+	void calculateStartPosition();
+	PlayerShip(const sf::Texture& texture);
 	void handleIntro();
-	void updateShip(KeyboardController& controller, BoundedFloatRect worldBounds);
+	void updateShip(KeyboardController& controller);
     void resetManager() override;
    
 private:

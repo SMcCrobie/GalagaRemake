@@ -10,6 +10,8 @@ namespace GameState
 	inline movement_control movementControlSetting = window_and_ship_orientation;
 	inline bool isMovementSet = false;
 
+	inline BoundedFloatRect world_bounds(0.0f, 0.0f, 600.0f, 1000.0f);
+	inline sf::View world_view(world_bounds);
 
 	inline void init()
 	{
@@ -27,7 +29,10 @@ namespace GameState
 		timeOfLastGameLoop = 0;
 		timeOfLastEnemyShip = 0;
 		deltaTillNextEnemyShip = 300;
-		levelOutroDelay = -1; 
+		levelOutroDelay = -1;
+
+		world_bounds = BoundedFloatRect (0.0f, 0.0f, 600.0f, 1000.0f);
+		world_view.setViewport(world_bounds);
 
 		clock.restart();
 	}

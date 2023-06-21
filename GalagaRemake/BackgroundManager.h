@@ -7,7 +7,7 @@ class BackgroundManager
 	: public sf::Drawable, public Manager
 {
 public:
-	BackgroundManager(BoundedFloatRect windowDimensions);
+	BackgroundManager();
 	void moveBackground(float increment);
 	void addForegroundPlanet(sf::Sprite planet);
 	void resetManager() override;

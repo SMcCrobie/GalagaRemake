@@ -17,21 +17,21 @@ void PlayerShip::initStartState()
 	m_shipControlsStateMappings[MoveUp] = true;
 }
 
-void PlayerShip::calculateStartPosition(const BoundedFloatRect& worldDimensions)
+void PlayerShip::calculateStartPosition()
 {
 	const sf::FloatRect shipSize = getGlobalBounds();
-	const float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
-	const float yPos = 1050.f;//worldDimensions.height / 3 * 2;
+	const float xPos = (GameState::world_bounds.width / 2.f) - (shipSize.width / 2.f);
+	const float yPos = GameState::world_bounds.height + 50.f;
 	m_startPosition = sf::Vector2f(xPos, yPos);
 }
 
-PlayerShip::PlayerShip(const sf::Texture& texture, const BoundedFloatRect& worldDimensions)
+PlayerShip::PlayerShip(const sf::Texture& texture)
 	: Ship()
 {
 	setTexture(texture);
 	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 
-	calculateStartPosition(worldDimensions);
+	calculateStartPosition();
 	initStartState();
 }
 
@@ -46,13 +46,13 @@ void PlayerShip::handleIntro()
 	}
 }
 
-void PlayerShip::updateShip(KeyboardController& controller, BoundedFloatRect worldBounds)
+void PlayerShip::updateShip(KeyboardController& controller)
 {
 	handleIntro();
 	bool swapControls = false;
 	if (m_shipControlsStateMappings.at(Rotate) && !m_isTransitioning)//should be its own variable
 		swapControls = true;
-	Ship::updateShip(worldBounds);
+	Ship::updateShip(GameState::world_bounds);
 	if(swapControls)
 		controller.swapControlsAndStatesBasedOnMovementSetting(*this);
 }

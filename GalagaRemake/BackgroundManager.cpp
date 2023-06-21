@@ -1,4 +1,6 @@
 #include "BackgroundManager.h"
+
+#include "GameState.h"
 #include "RandMacros.h"
 
 void BackgroundManager::init()
@@ -20,8 +22,8 @@ void BackgroundManager::init()
 	}
 }
 
-BackgroundManager::BackgroundManager(BoundedFloatRect windowDimensions)
-	: m_windowDimensions(windowDimensions)
+BackgroundManager::BackgroundManager()
+	: m_windowDimensions(GameState::world_bounds)
 {
 	init();
 }

@@ -24,10 +24,9 @@ void UIManager::initializePauseText()
 
 }
 
-UIManager::UIManager(const PlayerShip& playerShip,
-                     const BoundedFloatRect& windowDimensions, int totalExtraLives, float windowMargin)
+UIManager::UIManager(const PlayerShip& playerShip, int totalExtraLives, float windowMargin)
 	: m_baseScale(sf::Vector2f(.45f, .55f)),
-	  m_windowDimensions(windowDimensions), m_windowMargin(windowMargin), m_playerHealth(playerShip.getHealth()),
+	  m_windowDimensions(GameState::world_bounds), m_windowMargin(windowMargin), m_playerHealth(playerShip.getHealth()),
 	  m_lifeSymbol(playerShip), m_totalExtraLives(totalExtraLives)
 {
 	initializePauseText();
@@ -116,6 +115,7 @@ void UIManager::styleSecondaryText(sf::Text& secondaryText)
 	windowPosition.y += 30.f;
 	secondaryText.setPosition(windowPosition);
 }
+
 
 void UIManager::initializeLevelIntroText(TempText& primaryText, TempText& secondaryText)
 {
