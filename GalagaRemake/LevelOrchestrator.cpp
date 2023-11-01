@@ -5,6 +5,7 @@
 
 #include "BackgroundManager.h"
 #include "DebugMacros.h"
+#include "GameObjectManager.h"
 #include "GameState.h"
 
 extern PlayerShip playerShip;
@@ -13,6 +14,7 @@ extern ProjectileManager playerProjectileManager;
 extern ShipManager enemyShipsManager;
 extern UIManager uiManager;
 extern BackgroundManager backgroundManager;
+extern GameObjectManager gameObjectManager;
 
 LevelOrchestrator& LevelOrchestrator::addDrawableLayer(Drawable* drawable)
 {
@@ -27,6 +29,7 @@ void LevelOrchestrator::initDefaultManager()
 		.addDrawableLayer(&playerProjectileManager)
 		.addDrawableLayer(&enemyProjectileManager)
 		.addDrawableLayer(&enemyShipsManager)
+		.addDrawableLayer(&gameObjectManager)
 		.addDrawableLayer(&playerShip)
 		.addDrawableLayer(&uiManager);
 }
@@ -37,6 +40,7 @@ void LevelOrchestrator::initDefaultDrawableLayersAndOrder()
 		.addManager(&playerProjectileManager)
 		.addManager(&enemyProjectileManager)
 		.addManager(&enemyShipsManager)
+		.addManager(&gameObjectManager)
 		.addManager(&playerShip)
 		.addManager(&uiManager);
 }
@@ -155,7 +159,6 @@ void LevelOrchestrator::enemyShipCreation() const
 {
 	m_level->enemyShipCreation();
 }
-
 
 void LevelOrchestrator::posePlayerQuestion()
 {

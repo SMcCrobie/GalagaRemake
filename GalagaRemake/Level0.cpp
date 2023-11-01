@@ -8,11 +8,14 @@
 #include "Loader.h"
 #include "RandMacros.h"
 #include "ControllerConfigs.h"
+#include "GameObject.h"
+#include "GameObjectManager.h"
 
 
 static int timeOfLastEnemyShip = 0;
 static int deltaTillNextEnemyShip = 0;
 static bool isBossCreated = false;
+static bool isRepairPackCreated = false;
 
 
 static Ship bossShip;
@@ -20,6 +23,10 @@ static sf::Texture bossAnimations;
 static auto laserTurretProjectile = RectangleProjectile();
 static std::shared_ptr<sf::Texture> bossProjectileTexture;
 static sf::Color shieldColor;
+
+static GameObject repairKit;
+static sf::Sprite repairKitSprite;
+static sf::Texture repairKitAnimations;
 
 static Ship laserTurret;
 static sf::Texture laserTurretAnimations;
@@ -46,6 +53,8 @@ int Level0::initializeLevel()
 		Loader::LOAD_SAFELY(bossAnimations, "bossAnimations.png");
 		Loader::LOAD_SAFELY(laserTurretAnimations, "LaserTurretAnimations.png");
 		Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
+
+		Loader::LOAD_SAFELY(repairKitAnimations, "repairKit.png");
 	}
 	catch (std::invalid_argument& e) {
 		std::cout << e.what() << std::endl;
@@ -82,20 +91,37 @@ int Level0::initializeLevel()
 	laserTurret.setProjectile1(laserTurretProjectile);
 
 
+	repairKitSprite.setTexture(repairKitAnimations);
+	repairKitSprite.setPosition(sf::Vector2f(100.f, 140.f));
+	repairKit.setSprite(repairKitSprite);
+	
+
+
+
+
+
 	return 0;
 }
 
 void Level0::enemyShipCreation()
 {
 	extern ShipManager enemyShipsManager;
+	extern GameObjectManager gameObjectManager;
+
 	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip)
 		return;
 	GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
 
+	if(!isRepairPackCreated)
+	{
+		isRepairPackCreated = true;
+		gameObjectManager.createGameObject(repairKit);
+	}
+	/*
 	if (enemyShipsManager.count() < 2) {
 		laserTurret.setPosition(sf::Vector2f(GameState::world_bounds.left + 50.f, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(laserTurret, laserTurretController);
-	}
+	}*/
 
 
 	return;

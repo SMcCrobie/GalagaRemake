@@ -72,6 +72,9 @@
     <ClCompile Include="Level0.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameObjectManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Projectile.h">
@@ -152,6 +155,9 @@
     <ClInclude Include="WindowUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjectManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Planets.png">
@@ -182,6 +188,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\LaserTurretAnimations.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
+    <Image Include="..\x64\Release\repairKit.png">
       <Filter>Source Files\Images</Filter>
     </Image>
   </ItemGroup>

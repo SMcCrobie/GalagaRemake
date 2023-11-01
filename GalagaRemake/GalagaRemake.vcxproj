@@ -148,6 +148,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Fonts.cpp" />
+    <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="Level0.cpp" />
     <ClCompile Include="LevelOrchestrator.cpp" />
     <ClCompile Include="Level1.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="BackgroundManager.h" />
     <ClInclude Include="GameCoordinator.h" />
+    <ClInclude Include="GameObjectManager.h" />
     <ClInclude Include="ILevel.h" />
     <ClInclude Include="BoundedFloatRect.h" />
     <ClInclude Include="Collision.h" />
@@ -192,6 +194,10 @@
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\BossSideKicksAnimations.png" />
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\LaserTurretAnimations.png" />
+    <Image Include="..\x64\Release\repairKit.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </Image>
     <Image Include="BossAnimations.ico" />
     <Image Include="BossAnimations.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

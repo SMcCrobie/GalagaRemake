@@ -36,6 +36,7 @@ Ship::Ship() : sf::Sprite()
 	
 }
 
+
 void Ship::rotate180()
 {
 	m_isBackwards = !m_isBackwards;

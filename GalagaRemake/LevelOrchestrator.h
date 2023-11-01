@@ -28,6 +28,7 @@ public:
 	void initializeLevelIntroText(UIManager& uiManager) const;
 	void initializeLevelOutroText(UIManager& uiManager) const;
 	void enemyShipCreation() const;
+	void gameObjectCreation() const;
 
 
 private:

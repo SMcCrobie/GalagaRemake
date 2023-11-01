@@ -27,6 +27,8 @@
 
 #include <cstdio>
 #include <conio.h>
+
+#include "GameObjectManager.h"
 #include "Level0.h"
 #include "Level1.h"
 //YOU HAVE TODOS TODO
@@ -40,6 +42,7 @@ ProjectileManager playerProjectileManager;
 ShipManager enemyShipsManager;
 UIManager uiManager;
 BackgroundManager backgroundManager;
+GameObjectManager gameObjectManager;
 
 //Level Orchestrator
 LevelOrchestrator levelOrchestrator;
@@ -104,10 +107,30 @@ int main(int, char const**)
 
 
 
+
+
+
+
+
+
+
+
 	//current way to hotswap any level in
 	/////////////////////////////////////////////////////////////
-	levelOrchestrator.loadLevel(level1);
+	levelOrchestrator.loadLevel(level0);
 	/////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	levelOrchestrator.initDefaultManager();
@@ -135,6 +158,8 @@ int main(int, char const**)
 		playerShip.updateShip(playerController);
 		enemyShipsManager.updateShips();
 
+		//update Game objects
+		gameObjectManager.updateObjects();
 
 		//updateBackground
 		backgroundManager.moveBackground(backgroundSpeed);

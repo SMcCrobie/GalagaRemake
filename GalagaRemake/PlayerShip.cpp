@@ -17,7 +17,7 @@ void PlayerShip::initStartState()
 	m_shipControlsStateMappings[MoveUp] = true;
 	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
 	m_moveUpIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
-	m_moveDownIncrement = SINGLE_THRUST_DIRECTION_INCREMENT / 4;
+	m_moveDownIncrement = SINGLE_THRUST_DIRECTION_INCREMENT / 2;
 }
 
 void PlayerShip::calculateStartPosition()
