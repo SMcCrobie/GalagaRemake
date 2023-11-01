@@ -92,8 +92,10 @@ int Level0::initializeLevel()
 
 
 	repairKitSprite.setTexture(repairKitAnimations);
-	repairKitSprite.setPosition(sf::Vector2f(100.f, 140.f));
+	repairKitSprite.setPosition(sf::Vector2f(300.f, 100.f));
 	repairKit.setSprite(repairKitSprite);
+	repairKit.setRotation(-1.5f);
+	repairKit.setOscillation(sf::Vector2f(1.004f, 1.004f), 80);
 	
 
 
