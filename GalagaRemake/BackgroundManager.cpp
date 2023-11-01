@@ -49,6 +49,11 @@ void BackgroundManager::addForegroundPlanet(const sf::Sprite planet)
 	m_foregroundPlanetStartPosition = planet.getPosition();
 }
 
+void BackgroundManager::removeForegroundPlanet()
+{
+	m_foregroundPlanet = sf::Sprite();
+}
+
 void BackgroundManager::resetManager()
 {
 	m_foregroundPlanet.setPosition(m_foregroundPlanetStartPosition);

@@ -32,6 +32,7 @@ public:
     std::size_t getPointCount() const override;
     sf::Vector2f getPoint(std::size_t index) const override;
     std::shared_ptr<Projectile> clone() override;
+    void setGrowthSpeed(sf::Vector2f& growthAmount);
 
 private:
     sf::Vector2f m_size;

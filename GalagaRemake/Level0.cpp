@@ -2,20 +2,49 @@
 
 #include <iostream>
 
+#include "BackgroundManager.h"
 #include "Fonts.h"
 #include "GameState.h"
 #include "Loader.h"
+#include "RandMacros.h"
+#include "ControllerConfigs.h"
+
+
+static int timeOfLastEnemyShip = 0;
+static int deltaTillNextEnemyShip = 0;
+static bool isBossCreated = false;
+
+
+static Ship bossShip;
+static sf::Texture bossAnimations;
+static auto laserTurretProjectile = RectangleProjectile();
+static std::shared_ptr<sf::Texture> bossProjectileTexture;
+static sf::Color shieldColor;
+
+static Ship laserTurret;
+static sf::Texture laserTurretAnimations;
+static StateMachineController laserTurretController;
+
+static std::map<State, std::vector<ShipControl>> bossStateToShipControlInputsMap;
+static std::map<State, std::map<Input, State>> bossStateWithInputToStateMap;
+
+static std::map<State, std::vector<ShipControl>> laserTurretStateToShipControlInputsMap;
+static std::map<State, std::map<Input, State>> laserTurretStateWithInputToStateMap;
+
 
 
 int Level0::initializeLevel()
 {
+	extern BackgroundManager backgroundManager;
+	backgroundManager.removeForegroundPlanet();
 	timeOfLastEnemyShip = 0;
-	deltaTillNextEnemyShip = 200;
+	deltaTillNextEnemyShip = 100;
 	isBossCreated = false;
 
 	bossProjectileTexture = std::make_shared<sf::Texture>();
 	try {
 		Loader::LOAD_SAFELY(bossAnimations, "bossAnimations.png");
+		Loader::LOAD_SAFELY(laserTurretAnimations, "LaserTurretAnimations.png");
 		Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
 	}
 	catch (std::invalid_argument& e) {
@@ -31,48 +60,43 @@ int Level0::initializeLevel()
 	level_outro_text_primary = TempText("Level Complete", Fonts::galaxus);
 	level_outro_text_secondary = TempText("Escaped Starship SaberII", Fonts::playFair);
 
-
-	bossShip.setIsHorizontallyWorldBound(false);
-	bossShip.setTexture(bossAnimations);
-	bossShip.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(42, 48)));
-	bossShip.setPosition(sf::Vector2f(300.f, 1050.f));
-	bossShip.scale(2.f, 2.f);
-	bossShip.setWeaponRechargeTime(15);
-
-	bossProjectile.setVelocity(sf::Vector2f(0, -8));
-	bossProjectile.setTexture(bossProjectileTexture.get());
-	bossProjectile.setRadius(12.f);
-	bossProjectile.setInitOffSets(12.f, 15.f);
-	bossProjectile.setShieldColor(sf::Color::Red);
-	bossProjectile.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	laserTurret.setTexture(laserTurretAnimations);
+	laserTurret.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(32, 32)));
+	laserTurret.setPosition(sf::Vector2f(100.f, 1040.f));
+	laserTurret.setWeaponRechargeTime(8);
+	laserTurret.setIsHorizontallyWorldBound(false);
+	laserTurret.setMovementIncrements(0.f, 0.05f, 0.05f);
+	laserTurret.setHealth(10);
 
 
-	bossShip.setProjectile1(bossProjectile);
+	laserTurretProjectile.setFillColor(sf::Color::Red);
+	laserTurretProjectile.setSize(sf::Vector2f(20.f, 10.f));
+	laserTurretProjectile.setInitOffSets(12.f, 10.f);
+	laserTurretProjectile.setVelocity(sf::Vector2f(4.f, 0.f));
 
-	shieldColor = sf::Color::Red;
-	shieldColor.a = 125;
+	laserTurretStateToShipControlInputsMap = std::map<State, std::vector<ShipControl>>{ LASER_TURRET_STATE_TO_SHIP_CONTROL_INPUTS_MAP };
+	laserTurretStateWithInputToStateMap = std::map<State, std::map<Input, State>>{ LASER_TURRET_STATE_WITH_INPUT_TO_STATE_MAP };
+	laserTurretController = StateMachineController(laserTurretStateToShipControlInputsMap,
+		laserTurretStateWithInputToStateMap, 2, 200);
 
-	auto radius = 56.f;
-	bossProjectile.setRadius(radius);
-	bossProjectile.setShieldColor(shieldColor);
-	/*bossProjectile.setOutlineColor(sf::Color(0xa91e25ff));
-	bossProjectile.setOutlineThickness(2.5f);*/
-	bossProjectile.setOrigin(radius, radius);
-	bossShip.setHealth(30);
-	bossShip.rotate180();
-	bossShip.setOrigin(bossShip.getLocalBounds().width / 2, bossShip.getLocalBounds().height / 2);
-	bossShip.setShield(bossProjectile, 50);
+	laserTurret.setProjectile1(laserTurretProjectile);
+
 
 	return 0;
 }
 
-void Level0::enemyShipCreation(std::shared_ptr<ShipManager>& enemyShipsManager)
+void Level0::enemyShipCreation()
 {
-	if (GameState::gameCycleCounter - timeOfLastEnemyShip <= deltaTillNextEnemyShip ||
-		isBossCreated)
+	extern ShipManager enemyShipsManager;
+	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip)
 		return;
-	isBossCreated = true;
-	//enemyShipsManager->createShip(bossShip);
+	GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
+
+	if (enemyShipsManager.count() < 2) {
+		laserTurret.setPosition(sf::Vector2f(GameState::world_bounds.left + 50.f, GameState::world_bounds.top - 50.f));
+		enemyShipsManager.createShip(laserTurret, laserTurretController);
+	}
+
 
 	return;
 }

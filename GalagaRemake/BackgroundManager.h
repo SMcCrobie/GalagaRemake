@@ -1,15 +1,16 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "BoundedFloatRect.h"
-#include "Manager.h"
+#include "IManager.h"
 
 class BackgroundManager
-	: public sf::Drawable, public Manager
+	: public sf::Drawable, public IManager
 {
 public:
 	BackgroundManager();
 	void moveBackground(float increment);
 	void addForegroundPlanet(sf::Sprite planet);
+	void removeForegroundPlanet();
 	void resetManager() override;
 
 private:

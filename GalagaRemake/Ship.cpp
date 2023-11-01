@@ -250,6 +250,13 @@ void Ship::flipVerticalMovementStates()
 	m_shipControlsStateMappings[MoveDown] = isMovingUp;
 }
 
+void Ship::setMovementIncrements(float horizontal, float up, float down)
+{
+	m_horizontalDirectionIncrement = horizontal;
+	m_moveUpIncrement = up;
+	m_moveDownIncrement = down;
+}
+
 
 void Ship::decrementHealth()
 {
@@ -555,10 +562,12 @@ std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 	const float horizontalStartPoint = currentShipPosition.left + (currentShipPosition.width / 2) - (m_weapon1Projectile->getGlobalBounds().width / 2);
 	auto yVel = abs(m_weapon1Projectile->getVelocity().y);
 	yVel = m_isBackwards ? yVel : -yVel;
+	auto xVel = abs(m_weapon1Projectile->getVelocity().x);
+	xVel = m_isBackwards ? xVel : -xVel;
 
 	m_shipControlsStateMappings[FireWeapon1] = false;
 	m_weapon1Projectile->initStartPosition(horizontalStartPoint, verticalStartPoint, isBackwards());
-	m_weapon1Projectile->setVelocity(sf::Vector2f(0, yVel));
+	m_weapon1Projectile->setVelocity(sf::Vector2f(xVel, yVel));
 	return m_weapon1Projectile->clone();
 
 }

@@ -149,7 +149,7 @@
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Fonts.cpp" />
     <ClCompile Include="Level0.cpp" />
-    <ClCompile Include="LevelManager.cpp" />
+    <ClCompile Include="LevelOrchestrator.cpp" />
     <ClCompile Include="Level1.cpp" />
     <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="ShipManager.cpp" />
@@ -163,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackgroundManager.h" />
+    <ClInclude Include="GameCoordinator.h" />
     <ClInclude Include="ILevel.h" />
     <ClInclude Include="BoundedFloatRect.h" />
     <ClInclude Include="Collision.h" />
@@ -174,8 +175,8 @@
     <ClInclude Include="Level0.h" />
     <ClInclude Include="Level1.h" />
     <ClInclude Include="Loader.h" />
-    <ClInclude Include="LevelManager.h" />
-    <ClInclude Include="Manager.h" />
+    <ClInclude Include="LevelOrchestrator.h" />
+    <ClInclude Include="IManager.h" />
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="RandMacros.h" />
     <ClInclude Include="resource1.h" />
@@ -186,9 +187,11 @@
     <ClInclude Include="Ship.h" />
     <ClInclude Include="TempText.h" />
     <ClInclude Include="UIManager.h" />
+    <ClInclude Include="WindowUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\BossSideKicksAnimations.png" />
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\LaserTurretAnimations.png" />
     <Image Include="BossAnimations.ico" />
     <Image Include="BossAnimations.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -214,6 +217,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ControlsConfig.txt" />
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

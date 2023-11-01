@@ -3,12 +3,14 @@
 #include "ProjectileManager.h"
 
 class PlayerShip :
-    public Ship, public Manager
+    public Ship, public IManager
 {
 public:
 	void initStartState();
 	void calculateStartPosition();
 	PlayerShip(const sf::Texture& texture);
+    PlayerShip();
+    void init(const sf::Texture& texture);
 	void handleIntro();
 	void updateShip(KeyboardController& controller);
     void resetManager() override;

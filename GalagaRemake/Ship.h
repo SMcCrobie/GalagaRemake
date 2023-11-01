@@ -75,6 +75,8 @@ public:
 	void setWeaponRechargeTime(int gameCycles);
 	void flipHorizontalMovementStates();
 	void flipVerticalMovementStates();
+	void setMovementIncrements(float horizontal, float up, float down);
+
 
 protected:
 	void updateShadingIfRespawning();

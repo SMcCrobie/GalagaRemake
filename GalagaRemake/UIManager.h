@@ -6,10 +6,11 @@
 #include "Fonts.h"
 
 class UIManager
-	: public sf::Drawable, public Manager
+	: public sf::Drawable, public IManager
 {
 public:
-	UIManager(const PlayerShip& playerShip, int totalExtraLives = 3, float windowMargin = 10.f);
+	UIManager();
+	void init(const Ship& shipModel, int totalExtraLives = 3, float windowMargin = 10.f);
 	void addUiText(TempText text);
 	bool isOutOfLives() const;
 	void playerLostLife();
@@ -45,9 +46,8 @@ private:
 	sf::Text m_extraLivesText;
 	sf::Vector2f m_baseScale;
 	sf::RectangleShape m_healthBarSegment;
-	const float m_windowMargin;
-	const int& m_playerHealth;
-	const Ship& m_lifeSymbol;
+	float m_windowMargin;
+	Ship m_lifeSymbol;
 	int m_totalExtraLives;
 	BoundedFloatRect m_windowDimensions;
 	TempText m_introPrimaryText;

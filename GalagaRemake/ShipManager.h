@@ -6,7 +6,7 @@
 #include "ProjectileManager.h"
 
 class ShipManager
-	: public sf::Drawable, public Manager
+	: public sf::Drawable, public IManager
 {
 public:
 	void createShip(const Ship& ship);

@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-class Manager
+class IManager
 {
 public:
-	virtual ~Manager() = default;
+	virtual ~IManager() = default;
 	virtual void resetManager() = 0;
 	
 };

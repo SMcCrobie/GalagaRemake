@@ -1,20 +1,48 @@
-#include "LevelManager.h"
+#include "LevelOrchestrator.h"
 
 #include <conio.h>
 #include <iostream>
 
+#include "BackgroundManager.h"
 #include "DebugMacros.h"
 #include "GameState.h"
 
-LevelManager& LevelManager::addDrawableLayer(const std::shared_ptr<sf::Drawable>& drawable)
+extern PlayerShip playerShip;
+extern ProjectileManager enemyProjectileManager;
+extern ProjectileManager playerProjectileManager;
+extern ShipManager enemyShipsManager;
+extern UIManager uiManager;
+extern BackgroundManager backgroundManager;
+
+LevelOrchestrator& LevelOrchestrator::addDrawableLayer(Drawable* drawable)
 {
 	m_drawables.push_back(drawable);
 	return *this;
 }
 
+void LevelOrchestrator::initDefaultManager()
+{
+
+	addDrawableLayer(&backgroundManager)
+		.addDrawableLayer(&playerProjectileManager)
+		.addDrawableLayer(&enemyProjectileManager)
+		.addDrawableLayer(&enemyShipsManager)
+		.addDrawableLayer(&playerShip)
+		.addDrawableLayer(&uiManager);
+}
+
+void LevelOrchestrator::initDefaultDrawableLayersAndOrder()
+{
+	addManager(&backgroundManager)
+		.addManager(&playerProjectileManager)
+		.addManager(&enemyProjectileManager)
+		.addManager(&enemyShipsManager)
+		.addManager(&playerShip)
+		.addManager(&uiManager);
+}
 
 
-bool LevelManager::checkForGameEvent(KeyboardController& playerController) const
+bool LevelOrchestrator::checkForGameEvent(KeyboardController& playerController) const
 {
 	if (GameState::requiresLevelRestart)
 	{
@@ -27,19 +55,16 @@ bool LevelManager::checkForGameEvent(KeyboardController& playerController) const
 	return false;
 }
 
-LevelManager::LevelManager()
-{
+LevelOrchestrator::LevelOrchestrator()
+= default;
 
-
-}
-
-LevelManager& LevelManager::addManager(const std::shared_ptr<Manager>& manager)
+LevelOrchestrator& LevelOrchestrator::addManager(IManager* manager)
 {
 	m_managers.push_back(manager);
 	return *this;
 }
 
-void LevelManager::reset(KeyboardController& playerController) const
+void LevelOrchestrator::reset(KeyboardController& playerController) const
 {
 	playerController.initKeyMappings();
 	for(const auto& manager : m_managers)
@@ -48,7 +73,7 @@ void LevelManager::reset(KeyboardController& playerController) const
 	}
 }
 
-bool LevelManager::shouldRunLoop()
+bool LevelOrchestrator::shouldRunLoop()
 {
 	//Run game loop every X milliseconds
 	if (GameState::clock.getElapsedTime().asMilliseconds() - GameState::timeOfLastGameLoop <= GAME_SPEED)
@@ -57,7 +82,7 @@ bool LevelManager::shouldRunLoop()
 	return  true;
 }
 
-void LevelManager::updateWindow(sf::RenderWindow& window) const
+void LevelOrchestrator::updateWindow(sf::RenderWindow& window) const
 {
 	// Update the window, 
 	window.clear();
@@ -65,7 +90,7 @@ void LevelManager::updateWindow(sf::RenderWindow& window) const
 	window.display();
 }
 
-void LevelManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void LevelOrchestrator::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for (const auto& drawable : m_drawables)
 	{
@@ -73,7 +98,7 @@ void LevelManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
-void LevelManager::pollForMovementSetting(sf::RenderWindow& window)
+void LevelOrchestrator::pollForMovementSetting(sf::RenderWindow& window)
 {
 	if (GameState::isMovementSet)
 		return;
@@ -99,7 +124,6 @@ void LevelManager::pollForMovementSetting(sf::RenderWindow& window)
 			ShowConsole();
 #endif
 			window.requestFocus();
-			//GameState::init();
 			return;
 		default:
 			cout << "Not a valid option." << endl;
@@ -108,7 +132,7 @@ void LevelManager::pollForMovementSetting(sf::RenderWindow& window)
 }
 
 
-int LevelManager::loadLevel(std::shared_ptr<ILevel> level)
+int LevelOrchestrator::loadLevel(std::shared_ptr<ILevel> level)
 {
 	if (level->initializeLevel() == EXIT_FAILURE)
 		return EXIT_FAILURE;
@@ -117,23 +141,23 @@ int LevelManager::loadLevel(std::shared_ptr<ILevel> level)
 	return 0;
 }
 
-void LevelManager::initializeLevelIntroText(UIManager& uiManager) const
+void LevelOrchestrator::initializeLevelIntroText(UIManager& uiManager) const
 {
 	uiManager.initializeLevelIntroText(m_level->level_into_text_primary, m_level->level_into_text_secondary);
 }
 
-void LevelManager::initializeLevelOutroText(UIManager& uiManager) const
+void LevelOrchestrator::initializeLevelOutroText(UIManager& uiManager) const
 {
 	uiManager.initializeLevelOutroText(m_level->level_outro_text_primary, m_level->level_outro_text_secondary);
 }
 
-void LevelManager::enemyShipCreation(std::shared_ptr<ShipManager>& enemyShipsManager) const
+void LevelOrchestrator::enemyShipCreation() const
 {
-	m_level->enemyShipCreation(enemyShipsManager);
-};
+	m_level->enemyShipCreation();
+}
 
 
-void LevelManager::posePlayerQuestion()
+void LevelOrchestrator::posePlayerQuestion()
 {
 	using namespace std;
 	std::cout << "Please Select a Movement Control Option\n(enter associated number)" << endl;

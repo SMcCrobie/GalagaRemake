@@ -12,7 +12,7 @@
 #include "ControllerConfigs.h"
 #include "DebugMacros.h"
 #include "GameState.h"
-#include "LevelManager.h"
+#include "LevelOrchestrator.h"
 #include "PlayerShip.h"
 #include "Projectile.h"
 #include "ProjectileManager.h"
@@ -23,27 +23,26 @@
 #include "Fonts.h"
 #include "Loader.h"
 #include "resource1.h"
-
+#include "WindowUtil.h"
 
 #include <cstdio>
 #include <conio.h>
-
 #include "Level0.h"
 #include "Level1.h"
 //YOU HAVE TODOS TODO
 
 #define SCORE_VALUE_AS_INT ((GameState::killCounter * 100))
 
+//Managers Class declaration
+PlayerShip playerShip;
+ProjectileManager enemyProjectileManager;
+ProjectileManager playerProjectileManager;
+ShipManager enemyShipsManager;
+UIManager uiManager;
+BackgroundManager backgroundManager;
 
-void create_window_dynamically(sf::RenderWindow& window)
-{
-	unsigned int screenHeight = sf::VideoMode::getDesktopMode().height / 10 * 7;//70% of screen height
-	window.create(sf::VideoMode(screenHeight / 5 * 3, screenHeight), "Galaga!");
-	sf::View view(sf::FloatRect(0.f, 0.f, GameState::world_bounds.width, GameState::world_bounds.height));
-	view.setViewport(sf::FloatRect(0, 0, 1, 1)); // full viewport
-	window.setView(view);
-	window.setKeyRepeatEnabled(false);
-}
+//Level Orchestrator
+LevelOrchestrator levelOrchestrator;
 
 int main(int, char const**)
 {
@@ -64,12 +63,11 @@ int main(int, char const**)
 	// X goes right and Y goes down
 	// Y is inverted 0 at the top 1000 at the bottoman
 	sf::RenderWindow window;
-	create_window_dynamically(window);
+	Window::create_window_dynamically(window);
 	window.display();
 
 	//textures
 	sf::Texture shipAnimations;
-	sf::Texture planetsSheet;
 
 	auto meteorTexture = std::make_shared<sf::Texture>();
 
@@ -77,9 +75,7 @@ int main(int, char const**)
 	try {
 		//textures
 		Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
-		Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
 		Loader::LOAD_SAFELY(*meteorTexture, "meteor.png");
-
 		//fonts
 		Fonts::load();
 
@@ -90,105 +86,80 @@ int main(int, char const**)
 		return EXIT_FAILURE;
 	}
 
-	planetsSheet.setSmooth(true);
-	sf::Sprite planet(planetsSheet);
-	planet.setPosition(300, -500);
-	planet.setColor(sf::Color(120, 120, 120));
-
-
 	//intialize ships
-	auto playerShip = std::make_shared<PlayerShip>(shipAnimations);
-	playerShip->setOrigin(playerShip->getLocalBounds().width / 2, playerShip->getLocalBounds().height / 2);
-
-	//Managers Class intialization
-	auto enemyProjectileManager = std::make_shared<ProjectileManager>();
-	auto playerProjectileManager = std::make_shared<ProjectileManager>();
-	auto enemyShipsManager = std::make_shared<ShipManager>();
-	auto uiManager = std::make_shared<UIManager>(*playerShip);
-	auto backgroundManager = std::make_shared<BackgroundManager>();
-
-	backgroundManager->addForegroundPlanet(planet);
-
-
-	//Level Manager
-	LevelManager levelManager;
-	levelManager.addDrawableLayer(backgroundManager)
-		 .addDrawableLayer(playerProjectileManager)
-		 .addDrawableLayer(enemyProjectileManager)
-		 .addDrawableLayer(enemyShipsManager)
-		 .addDrawableLayer(playerShip)
-		 .addDrawableLayer(uiManager);
-	
-	levelManager.addManager(backgroundManager)
-		 .addManager(playerProjectileManager)
-		 .addManager(enemyProjectileManager)
-		 .addManager(enemyShipsManager)
-		 .addManager(playerShip)
-		 .addManager(uiManager);
+	playerShip.init(shipAnimations);
+	uiManager.init(playerShip);
+	playerShip.setOrigin(playerShip.getLocalBounds().width / 2, playerShip.getLocalBounds().height / 2);
 
 
 	//intialize controller
 	KeyboardController playerController{};
 	StateMachineController enemyController;
 
-	float backgroundSpeed = .25f;
+	float backgroundSpeed = .25f;//move inside backgroundmanager
 	GameState::init();
 
 	std::shared_ptr<ILevel> level0 = std::make_shared<Level0>();
 	std::shared_ptr<ILevel> level1 = std::make_shared<Level1>();
 
+
+
 	//current way to hotswap any level in
-	levelManager.loadLevel(level0);
+	/////////////////////////////////////////////////////////////
+	levelOrchestrator.loadLevel(level1);
+	/////////////////////////////////////////////////////////////
 
 
-	levelManager.initializeLevelIntroText(*uiManager);
+	levelOrchestrator.initDefaultManager();
+	levelOrchestrator.initDefaultDrawableLayersAndOrder();
+	levelOrchestrator.initializeLevelIntroText(uiManager);
 
 	while (window.isOpen())
 	{ 
-		levelManager.updateWindow(window);
-		if(levelManager.shouldRunLoop() == false)
+		levelOrchestrator.updateWindow(window);
+		if(levelOrchestrator.shouldRunLoop() == false)
 			continue;
 
 		if (GameState::isMovementSet == false)
-			levelManager.pollForMovementSetting(window);
+			levelOrchestrator.pollForMovementSetting(window);
 
 		//Poll for events
-		playerController.PollEventsAndUpdateShipState(window, *playerShip);
+		playerController.PollEventsAndUpdateShipState(window, playerShip);
 
-		if (levelManager.checkForGameEvent(playerController))
+		if (levelOrchestrator.checkForGameEvent(playerController))
 			continue;
 
-		levelManager.enemyShipCreation(enemyShipsManager);
+		levelOrchestrator.enemyShipCreation();
 
 		//update ships based on inputs from controllers
-		playerShip->updateShip(playerController);
-		enemyShipsManager->updateShips();
+		playerShip.updateShip(playerController);
+		enemyShipsManager.updateShips();
 
 
 		//updateBackground
-		backgroundManager->moveBackground(backgroundSpeed);
+		backgroundManager.moveBackground(backgroundSpeed);
 
 		//projectile calls
-		playerProjectileManager->collectProjectile(*playerShip);
-		enemyShipsManager->offloadProjectiles(*enemyProjectileManager);
+		playerProjectileManager.collectProjectile(playerShip);
+		enemyShipsManager.offloadProjectiles(enemyProjectileManager);
 
-		playerProjectileManager->updateProjectiles();
-		enemyProjectileManager->updateProjectiles();
-
-		enemyShipsManager->detectCollision(*playerProjectileManager);
-		bool isOutOfLives = uiManager->isOutOfLives();
-		if (!playerShip->isRespawning() && playerShip->detectCollision(*enemyProjectileManager)
-			&& !playerShip->hasHealth()) {
+		playerProjectileManager.updateProjectiles();
+		enemyProjectileManager.updateProjectiles();
+		
+		enemyShipsManager.detectCollision(playerProjectileManager);
+		bool isOutOfLives = uiManager.isOutOfLives();
+		if (!playerShip.isRespawning() && playerShip.detectCollision(enemyProjectileManager)
+			&& !playerShip.hasHealth()) {
 
 			if (isOutOfLives) {
 				GameState::isGameOver = true;
-				uiManager->updateUI(SCORE_VALUE_AS_INT);
+				uiManager.updateUI(SCORE_VALUE_AS_INT);
 				continue;
 			}
-			uiManager->playerLostLife();
-			playerShip->respawnShip();
+			uiManager.playerLostLife();
+			playerShip.respawnShip();
 		}
-		if(GameState::isBossCreated && enemyShipsManager->isEmpty() && !GameState::isBossDestroyed)
+		if(GameState::isBossCreated && enemyShipsManager.isEmpty() && !GameState::isBossDestroyed)
 		{
 			GameState::killCounter += 8;
 			GameState::isBossDestroyed = true;
@@ -199,12 +170,12 @@ int main(int, char const**)
 		if(GameState::levelOutroDelay == 0)
 		{
 			GameState::levelOutroDelay--;
-			levelManager.initializeLevelOutroText(*uiManager);
+			levelOrchestrator.initializeLevelOutroText(uiManager);
 		
 		}
 
 		//UI Update
-		uiManager->updateUI(SCORE_VALUE_AS_INT);
+		uiManager.updateUI(SCORE_VALUE_AS_INT);
 
 		GameState::gameCycleCounter++;
 

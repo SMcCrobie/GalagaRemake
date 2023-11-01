@@ -3,10 +3,10 @@
 #include "Projectile.h"
 #include <list>
 
-#include "Manager.h"
+#include "IManager.h"
 
 class ProjectileManager 
-	: public sf::Drawable, public Manager
+	: public sf::Drawable, public IManager
 {
 public:
 	void collectProjectile(CircleProjectile& projectile);

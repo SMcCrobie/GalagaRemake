@@ -24,11 +24,18 @@ void UIManager::initializePauseText()
 
 }
 
-UIManager::UIManager(const PlayerShip& playerShip, int totalExtraLives, float windowMargin)
-	: m_baseScale(sf::Vector2f(.45f, .55f)),
-	  m_windowDimensions(GameState::world_bounds), m_windowMargin(windowMargin), m_playerHealth(playerShip.getHealth()),
-	  m_lifeSymbol(playerShip), m_totalExtraLives(totalExtraLives)
+UIManager::UIManager() = default;
+
+
+void UIManager::init(const Ship& shipModel, int totalExtraLives, float windowMargin)
 {
+	m_baseScale = sf::Vector2f(.45f, .55f);
+	m_windowMargin = windowMargin;
+	m_lifeSymbol = shipModel;
+	m_totalExtraLives = totalExtraLives;
+	m_windowDimensions = GameState::world_bounds;
+
+
 	initializePauseText();
 	initializeScore();
 	initializeGameOverText();
@@ -74,7 +81,8 @@ void UIManager::updateTempText()
 
 void UIManager::updateHealthBar()
 {
-	if(m_playerHealth != m_healthBarSegments.size() && !m_healthBarSegments.empty())
+	extern PlayerShip playerShip;
+	if(playerShip.getHealth() != m_healthBarSegments.size() && !m_healthBarSegments.empty())
 	{
 		m_healthBarSegments.pop_back();
 	}
@@ -246,13 +254,14 @@ void UIManager::initializeExtraLivesText()
 
 void UIManager::initializeHealthSegments()
 {
+	extern PlayerShip playerShip;
 	m_healthBarSegments.clear();
 	const float xPos = m_windowDimensions.left + m_windowDimensions.width - m_healthBarSegment.getGlobalBounds().width - m_windowMargin;
 	const float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - m_healthBarSegment.getGlobalBounds().height;
 
 	m_healthBarSegment.setPosition(xPos, yPos);
 
-	for(int i = 0; i < m_playerHealth; i++)
+	for(int i = 0; i < playerShip.getHealth(); i++)
 	{
 		m_healthBarSegments.push_back(m_healthBarSegment);
 		m_healthBarSegment.move(-m_healthBarSegment.getGlobalBounds().width - ELEMENT_BUFFER, 0.f);

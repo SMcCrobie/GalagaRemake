@@ -15,6 +15,9 @@ void PlayerShip::initStartState()
 	disableCurrentShipStates();
 	m_isVerticallyWorldBound = false;
 	m_shipControlsStateMappings[MoveUp] = true;
+	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
+	m_moveUpIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
+	m_moveDownIncrement = SINGLE_THRUST_DIRECTION_INCREMENT / 4;
 }
 
 void PlayerShip::calculateStartPosition()
@@ -27,6 +30,18 @@ void PlayerShip::calculateStartPosition()
 
 PlayerShip::PlayerShip(const sf::Texture& texture)
 	: Ship()
+{
+	setTexture(texture);
+	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
+
+	calculateStartPosition();
+	initStartState();
+}
+
+PlayerShip::PlayerShip()
+= default;
+
+void PlayerShip::init(const sf::Texture& texture)
 {
 	setTexture(texture);
 	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));

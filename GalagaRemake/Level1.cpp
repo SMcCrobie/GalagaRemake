@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "BackgroundManager.h"
 #include "Controller.h"
 #include "ControllerConfigs.h"
 #include "Fonts.h"
@@ -13,6 +14,35 @@
 #include "RandMacros.h"
 #include "Ship.h"
 
+
+//textures
+static sf::Texture shipAnimations;
+static sf::Texture bossAnimations;
+static sf::Texture bossSideKicksAnimations;
+static std::shared_ptr<sf::Texture> bossProjectileTexture;
+
+//objects
+static Ship enemyShip;
+static Ship bossShip;
+static Ship bossSideKicks;
+static CircleProjectile bossProjectile = CircleProjectile();
+static RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
+static sf::Color shieldColor;
+
+//controllers
+static std::map<State, std::vector<ShipControl>> bossSideKicksStateToShipControlInputsMap;
+static std::map<State, std::vector<ShipControl>> bossSideKicksStateToShipControlInputsMapB;
+static std::map<State, std::map<Input, State>> bossSideKicksStateWithInputToStateMap;
+static StateMachineController bossSideKicksController;
+static StateMachineController bossSideKicksControllerB;
+
+
+static std::map<State, std::vector<ShipControl>> bossStateToShipControlInputsMap;
+static std::map<State, std::map<Input, State>> bossStateWithInputToStateMap;
+
+static StateMachineController bossController;
+
+static sf::Texture planetsSheet;
 
 int Level1::initializeLevel()
 {
@@ -23,6 +53,7 @@ int Level1::initializeLevel()
 		Loader::LOAD_SAFELY(bossAnimations, "bossAnimations.png");
 		Loader::LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
 		Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
+		Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
 
 	}
 	catch (std::invalid_argument& e) {
@@ -31,6 +62,14 @@ int Level1::initializeLevel()
 		return EXIT_FAILURE;
 	}
 
+
+	planetsSheet.setSmooth(true);
+	sf::Sprite planet(planetsSheet);
+	planet.setPosition(300, -500);
+	planet.setColor(sf::Color(120, 120, 120));
+
+	extern BackgroundManager backgroundManager;
+	backgroundManager.addForegroundPlanet(planet);
 
 	enemyShip.setIsHorizontallyWorldBound(false);
 	enemyShip.setTexture(shipAnimations);
@@ -125,56 +164,57 @@ int Level1::initializeLevel()
 	return 0;
 }
 
-void Level1::enemyShipCreation(std::shared_ptr<ShipManager>& enemyShipsManager)
+void Level1::enemyShipCreation()
 {
+	extern ShipManager enemyShipsManager;
 	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip)
 		return;
 
-	int size = enemyShipsManager->count();
-	if (GameState::killCounter < 8 && enemyShipsManager->count() < 2) {
+	int size = enemyShipsManager.count();
+	if (GameState::killCounter < 8 && enemyShipsManager.count() < 2) {
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
-		enemyShipsManager->createShip(enemyShip);
+		enemyShipsManager.createShip(enemyShip);
 	}
 
-	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager->count() < 4) {
+	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4) {
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
-		enemyShipsManager->createShip(enemyShip);
+		enemyShipsManager.createShip(enemyShip);
 	}
 
-	if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager->count() < INT_MAX) {
+	if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager.count() < INT_MAX) {
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
-		enemyShipsManager->createShip(enemyShip);
+		enemyShipsManager.createShip(enemyShip);
 	}
 	//enemyship Upgrade
-	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager->count() < 4) {
+	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4) {
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 546.F);
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.bottom + 50.f));
 		enemyShip.rotate180();
-		enemyShipsManager->createShip(enemyShip);
+		enemyShipsManager.createShip(enemyShip);
 		enemyShip.rotate180();
 	}
-	if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager->count() < INT_MAX) {
+	if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager.count() < INT_MAX) {
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 546.F);
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.bottom + 50.f));
 		enemyShip.rotate180();
-		enemyShipsManager->createShip(enemyShip);
+		enemyShipsManager.createShip(enemyShip);
 		enemyShip.rotate180();
 	}
 	//boss
-	if (GameState::killCounter >= 32 && !GameState::isBossCreated && enemyShipsManager->isEmpty()) {
+	if (GameState::killCounter >= 32 && !GameState::isBossCreated && enemyShipsManager.isEmpty()) {
 		GameState::isBossCreated = true;
-		enemyShipsManager->createShip(bossShip, bossController);
-		enemyShipsManager->createShip(bossSideKicks, bossSideKicksController);
+		enemyShipsManager.createShip(bossShip, bossController);
+		enemyShipsManager.createShip(bossSideKicks, bossSideKicksController);
 		bossSideKicks.move(300.f, 0.f);
-		enemyShipsManager->createShip(bossSideKicks, bossSideKicksControllerB);
+		enemyShipsManager.createShip(bossSideKicks, bossSideKicksControllerB);
 		//this is why you need to standardize ship creation, prob set position before any creation period
 		bossSideKicks.move(-300.f, 0.f);
 	}
 	GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
-	if (size < enemyShipsManager->count())
+	if (size < enemyShipsManager.count())
 		GameState::deltaTillNextEnemyShip -= 5;
 	
 }

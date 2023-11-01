@@ -58,6 +58,11 @@ std::shared_ptr<Projectile> RectangleProjectile::clone()
     return std::make_shared<RectangleProjectile>(RectangleProjectile(*this));
 }
 
+void RectangleProjectile::setGrowthSpeed(sf::Vector2f& growthAmount)
+{
+
+}
+
 const sf::Vector2f& Projectile::getVelocity() const
 {
 	return m_velocity;

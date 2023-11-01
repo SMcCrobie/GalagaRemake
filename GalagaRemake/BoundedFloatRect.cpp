@@ -1,6 +1,15 @@
 #include "BoundedFloatRect.h"
 
 
+BoundedFloatRect::BoundedFloatRect()
+{
+    top = 0;
+    bottom = 0;
+
+    left = 0;
+    right = 0;
+}
+
 BoundedFloatRect::BoundedFloatRect(float rectLeft, float rectTop, float rectWidth, float rectHeight)
     : sf::FloatRect(rectLeft, rectTop, rectWidth, rectHeight) {
     right = rectLeft + rectWidth;

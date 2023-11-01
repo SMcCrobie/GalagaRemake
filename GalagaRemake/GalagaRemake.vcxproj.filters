@@ -60,7 +60,7 @@
     <ClCompile Include="Collision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LevelManager.cpp">
+    <ClCompile Include="LevelOrchestrator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Fonts.cpp">
@@ -119,10 +119,10 @@
     <ClInclude Include="Collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelManager.h">
+    <ClInclude Include="LevelOrchestrator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Manager.h">
+    <ClInclude Include="IManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameState.h">
@@ -144,6 +144,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Level0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCoordinator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -175,6 +181,9 @@
     <Image Include="BossAnimations.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\LaserTurretAnimations.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Galaxus.ttf">
@@ -185,6 +194,7 @@
     <Text Include="ControlsConfig.txt">
       <Filter>Source Files\Configs</Filter>
     </Text>
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

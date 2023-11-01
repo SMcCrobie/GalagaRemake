@@ -7,7 +7,7 @@ class ILevel
 public:
 	virtual int initializeLevel() = 0;
 
-	virtual void enemyShipCreation(std::shared_ptr<ShipManager>& enemyShipsManager) = 0;
+	virtual void enemyShipCreation() = 0;
 
 	virtual void killLevel() = 0 ;
 
