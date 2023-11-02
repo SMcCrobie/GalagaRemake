@@ -10,13 +10,17 @@ class GameObjectManager
 {
 public:
 	void createGameObject(const GameObject& obj);
+	void createItem(const GameObject& item);
 	[[nodiscard]] bool isEmpty() const;
 	[[nodiscard]] int count() const;
 	void resetManager() override;
-	void updateObjects();
+	void update();
+	void detectCollision(PlayerShip& playerShip);
 
 private:
 	std::list<GameObject> m_gameObjects;
+	std::list<GameObject> m_items;
+	ItemType detectCollisionWithItems(const PlayerShip& playerShip);
 	// Inherited via Drawable
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };

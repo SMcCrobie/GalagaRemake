@@ -75,6 +75,7 @@ void LevelOrchestrator::reset(KeyboardController& playerController) const
 	{
 		manager->resetManager();
 	}
+	m_level->resetLevel();
 }
 
 bool LevelOrchestrator::shouldRunLoop()

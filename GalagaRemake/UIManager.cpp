@@ -82,7 +82,11 @@ void UIManager::updateTempText()
 void UIManager::updateHealthBar()
 {
 	extern PlayerShip playerShip;
-	if(playerShip.getHealth() != m_healthBarSegments.size() && !m_healthBarSegments.empty())
+	if(playerShip.getHealth() > m_healthBarSegments.size())
+	{
+		initializeHealthSegments();
+	}
+	while(playerShip.getHealth() < m_healthBarSegments.size() && !m_healthBarSegments.empty())
 	{
 		m_healthBarSegments.pop_back();
 	}

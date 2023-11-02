@@ -12,5 +12,7 @@ public:
 
 	void killLevel() override;
 
+	void resetLevel() override;
+
 };
 

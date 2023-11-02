@@ -3,6 +3,11 @@
 #include "Controller.h"
 #include "GameState.h"
 
+void PlayerShip::initStartHealth()
+{
+	m_shipHealth = 3;
+}
+
 void PlayerShip::initStartState()
 {
 	if (isBackwards())
@@ -10,7 +15,7 @@ void PlayerShip::initStartState()
 	m_gameCyclesTillRespawned = 0;
 	setShipColor(sf::Color::White);
 	m_velocity = sf::Vector2f(0.0f, -6.0f);
-	m_shipHealth = 3;
+	initStartHealth();
 	setPosition(m_startPosition);
 	disableCurrentShipStates();
 	m_isVerticallyWorldBound = false;
@@ -98,6 +103,17 @@ void PlayerShip::resetManager()
 	initStartState();
 }
 
+void PlayerShip::useItem(const ItemType itemType)
+{
+	if (itemType == ItemType::None)
+		return;
+	if (itemType == ItemType::Repair_Kit)
+	{
+		initStartHealth();
+		return;
+	}
+	throw std::invalid_argument("Item Type Not Mapped for Ship interaction");
+}
 
 
 bool PlayerShip::isWithinLeftCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)

@@ -223,4 +223,8 @@ void Level1::enemyShipCreation()
 void Level1::killLevel()
 {
 	return;
+}
+
+void Level1::resetLevel()
+{
 };

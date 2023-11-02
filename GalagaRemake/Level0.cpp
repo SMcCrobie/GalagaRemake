@@ -42,7 +42,8 @@ static std::map<State, std::map<Input, State>> laserTurretStateWithInputToStateM
 
 int Level0::initializeLevel()
 {
-	extern BackgroundManager backgroundManager;
+	extern BackgroundManager backgroundManager; 
+	extern PlayerShip playerShip;
 	backgroundManager.removeForegroundPlanet();
 	timeOfLastEnemyShip = 0;
 	deltaTillNextEnemyShip = 100;
@@ -95,7 +96,11 @@ int Level0::initializeLevel()
 	repairKitSprite.setPosition(sf::Vector2f(300.f, 100.f));
 	repairKit.setSprite(repairKitSprite);
 	repairKit.setRotation(-1.5f);
-	repairKit.setOscillation(sf::Vector2f(1.004f, 1.004f), 80);
+	repairKit.setOscillation(sf::Vector2f(1.003f, 1.003f), 80);
+	repairKit.setItemType(ItemType::Repair_Kit);
+
+
+	playerShip.setHealth(1);
 	
 
 
@@ -114,10 +119,9 @@ void Level0::enemyShipCreation()
 		return;
 	GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
 
-	if(!isRepairPackCreated)
+	if(gameObjectManager.count() == 0)
 	{
-		isRepairPackCreated = true;
-		gameObjectManager.createGameObject(repairKit);
+		gameObjectManager.createItem(repairKit);
 	}
 	/*
 	if (enemyShipsManager.count() < 2) {
@@ -132,4 +136,10 @@ void Level0::enemyShipCreation()
 void Level0::killLevel()
 {
 	return;
+}
+
+void Level0::resetLevel()
+{
+	extern PlayerShip playerShip;
+	playerShip.setHealth(1);
 }

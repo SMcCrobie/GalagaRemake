@@ -1,19 +1,26 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "PlayerShip.h"
+#include "ItemType.h"
+
+
 class GameObject :
     public sf::Drawable
 {
 public:
     GameObject();
-    void setSprite(const sf::Sprite& sprite);
+    void setSprite(const sf::Sprite& sprite, bool withCollisionBox = true);
     void setRect(const sf::RectangleShape& rect);
     void setCircle(const sf::CircleShape& circle);
     void setRotation(float rotation);
     void setVelocity(const sf::Vector2f& velocity);
     void setOscillation(const sf::Vector2f& scalar, int framesTillSwitch);
+    //void setItemType(item_type type);
 
-    void updateGameObject();
-
+    void update();
+    bool detectCollision(const PlayerShip& playerShip) const;
+    ItemType getItemType() const;
+    void setItemType(ItemType type);
 
 protected:
     sf::Sprite m_sprite;
@@ -30,6 +37,7 @@ protected:
     int m_oscillationThreshold;
     sf::Vector2f m_velocity;
     float m_rotation;
+    ItemType m_itemType;
 
 
     

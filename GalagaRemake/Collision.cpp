@@ -56,10 +56,32 @@ namespace Collision
 	}
 
 
+	bool pixelPerfectTest(const sf::Sprite& sprite, const sf::RectangleShape& rect, sf::Uint8 alphaLimit)
+	{
+		sf::FloatRect intersection;
+		if (!sprite.getGlobalBounds().intersects(rect.getGlobalBounds(), intersection))
+			return false;
 
+		const auto s1SubRect = sprite.getTextureRect();
 
+		const auto& mask1 = bitmasks().get(*sprite.getTexture());
 
+		// Loop through our pixels
+		for (auto i = intersection.left; i < intersection.left + intersection.width; ++i) {
+			for (auto j = intersection.top; j < intersection.top + intersection.height; ++j) {
+				const auto s1v = sprite.getInverseTransform().transformPoint(i, j);
 
+				// Make sure pixels fall within the sprite's subrect
+				if (s1v.x > 0 && s1v.y > 0 && s1v.x < s1SubRect.width && s1v.y < s1SubRect.height) {
+
+					if (getPixel(mask1, *sprite.getTexture(), static_cast<int>(s1v.x) + s1SubRect.left, static_cast<int>(s1v.y) + s1SubRect.top) > alphaLimit)
+						return true;
+
+				}
+			}
+		}
+		return false;
+	}
 
 	bool pixelPerfectTest(const sf::Sprite& sprite, const RectangleProjectile& recProjectile, sf::Uint8 alphaLimit)
 	{

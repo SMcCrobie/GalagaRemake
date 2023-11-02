@@ -159,7 +159,10 @@ int main(int, char const**)
 		enemyShipsManager.updateShips();
 
 		//update Game objects
-		gameObjectManager.updateObjects();
+		gameObjectManager.update();
+
+		//object and Item Collisions
+		gameObjectManager.detectCollision(playerShip);
 
 		//updateBackground
 		backgroundManager.moveBackground(backgroundSpeed);

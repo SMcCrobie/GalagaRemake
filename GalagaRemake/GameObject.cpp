@@ -1,5 +1,9 @@
 #include "GameObject.h"
 
+#include <iostream>
+
+#include "Collision.h"
+
 GameObject::GameObject()
 {
 	m_isThereSprite = false;
@@ -7,11 +11,17 @@ GameObject::GameObject()
 	m_isThereCircle = false;
 }
 
-void GameObject::setSprite(const sf::Sprite& sprite)
+void GameObject::setSprite(const sf::Sprite& sprite, bool withCollisionBox)
 {
 	m_sprite = sprite;
 	m_isThereSprite = true;
 	m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
+
+	if(withCollisionBox)
+	{
+		setRect(sf::RectangleShape(sf::Vector2f(m_sprite.getLocalBounds().width, m_sprite.getLocalBounds().height)));
+		m_rectangle.setPosition(m_sprite.getPosition());
+	}
 }
 
 void GameObject::setRect(const sf::RectangleShape& rect)
@@ -45,6 +55,7 @@ void GameObject::setOscillation(const sf::Vector2f& scalar, int framesTillSwitch
 	m_oscillationTimer = 0;
 
 }
+
 
 void GameObject::rotateObject()
 {
@@ -113,12 +124,37 @@ void GameObject::moveObject()
 	}
 }
 
-void GameObject::updateGameObject()
+void GameObject::update()
 {
 	moveObject();
 	rotateObject();
 	oscillateObject();
 }
+
+bool GameObject::detectCollision(const PlayerShip& playerShip) const
+{
+	//TODO make other types of collisions
+	if (m_isThereSprite && m_isThereRect)
+	{
+		if (Collision::pixelPerfectTest(playerShip, m_rectangle))
+		{
+			std::cout << "Collision Detected" << std::endl;
+			return true;
+		}
+	}
+	return false;
+}
+
+ItemType GameObject::getItemType() const
+{
+	return m_itemType;
+}
+
+void GameObject::setItemType(ItemType type)
+{
+	m_itemType = type;
+}
+
 
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {

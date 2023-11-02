@@ -11,6 +11,8 @@ public:
 
 	virtual void killLevel() = 0 ;
 
+	virtual void resetLevel() = 0;
+
 	TempText level_into_text_primary;
 	TempText level_into_text_secondary;
 
