@@ -258,6 +258,12 @@ void Ship::setMovementIncrements(float horizontal, float up, float down)
 	m_moveDownIncrement = down;
 }
 
+//void Ship::setStartHealth(int startHealth)
+//{
+//	m_startHealth = startHealth;
+//	m_shipHealth = startHealth;
+//}
+
 
 void Ship::decrementHealth()
 {
@@ -474,7 +480,7 @@ void Ship::moveShip()
 
 void Ship::respawnShip()
 {
-	m_shipHealth = 3;
+	m_shipHealth = 1;
 	m_gameCyclesTillRespawned = 100;
 }
 

@@ -12,6 +12,7 @@ public:
 	void calculateStartPosition();
 	PlayerShip(const sf::Texture& texture);
     PlayerShip();
+    void respawnShip() override;
     void init(const sf::Texture& texture);
 	void handleIntro();
 	void updateShip(KeyboardController& controller);

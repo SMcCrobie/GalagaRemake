@@ -30,8 +30,9 @@ private:
 	void initializeScore();
 	void initializeGameOverText();
 	void initializeExtraLivesText();
-	void initializeHealthSegments();
+	void initializeHealthBar();
 	void initializeHealthBarSegment();
+	bool isHealthBarSegmentInitialized();
 	void initializePlayerHealth();
 	
 

@@ -4,6 +4,9 @@
 
 #define CENTER_ELEMENT_HORIZONTALLY(elementWidth) ((m_windowDimensions.width - (elementWidth)) / 2)
 #define ELEMENT_BUFFER 5.F
+#define HEALTH_BAR_MAX_WIDTH 150.F
+
+extern PlayerShip playerShip;
 
 void UIManager::initializePauseText()
 {
@@ -84,7 +87,7 @@ void UIManager::updateHealthBar()
 	extern PlayerShip playerShip;
 	if(playerShip.getHealth() > m_healthBarSegments.size())
 	{
-		initializeHealthSegments();
+		initializePlayerHealth();
 	}
 	while(playerShip.getHealth() < m_healthBarSegments.size() && !m_healthBarSegments.empty())
 	{
@@ -256,9 +259,9 @@ void UIManager::initializeExtraLivesText()
 	m_extraLivesText.setFillColor(sf::Color(0x05ecf1ff));
 }
 
-void UIManager::initializeHealthSegments()
+void UIManager::initializeHealthBar()
 {
-	extern PlayerShip playerShip;
+	
 	m_healthBarSegments.clear();
 	const float xPos = m_windowDimensions.left + m_windowDimensions.width - m_healthBarSegment.getGlobalBounds().width - m_windowMargin;
 	const float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - m_healthBarSegment.getGlobalBounds().height;
@@ -276,16 +279,25 @@ void UIManager::initializeHealthBarSegment()
 {
 	sf::RectangleShape healthBarSegment;
 	healthBarSegment.setFillColor(sf::Color::White);
-	healthBarSegment.setSize(sf::Vector2f(30.f, 6.f));
+
+	auto health = static_cast<float>(playerShip.getHealth());
+	auto healthSegmentWidth = (HEALTH_BAR_MAX_WIDTH - (ELEMENT_BUFFER * (health-1))) / health;
+
+	healthBarSegment.setSize(sf::Vector2f(healthSegmentWidth, 6.f));
 
 	m_healthBarSegment = healthBarSegment;
 }
 
+bool UIManager::isHealthBarSegmentInitialized()
+{
+	return m_healthBarSegment.getSize().x < 1.f;
+}
+
 void UIManager::initializePlayerHealth()
 {
-	if (m_healthBarSegment.getSize().x < 1.f)
-		initializeHealthBarSegment();
-	initializeHealthSegments();
+	//if (isHealthBarSegmentInitialized())
+	initializeHealthBarSegment();
+	initializeHealthBar();
 }
 
 

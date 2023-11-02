@@ -5,7 +5,8 @@
 
 void PlayerShip::initStartHealth()
 {
-	m_shipHealth = 3;
+
+	m_shipHealth = 5;
 }
 
 void PlayerShip::initStartState()
@@ -15,6 +16,7 @@ void PlayerShip::initStartState()
 	m_gameCyclesTillRespawned = 0;
 	setShipColor(sf::Color::White);
 	m_velocity = sf::Vector2f(0.0f, -6.0f);
+
 	initStartHealth();
 	setPosition(m_startPosition);
 	disableCurrentShipStates();
@@ -46,8 +48,15 @@ PlayerShip::PlayerShip(const sf::Texture& texture)
 PlayerShip::PlayerShip()
 = default;
 
+void PlayerShip::respawnShip()
+{
+	initStartHealth();
+	m_gameCyclesTillRespawned = 100;
+}
+
 void PlayerShip::init(const sf::Texture& texture)
 {
+	m_startHealth = 3;
 	setTexture(texture);
 	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 

@@ -57,8 +57,8 @@ public:
 	void moveShip();
 	virtual void rotate180();
 	virtual void initRotation();
-	void respawnShip();
-	void respawnShip(int respawnTimer);
+	virtual void respawnShip();
+	virtual void respawnShip(int respawnTimer);
 	bool isBackwards() const;
 	bool isRespawning() const;
 	bool hasShield() const;
@@ -76,6 +76,7 @@ public:
 	void flipHorizontalMovementStates();
 	void flipVerticalMovementStates();
 	void setMovementIncrements(float horizontal, float up, float down);
+	//void setStartHealth(int startHealth);//TODO fix this shit
 
 
 protected:
@@ -114,6 +115,7 @@ protected:
     std::map<ShipControl, bool> m_shipControlsStateMappings;
 	bool m_isTransitioning;
 	float m_rotationIncrement;
+	int m_startHealth;
 
 private:
 	void incrementRotation();

@@ -56,6 +56,7 @@ static sf::Texture planetsSheet;
 
 int Level1::initializeLevel()
 {
+	extern PlayerShip playerShip;
 	bossProjectileTexture = std::make_shared<sf::Texture>();
 	try {
 		//textures
@@ -64,7 +65,7 @@ int Level1::initializeLevel()
 		Loader::LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
 		Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
 		Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
-		Loader::LOAD_SAFELY(repairKitAnimations, "repairKit.png");
+		Loader::LOAD_SAFELY(repairKitAnimations, "repairKit3.png");
 
 	}
 	catch (std::invalid_argument& e) {
@@ -81,6 +82,8 @@ int Level1::initializeLevel()
 
 	extern BackgroundManager backgroundManager;
 	backgroundManager.addForegroundPlanet(planet);
+
+	//playerShip.setStartHealth(5);
 
 	enemyShip.setIsHorizontallyWorldBound(false);
 	enemyShip.setTexture(shipAnimations);
@@ -175,10 +178,10 @@ int Level1::initializeLevel()
 
 	repairKitSprite.setTexture(repairKitAnimations);
 	repairKitSprite.setPosition(sf::Vector2f(300.f, 100.f));
-	repairKitSprite.setScale(.8f, .8f);
+	repairKitSprite.setScale(.9f, .9f);
 	repairKit.setSprite(repairKitSprite);
 	repairKit.setRotation(-1.5f);
-	repairKit.setOscillation(sf::Vector2f(1.004f, 1.004f), 80);
+	repairKit.setOscillation(sf::Vector2f(1.0045f, 1.0045f), 80);
 	repairKit.setItemType(ItemType::Repair_Kit);
 
 
@@ -203,8 +206,7 @@ void Level1::enemyShipCreation()
 		enemyShipsManager.createShip(enemyShip);
 	}
 
-	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4) {
-			Loader::LOAD_SAFELY(repairKitAnimations, "repairKit.png");
+	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4){;
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(enemyShip);
