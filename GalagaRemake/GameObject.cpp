@@ -56,6 +56,22 @@ void GameObject::setOscillation(const sf::Vector2f& scalar, int framesTillSwitch
 
 }
 
+void GameObject::setPosition(const float x, const float y)
+{
+	if (m_isThereSprite)
+	{
+		m_sprite.setPosition(x, y);
+	}
+	if (m_isThereCircle)
+	{
+		m_circle.setPosition(x, y);
+	}
+	if (m_isThereRect)
+	{
+		m_rectangle.setPosition(x, y);
+	}
+}
+
 
 void GameObject::rotateObject()
 {

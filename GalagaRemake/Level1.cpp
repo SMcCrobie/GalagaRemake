@@ -9,10 +9,17 @@
 #include "Controller.h"
 #include "ControllerConfigs.h"
 #include "Fonts.h"
+#include "GameObject.h"
+#include "GameObjectManager.h"
 #include "GameState.h"
 #include "Loader.h"
 #include "RandMacros.h"
 #include "Ship.h"
+
+//level flags
+static bool isRepairKitOneCreated = false;
+static bool isRepairKitTwoCreated = false;
+static bool isRepairKitThreeCreated = false;
 
 
 //textures
@@ -28,6 +35,9 @@ static Ship bossSideKicks;
 static CircleProjectile bossProjectile = CircleProjectile();
 static RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
 static sf::Color shieldColor;
+static GameObject repairKit;
+static sf::Sprite repairKitSprite;
+static sf::Texture repairKitAnimations;
 
 //controllers
 static std::map<State, std::vector<ShipControl>> bossSideKicksStateToShipControlInputsMap;
@@ -54,6 +64,7 @@ int Level1::initializeLevel()
 		Loader::LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
 		Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
 		Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
+		Loader::LOAD_SAFELY(repairKitAnimations, "repairKit.png");
 
 	}
 	catch (std::invalid_argument& e) {
@@ -161,12 +172,27 @@ int Level1::initializeLevel()
 	level_outro_text_secondary = TempText("Exiting Tarkion III Orbit", Fonts::playFair);
 
 
+
+	repairKitSprite.setTexture(repairKitAnimations);
+	repairKitSprite.setPosition(sf::Vector2f(300.f, 100.f));
+	repairKitSprite.setScale(.8f, .8f);
+	repairKit.setSprite(repairKitSprite);
+	repairKit.setRotation(-1.5f);
+	repairKit.setOscillation(sf::Vector2f(1.004f, 1.004f), 80);
+	repairKit.setItemType(ItemType::Repair_Kit);
+
+
+
+
+
 	return 0;
 }
 
 void Level1::enemyShipCreation()
 {
 	extern ShipManager enemyShipsManager;
+	extern GameObjectManager gameObjectManager;
+
 	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip)
 		return;
 
@@ -178,6 +204,7 @@ void Level1::enemyShipCreation()
 	}
 
 	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4) {
+			Loader::LOAD_SAFELY(repairKitAnimations, "repairKit.png");
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(enemyShip);
@@ -203,6 +230,27 @@ void Level1::enemyShipCreation()
 		enemyShipsManager.createShip(enemyShip);
 		enemyShip.rotate180();
 	}
+	
+	//repair kits
+	if (GameState::killCounter >= 12 && !isRepairKitOneCreated)
+	{
+		isRepairKitOneCreated = true;
+		repairKit.setPosition(300.f, 100.f);
+		gameObjectManager.createItem(repairKit);
+	}
+	if (GameState::killCounter >= 24 && !isRepairKitTwoCreated)
+	{
+		isRepairKitTwoCreated = true;
+		repairKit.setPosition(300.f, 900.f);
+		gameObjectManager.createItem(repairKit);
+	}
+	if (GameState::killCounter >= 32 && !isRepairKitThreeCreated && enemyShipsManager.isEmpty())
+	{
+		isRepairKitThreeCreated = true;
+		repairKit.setPosition(300.f, 500.f);
+		gameObjectManager.createItem(repairKit);
+	}
+
 	//boss
 	if (GameState::killCounter >= 32 && !GameState::isBossCreated && enemyShipsManager.isEmpty()) {
 		GameState::isBossCreated = true;
@@ -213,6 +261,9 @@ void Level1::enemyShipCreation()
 		//this is why you need to standardize ship creation, prob set position before any creation period
 		bossSideKicks.move(-300.f, 0.f);
 	}
+
+
+
 	GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
 	if (size < enemyShipsManager.count())
 		GameState::deltaTillNextEnemyShip -= 5;
@@ -222,7 +273,7 @@ void Level1::enemyShipCreation()
 
 void Level1::killLevel()
 {
-	return;
+	
 }
 
 void Level1::resetLevel()

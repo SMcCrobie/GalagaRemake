@@ -94,10 +94,12 @@ int Level0::initializeLevel()
 
 	repairKitSprite.setTexture(repairKitAnimations);
 	repairKitSprite.setPosition(sf::Vector2f(300.f, 100.f));
+	repairKitSprite.setScale(.8f, .8f);
 	repairKit.setSprite(repairKitSprite);
 	repairKit.setRotation(-1.5f);
-	repairKit.setOscillation(sf::Vector2f(1.003f, 1.003f), 80);
+	repairKit.setOscillation(sf::Vector2f(1.004f, 1.004f), 80);
 	repairKit.setItemType(ItemType::Repair_Kit);
+	
 
 
 	playerShip.setHealth(1);
@@ -128,14 +130,11 @@ void Level0::enemyShipCreation()
 		laserTurret.setPosition(sf::Vector2f(GameState::world_bounds.left + 50.f, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(laserTurret, laserTurretController);
 	}*/
-
-
-	return;
 }
 
 void Level0::killLevel()
 {
-	return;
+
 }
 
 void Level0::resetLevel()

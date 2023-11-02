@@ -15,8 +15,8 @@ public:
     void setRotation(float rotation);
     void setVelocity(const sf::Vector2f& velocity);
     void setOscillation(const sf::Vector2f& scalar, int framesTillSwitch);
-    //void setItemType(item_type type);
-
+    void setPosition(float x, float y);
+  
     void update();
     bool detectCollision(const PlayerShip& playerShip) const;
     ItemType getItemType() const;
