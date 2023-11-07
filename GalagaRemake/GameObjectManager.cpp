@@ -5,7 +5,7 @@ void GameObjectManager::createGameObject(const GameObject& obj)
 	m_gameObjects.emplace_back(obj);
 }
 
-void GameObjectManager::createItem(const GameObject& item)
+void GameObjectManager::createItem(const Item& item)
 {
 	m_items.emplace_back(item);
 }
@@ -45,7 +45,7 @@ ItemType GameObjectManager::detectCollisionWithItems(const PlayerShip& playerShi
 	{
 		if (it->detectCollision(playerShip))
 		{
-			auto type = it->getItemType();
+			const auto type = it->getItemType();
 			m_items.erase(it);
 			return type;
 		}

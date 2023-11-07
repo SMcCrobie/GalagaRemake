@@ -10,7 +10,7 @@ class GameObjectManager
 {
 public:
 	void createGameObject(const GameObject& obj);
-	void createItem(const GameObject& item);
+	void createItem(const Item& item);
 	[[nodiscard]] bool isEmpty() const;
 	[[nodiscard]] int count() const;
 	void resetManager() override;
@@ -19,7 +19,7 @@ public:
 
 private:
 	std::list<GameObject> m_gameObjects;
-	std::list<GameObject> m_items;
+	std::list<Item> m_items;
 	ItemType detectCollisionWithItems(const PlayerShip& playerShip);
 	// Inherited via Drawable
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

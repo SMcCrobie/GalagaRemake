@@ -56,7 +56,6 @@ void PlayerShip::respawnShip()
 
 void PlayerShip::init(const sf::Texture& texture)
 {
-	m_startHealth = 3;
 	setTexture(texture);
 	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 

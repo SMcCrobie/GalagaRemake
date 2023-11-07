@@ -4,7 +4,7 @@
 
 #include "Collision.h"
 
-GameObject::GameObject()
+GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_rotation(0)
 {
 	m_isThereSprite = false;
 	m_isThereRect = false;
@@ -161,17 +161,6 @@ bool GameObject::detectCollision(const PlayerShip& playerShip) const
 	return false;
 }
 
-ItemType GameObject::getItemType() const
-{
-	return m_itemType;
-}
-
-void GameObject::setItemType(ItemType type)
-{
-	m_itemType = type;
-}
-
-
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if(m_isThereSprite)
@@ -188,3 +177,20 @@ void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		target.draw(m_rectangle, states);
 	}
 }
+
+
+
+
+//Item
+//--------------------------------------------------------------------------
+
+ItemType Item::getItemType() const
+{
+	return m_itemType;
+}
+
+void Item::setItemType(ItemType type)
+{
+	m_itemType = type;
+}
+

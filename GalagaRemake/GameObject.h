@@ -19,8 +19,6 @@ public:
   
     void update();
     bool detectCollision(const PlayerShip& playerShip) const;
-    ItemType getItemType() const;
-    void setItemType(ItemType type);
 
 protected:
     sf::Sprite m_sprite;
@@ -37,7 +35,6 @@ protected:
     int m_oscillationThreshold;
     sf::Vector2f m_velocity;
     float m_rotation;
-    ItemType m_itemType;
 
 
     
@@ -49,3 +46,14 @@ private:
     void oscillateObject();
 };
 
+class Item :
+	public GameObject
+{
+public:
+    ItemType getItemType() const;
+    void setItemType(ItemType type);
+
+private:
+    ItemType m_itemType;
+
+};

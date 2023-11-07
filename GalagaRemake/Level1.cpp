@@ -35,7 +35,7 @@ static Ship bossSideKicks;
 static CircleProjectile bossProjectile = CircleProjectile();
 static RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
 static sf::Color shieldColor;
-static GameObject repairKit;
+static Item repairKit;
 static sf::Sprite repairKitSprite;
 static sf::Texture repairKitAnimations;
 

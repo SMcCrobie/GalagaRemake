@@ -24,7 +24,7 @@ static auto laserTurretProjectile = RectangleProjectile();
 static std::shared_ptr<sf::Texture> bossProjectileTexture;
 static sf::Color shieldColor;
 
-static GameObject repairKit;
+static Item repairKit;
 static sf::Sprite repairKitSprite;
 static sf::Texture repairKitAnimations;
 

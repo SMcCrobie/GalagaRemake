@@ -8,11 +8,15 @@ Design Themes(*will be updated as/if themes change)
 
 TODOs
 ---------------------------------------------------------------
-- Scrub world bounds from all parameters, use GameState::WorldBounds in its stead
-- Need to move GameState stuff into new LevelState object or just within the levels themselves
-
+- Add point values to getting items
+	- less life needed more points
 - Add points representation on screen
 	- add points for collecting health packs when already at full health or close to it
+- remove control selection widow, tie control changes to function keys instead for now, menus further down the line
+
+
+- Scrub world bounds from all parameters, use GameState::WorldBounds in its stead
+- Need to move GameState stuff into new LevelState object or just within the levels themselves
 
 
 Notes
