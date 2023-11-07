@@ -113,8 +113,6 @@ void PlayerShip::resetManager()
 
 void PlayerShip::useItem(const ItemType itemType)
 {
-	if (itemType == ItemType::None)
-		return;
 	if (itemType == ItemType::Repair_Kit)
 	{
 		initStartHealth();

@@ -16,9 +16,11 @@ public:
     void setVelocity(const sf::Vector2f& velocity);
     void setOscillation(const sf::Vector2f& scalar, int framesTillSwitch);
     void setPosition(float x, float y);
+    void setPointValue(int pointValue);
   
     void update();
     bool detectCollision(const PlayerShip& playerShip) const;
+    int getPointValue();
 
 protected:
     sf::Sprite m_sprite;
@@ -35,6 +37,7 @@ protected:
     int m_oscillationThreshold;
     sf::Vector2f m_velocity;
     float m_rotation;
+    int m_pointValue;
 
 
     

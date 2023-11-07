@@ -14,7 +14,7 @@ public:
 	void addUiText(TempText text);
 	bool isOutOfLives() const;
 	void playerLostLife();
-	void updateUI(int currentScore);
+	void updateUI();
 	void stylePrimaryText(sf::Text& primaryText);
 	void styleSecondaryText(sf::Text& secondaryText);
 	void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);

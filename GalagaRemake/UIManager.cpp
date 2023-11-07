@@ -95,11 +95,11 @@ void UIManager::updateHealthBar()
 	}
 }
 
-void UIManager::updateUI(int currentScore)
+void UIManager::updateUI()
 {
 	updateTempText();
 	updateHealthBar();
-	m_scoreText.setString("Score  " + std::to_string(currentScore));
+	m_scoreText.setString("Score  " + std::to_string(GameState::score));
 	if (m_lives.empty())
 		return;
 	if (!m_lives.back().isRespawning() && !GameState::isPlayerDead)

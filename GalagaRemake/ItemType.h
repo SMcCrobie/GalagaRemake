@@ -2,6 +2,5 @@
 
 enum class ItemType
 {
-	None,
 	Repair_Kit
 };

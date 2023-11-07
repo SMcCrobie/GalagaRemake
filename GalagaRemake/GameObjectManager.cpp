@@ -1,5 +1,7 @@
 #include "GameObjectManager.h"
 
+#include "GameState.h"
+
 void GameObjectManager::createGameObject(const GameObject& obj)
 {
 	m_gameObjects.emplace_back(obj);
@@ -39,7 +41,7 @@ void GameObjectManager::update()
 	}
 }
 
-ItemType GameObjectManager::detectCollisionWithItems(const PlayerShip& playerShip)
+std::optional<ItemType> GameObjectManager::detectCollisionWithItems(const PlayerShip& playerShip)
 {
 	for (auto it = m_items.begin(); it != m_items.end(); it++)
 	{
@@ -50,13 +52,27 @@ ItemType GameObjectManager::detectCollisionWithItems(const PlayerShip& playerShi
 			return type;
 		}
 	}
-	return ItemType::None;
+	return std::nullopt;
 }
 
-void GameObjectManager::detectCollision(PlayerShip& playerShip)
+void GameObjectManager::addItemPointValueToScore(ItemType item, const PlayerShip& playerShip)
+{
+	if (item == ItemType::Repair_Kit)
+	{
+		const auto health = playerShip.getHealth();
+		GameState::score += (health * 100);
+	}
+}
+
+
+void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 {
 	//TODO detect collisions with game objects
-	playerShip.useItem(detectCollisionWithItems(playerShip));
+	const auto itemType = detectCollisionWithItems(playerShip);
+	if(!itemType.has_value())
+		return;
+	addItemPointValueToScore(itemType.value(), playerShip);
+	playerShip.useItem(itemType.value());
 	
 }
 

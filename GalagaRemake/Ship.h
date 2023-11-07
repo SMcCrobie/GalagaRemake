@@ -76,6 +76,8 @@ public:
 	void flipHorizontalMovementStates();
 	void flipVerticalMovementStates();
 	void setMovementIncrements(float horizontal, float up, float down);
+	void setPointValue(int pointValue);
+	int getPointValue() const;
 	//void setStartHealth(int startHealth);//TODO fix this shit
 
 
@@ -116,6 +118,7 @@ protected:
 	bool m_isTransitioning;
 	float m_rotationIncrement;
 	int m_startHealth;
+	int m_pointValue;
 
 private:
 	void incrementRotation();

@@ -29,6 +29,7 @@ Ship::Ship() : sf::Sprite()
 	m_isTransitioning = false;
 	setOrigin(getGlobalBounds().width / 2, getGlobalBounds().height / 2);
 	m_rotationIncrement = 10.f;
+	m_pointValue = 100;
 	
 	for (int i = MoveUp; i < InvalidShipControl; i++) {
 		m_shipControlsStateMappings[static_cast<ShipControl>(i)] = false;
@@ -256,6 +257,16 @@ void Ship::setMovementIncrements(float horizontal, float up, float down)
 	m_horizontalDirectionIncrement = horizontal;
 	m_moveUpIncrement = up;
 	m_moveDownIncrement = down;
+}
+
+void Ship::setPointValue(const int pointValue)
+{
+	m_pointValue = pointValue;
+}
+
+int Ship::getPointValue() const
+{
+	return m_pointValue;
 }
 
 //void Ship::setStartHealth(int startHealth)

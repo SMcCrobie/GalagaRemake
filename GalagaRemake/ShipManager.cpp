@@ -42,10 +42,11 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager)
 			++it;
 			continue;
 		}
-
+		GameState::killCounter++;
+		GameState::score += it->first.getPointValue();
 		it = m_ships.erase(it);//increments the iterator
 		std::cout << "Destroy Ship!" << std::endl;
-		GameState::killCounter++;
+		
 	}
 }
 

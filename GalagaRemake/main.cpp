@@ -33,8 +33,6 @@
 #include "Level1.h"
 //YOU HAVE TODOS TODO
 
-#define SCORE_VALUE_AS_INT ((GameState::killCounter * 100))
-
 //Managers Class declaration
 PlayerShip playerShip;
 ProjectileManager enemyProjectileManager;
@@ -162,7 +160,7 @@ int main(int, char const**)
 		gameObjectManager.update();
 
 		//object and Item Collisions
-		gameObjectManager.detectCollision(playerShip);
+		gameObjectManager.detectItemCollision(playerShip);
 
 		//updateBackground
 		backgroundManager.moveBackground(backgroundSpeed);
@@ -181,7 +179,7 @@ int main(int, char const**)
 
 			if (isOutOfLives) {
 				GameState::isGameOver = true;
-				uiManager.updateUI(SCORE_VALUE_AS_INT);
+				uiManager.updateUI();
 				continue;
 			}
 			uiManager.playerLostLife();
@@ -189,7 +187,6 @@ int main(int, char const**)
 		}
 		if(GameState::isBossCreated && enemyShipsManager.isEmpty() && !GameState::isBossDestroyed)
 		{
-			GameState::killCounter += 8;
 			GameState::isBossDestroyed = true;
 			GameState::levelOutroDelay = 40;
 		}
@@ -203,7 +200,7 @@ int main(int, char const**)
 		}
 
 		//UI Update
-		uiManager.updateUI(SCORE_VALUE_AS_INT);
+		uiManager.updateUI();
 
 		GameState::gameCycleCounter++;
 
