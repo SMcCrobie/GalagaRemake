@@ -20,6 +20,8 @@ public:
 	void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
 	void initializeLevelOutroText(TempText& primaryText, TempText& secondaryText);
 	void resetManager() override;
+	void addPointValue(sf::Vector2f position, int pointValue, sf::Color color = sf::Color::White, float scale = 0.f);
+
 
 private:
 	void initializePauseText();
@@ -34,6 +36,7 @@ private:
 	void initializeHealthBarSegment();
 	bool isHealthBarSegmentInitialized();
 	void initializePlayerHealth();
+	void initializeShipPointValue();
 	
 
 	std::vector<Ship> m_lives;
@@ -53,6 +56,7 @@ private:
 	BoundedFloatRect m_windowDimensions;
 	TempText m_introPrimaryText;
 	TempText m_introSecondaryText;
+	TempText m_shipPointValue;
 	sf::Text m_gameOverByline;
 	sf::Text m_gameOverByline2;
 

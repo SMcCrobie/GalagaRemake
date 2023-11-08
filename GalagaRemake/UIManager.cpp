@@ -45,6 +45,7 @@ void UIManager::init(const Ship& shipModel, int totalExtraLives, float windowMar
 	initializeExtraLivesText();
 	initializePlayerHealth();
 	initializeLives();
+	initializeShipPointValue();
 }
 
 void UIManager::addUiText(TempText text)
@@ -121,6 +122,7 @@ void UIManager::stylePrimaryText(sf::Text& primaryText)
 	primaryText.setFillColor(sf::Color(0x05ecf1ff));
 	sf::Vector2f windowPosition = centerElement(primaryText.getGlobalBounds());
 	primaryText.setPosition(windowPosition);
+
 }
 
 void UIManager::styleSecondaryText(sf::Text& secondaryText)
@@ -129,6 +131,15 @@ void UIManager::styleSecondaryText(sf::Text& secondaryText)
 	sf::Vector2f windowPosition = centerElement(secondaryText.getGlobalBounds());
 	windowPosition.y += 30.f;
 	secondaryText.setPosition(windowPosition);
+}
+
+void UIManager::initializeShipPointValue()
+{
+	m_shipPointValue = TempText("100", Fonts::playFair);
+	m_shipPointValue.setDuration(80);
+	m_shipPointValue.addFadeOut(80);
+	//m_shipPointValue.setFillColor(sf::Color(0x05ecf1ff));
+	m_shipPointValue.setScale(.6f, .6f);
 }
 
 
@@ -179,6 +190,20 @@ void UIManager::resetManager()
 	m_texts.push_back(m_introPrimaryText);
 	m_texts.push_back(m_introSecondaryText);
 }
+
+void UIManager::addPointValue(sf::Vector2f position, int pointValue, sf::Color color, float scale)
+{
+	m_texts.push_back(m_shipPointValue);
+	TempText& pointsText = m_texts.back();
+	pointsText.setString(std::to_string(pointValue));
+	pointsText.setOrigin(m_shipPointValue.getLocalBounds().width / 2.f, m_shipPointValue.getLocalBounds().height / 2.f);
+	pointsText.setPosition(position);
+	pointsText.setFillColor(color);
+	if (scale > 0.f)
+		pointsText.setScale(scale, scale);
+}
+
+
 
 sf::Vector2f UIManager::centerElement(const sf::FloatRect rect) const
 {

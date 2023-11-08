@@ -100,7 +100,7 @@ int Level1::initializeLevel()
 	bossShip.setPosition(sf::Vector2f(300.f, -150.f));
 	bossShip.scale(2.f, 2.f);
 	bossShip.setWeaponRechargeTime(15);
-	bossShip.setPointValue(600);
+	bossShip.setPointValue(1000);
 
 
 	bossSideKicks.setIsHorizontallyWorldBound(false);
@@ -111,7 +111,7 @@ int Level1::initializeLevel()
 	//bossSideKicks.rotate180();
 	bossSideKicks.setPosition(sf::Vector2f(150.f, 1050.f));
 	bossSideKicks.setWeaponRechargeTime(15);
-	bossSideKicks.setPointValue(200);
+	bossSideKicks.setPointValue(300);
 
 
 

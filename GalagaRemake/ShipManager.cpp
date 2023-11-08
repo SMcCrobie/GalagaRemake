@@ -1,7 +1,10 @@
 #include "ShipManager.h"
 #include <iostream>
 
+#include "Fonts.h"
 #include "GameState.h"
+#include "TempText.h"
+#include "UIManager.h"
 
 void ShipManager::createShip(const Ship& ship)
 {
@@ -34,6 +37,7 @@ void ShipManager::updateShips()
 
 void ShipManager::detectCollision(ProjectileManager& projectileManager)
 {
+	extern UIManager uiManager;
 	auto it = m_ships.begin();
 	while (it != m_ships.end()) {
 		it->first.detectCollision(projectileManager);
@@ -42,8 +46,17 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager)
 			++it;
 			continue;
 		}
+		auto pointValue = it->first.getPointValue();
 		GameState::killCounter++;
-		GameState::score += it->first.getPointValue();
+		GameState::score += pointValue;
+		if (pointValue >= 300)
+		{
+			uiManager.addPointValue(it->first.getPosition(), it->first.getPointValue(), sf::Color::Red, .9f);
+		}
+		else
+		{
+			uiManager.addPointValue(it->first.getPosition(), it->first.getPointValue());
+		}
 		it = m_ships.erase(it);//increments the iterator
 		std::cout << "Destroy Ship!" << std::endl;
 		

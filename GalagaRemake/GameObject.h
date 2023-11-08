@@ -16,6 +16,7 @@ public:
     void setVelocity(const sf::Vector2f& velocity);
     void setOscillation(const sf::Vector2f& scalar, int framesTillSwitch);
     void setPosition(float x, float y);
+    sf::Vector2f getPosition() const;
     void setPointValue(int pointValue);
   
     void update();

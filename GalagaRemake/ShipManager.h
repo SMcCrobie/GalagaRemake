@@ -12,7 +12,7 @@ public:
 	void createShip(const Ship& ship);
 	void createShip(const Ship& ship, const StateMachineController& controller);
 	void updateShips();
-	void detectCollision(ProjectileManager& projectileManager);
+	void detectCollision(ProjectileManager& projectileManager);//and getScore
 	void offloadProjectiles(ProjectileManager& projectileManager);
 	bool isEmpty() const;
 	int	 count() const;

@@ -72,6 +72,24 @@ void GameObject::setPosition(const float x, const float y)
 	}
 }
 
+sf::Vector2f GameObject::getPosition() const
+{
+	if (m_isThereSprite)
+	{
+		return m_sprite.getPosition();
+	}
+	if (m_isThereCircle)
+	{
+		return m_circle.getPosition();
+	}
+	if (m_isThereRect)
+	{
+		return m_rectangle.getPosition();
+	}
+
+	return {};
+}
+
 
 void GameObject::rotateObject()
 {

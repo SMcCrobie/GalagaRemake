@@ -1,6 +1,7 @@
 #include "GameObjectManager.h"
 
 #include "GameState.h"
+#include "UIManager.h"
 
 void GameObjectManager::createGameObject(const GameObject& obj)
 {
@@ -55,12 +56,17 @@ std::optional<ItemType> GameObjectManager::detectCollisionWithItems(const Player
 	return std::nullopt;
 }
 
-void GameObjectManager::addItemPointValueToScore(ItemType item, const PlayerShip& playerShip)
+void GameObjectManager::addItemPointValueToScore(const Item& item, const PlayerShip& playerShip)
 {
-	if (item == ItemType::Repair_Kit)
+	extern UIManager uiManager;
+	if (item.getItemType() == ItemType::Repair_Kit)
 	{
 		const auto health = playerShip.getHealth();
 		GameState::score += (health * 100);
+		if(health == 5)
+			uiManager.addPointValue(item.getPosition(),  800, sf::Color(0x05ecf1ff), 1.0f);
+		else
+			uiManager.addPointValue(item.getPosition(), health * 100);
 	}
 }
 
@@ -68,11 +74,16 @@ void GameObjectManager::addItemPointValueToScore(ItemType item, const PlayerShip
 void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 {
 	//TODO detect collisions with game objects
-	const auto itemType = detectCollisionWithItems(playerShip);
-	if(!itemType.has_value())
-		return;
-	addItemPointValueToScore(itemType.value(), playerShip);
-	playerShip.useItem(itemType.value());
+	for (auto it = m_items.begin(); it != m_items.end(); it++)
+	{
+		if (it->detectCollision(playerShip))
+		{
+			addItemPointValueToScore(*it, playerShip);
+			playerShip.useItem(it->getItemType());
+			it = m_items.erase(it);
+		}
+	}
+	
 	
 }
 
