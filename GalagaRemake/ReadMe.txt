@@ -10,6 +10,8 @@ Design Themes(*will be updated as/if themes change)
 
 TODOs
 ---------------------------------------------------------------
+- Make a closing screen that gives extra points, and also one on game over as well I guess  ;
+
 - Think every object that has points to be had, should pocess their own version of what they want that temp text to look like
 - remove control selection widow, tie control changes to function keys instead for now, menus further down the line
 

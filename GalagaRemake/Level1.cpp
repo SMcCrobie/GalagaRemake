@@ -255,7 +255,7 @@ void Level1::enemyShipCreation()
 		gameObjectManager.createItem(repairKit);
 	}
 
-	//boss
+	////boss
 	if (GameState::killCounter >= 32 && !GameState::isBossCreated && enemyShipsManager.isEmpty()) {
 		GameState::isBossCreated = true;
 		enemyShipsManager.createShip(bossShip, bossController);
@@ -282,4 +282,7 @@ void Level1::killLevel()
 
 void Level1::resetLevel()
 {
+	isRepairKitOneCreated = false;
+	isRepairKitTwoCreated = false;
+	isRepairKitThreeCreated = false;
 };

@@ -48,7 +48,6 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager)
 		}
 		auto pointValue = it->first.getPointValue();
 		GameState::killCounter++;
-		GameState::score += pointValue;
 		if (pointValue >= 300)
 		{
 			uiManager.addPointValue(it->first.getPosition(), it->first.getPointValue(), sf::Color::Red, .9f);

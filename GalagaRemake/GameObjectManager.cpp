@@ -62,9 +62,8 @@ void GameObjectManager::addItemPointValueToScore(const Item& item, const PlayerS
 	if (item.getItemType() == ItemType::Repair_Kit)
 	{
 		const auto health = playerShip.getHealth();
-		GameState::score += (health * 100);
 		if(health == 5)
-			uiManager.addPointValue(item.getPosition(),  800, sf::Color(0x05ecf1ff), 1.0f);
+			uiManager.addPointValue(item.getPosition(), 800, sf::Color(0x05ecf1ff), 1.0f);
 		else
 			uiManager.addPointValue(item.getPosition(), health * 100);
 	}

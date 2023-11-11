@@ -28,6 +28,7 @@ private:
 	void updateTempText();
 	void updateHealthBar();
 	sf::Vector2f centerElement(sf::FloatRect rect) const;
+
 	void initializeLives();
 	void initializeScore();
 	void initializeGameOverText();
