@@ -11,7 +11,9 @@ GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_ro
 	m_isThereCircle = false;
 }
 
-void GameObject::setSprite(const sf::Sprite& sprite, bool withCollisionBox)
+
+//remove with collision box option
+void GameObject::setSprite(const sf::Sprite& sprite, const bool withCollisionBox)
 {
 	m_sprite = sprite;
 	m_isThereSprite = true;
@@ -46,6 +48,33 @@ void GameObject::setRotation(const float rotation)
 void GameObject::setVelocity(const sf::Vector2f& velocity)
 {
 	m_velocity = velocity;
+}
+
+void GameObject::setVelocity(const float x, const float y)
+{
+	m_velocity.x = x;
+	m_velocity.y = y;
+}
+
+void GameObject::setScale(float x, float y)
+{
+	if (m_isThereSprite)
+	{
+		m_sprite.setScale(x, y);
+	}
+	if (m_isThereCircle)
+	{
+		m_circle.setScale(x, y);
+	}
+	if (m_isThereRect)
+	{
+		m_rectangle.setScale(x, y);
+	}
+}
+
+sf::Vector2f GameObject::getVelocity() const
+{
+	return m_velocity;
 }
 
 void GameObject::setOscillation(const sf::Vector2f& scalar, int framesTillSwitch)
@@ -88,6 +117,11 @@ sf::Vector2f GameObject::getPosition() const
 	}
 
 	return {};
+}
+
+void GameObject::setPointValue(const int pointValue)
+{
+	m_pointValue = pointValue;
 }
 
 
@@ -167,7 +201,7 @@ void GameObject::update()
 
 bool GameObject::detectCollision(const PlayerShip& playerShip) const
 {
-	//TODO make other types of collisions
+	//refactor this to be like other detect collision
 	if (m_isThereSprite && m_isThereRect)
 	{
 		if (Collision::pixelPerfectTest(playerShip, m_rectangle))
@@ -177,6 +211,11 @@ bool GameObject::detectCollision(const PlayerShip& playerShip) const
 		}
 	}
 	return false;
+}
+
+int GameObject::getPointValue() const
+{
+	return m_pointValue;
 }
 
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -212,3 +251,97 @@ void Item::setItemType(ItemType type)
 	m_itemType = type;
 }
 
+void Collidable::setHealth(const int health)
+{
+	m_health = health;
+}
+
+int Collidable::getHealth() const
+{
+	return m_health;
+}
+
+void Collidable::setColor(const sf::Color& color)
+{
+	m_objectHitTimer += 3;
+	if (m_isThereSprite)
+	{
+		m_sprite.setColor(color);
+		return;
+	}
+	if (m_isThereCircle)
+	{
+		m_circle.setFillColor(color);
+		return;
+	}
+	if (m_isThereRect) {
+		m_rectangle.setFillColor(color);
+	}
+}
+
+void Collidable::decrementHealth()
+{
+	if(m_health > 0)
+	{
+		m_objectHitTimer += 1;
+		m_health--;
+		setColor(sf::Color(218, 160, 109));
+	}
+}
+
+void Collidable::explode()
+{
+	//TODO add animation here
+}
+
+void Collidable::applyForce(const sf::Vector2f vel)
+{
+	m_velocity = (vel / m_mass) + m_velocity;
+}
+
+void Collidable::update()
+{
+	GameObject::update();
+	updateObjectHitTimer();
+}
+
+bool Collidable::detectCollision()
+{
+	extern ProjectileManager playerProjectileManager;
+	if (m_isThereCircle)
+	{
+		//TODO switch to circle shapes, everywhere
+		return false;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
+	}
+    if (m_isThereRect) {
+		const auto optVel = playerProjectileManager.detectCollisionAndDestroyProjectileAndApplyForce(m_rectangle.getGlobalBounds());
+		if (!optVel.has_value())
+			return false;
+		applyForce(optVel.value());
+		return true;
+	}
+	if (m_isThereSprite)
+	{
+		const auto optVel = playerProjectileManager.detectCollisionAndDestroyProjectileAndApplyForce(m_sprite);
+		if (!optVel.has_value())
+			return false;
+		applyForce(optVel.value());
+		return true;
+	}
+	return false;
+
+}
+
+void Collidable::setMass(float mass)
+{
+	m_mass = mass;
+}
+
+void Collidable::updateObjectHitTimer()
+{
+	if (m_objectHitTimer < 0 )
+		return;
+	if (m_objectHitTimer == 0)
+		setColor(sf::Color::White);
+	m_objectHitTimer--;
+}

@@ -14,18 +14,20 @@ public:
     void setCircle(const sf::CircleShape& circle);
     void setRotation(float rotation);
     void setVelocity(const sf::Vector2f& velocity);
+    void setVelocity(float x, float y);
+    void setScale(float x, float y);
+    sf::Vector2f getVelocity() const;
     void setOscillation(const sf::Vector2f& scalar, int framesTillSwitch);
     void setPosition(float x, float y);
     sf::Vector2f getPosition() const;
     void setPointValue(int pointValue);
-  
-    void update();
+
+    virtual void update();
     bool detectCollision(const PlayerShip& playerShip) const;
-    int getPointValue();
+    int getPointValue() const;
 
 protected:
     sf::Sprite m_sprite;
-	//can use one of these as the collision box for the object, unsure if I should rename
     sf::RectangleShape m_rectangle;
     sf::CircleShape m_circle;
 
@@ -38,7 +40,7 @@ protected:
     int m_oscillationThreshold;
     sf::Vector2f m_velocity;
     float m_rotation;
-    int m_pointValue;
+    int m_pointValue{};
 
 
     
@@ -60,4 +62,25 @@ public:
 private:
     ItemType m_itemType;
 
+};
+
+class Collidable :
+	public GameObject
+{
+public:
+    void setHealth(int health);
+    int getHealth() const;
+    void setColor(const sf::Color& color);
+    void decrementHealth();
+    void applyForce(sf::Vector2f vel);
+    void update() override;
+    bool detectCollision();
+    void setMass(float mass);
+
+private:
+    void updateObjectHitTimer();
+    void explode();
+    int m_health = 1;
+    float m_mass = 1.0;//baseline mass
+    int m_objectHitTimer = -1;
 };

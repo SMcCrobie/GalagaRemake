@@ -37,10 +37,7 @@ void ProjectileManager::updateProjectiles()
 	}
 }
 
-bool ProjectileManager::detectCollision(const sf::FloatRect& gameObject)
-{
-	return findProjectileInCollision(gameObject) != m_projectiles.end();
-}
+
 
 bool ProjectileManager::detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject)
 {
@@ -67,6 +64,28 @@ bool ProjectileManager::detectCollisionAndDestroyProjectile(const CircleProjecti
 		return false;
 	m_projectiles.erase(it);
 	return true;
+}
+
+std::optional<sf::Vector2f> ProjectileManager::detectCollisionAndDestroyProjectileAndApplyForce(
+	const sf::FloatRect& gameObject)
+{
+	const auto it = findProjectileInCollision(gameObject);
+	if (it == m_projectiles.end())
+		return std::nullopt;
+	auto vel = (*it)->getVelocity();
+	m_projectiles.erase(it);
+	return vel;
+}
+
+std::optional<sf::Vector2f> ProjectileManager::detectCollisionAndDestroyProjectileAndApplyForce(
+	const sf::Sprite& sprite)
+{
+	const auto it = findProjectileInCollision(sprite);
+	if (it == m_projectiles.end())
+		return std::nullopt;
+	auto vel = (*it)->getVelocity();
+	m_projectiles.erase(it);
+	return vel;
 }
 
 std::list< std::shared_ptr<Projectile>>::iterator ProjectileManager::findProjectileInCollision(const sf::FloatRect& gameObject)

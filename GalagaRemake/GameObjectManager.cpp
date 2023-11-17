@@ -13,14 +13,39 @@ void GameObjectManager::createItem(const Item& item)
 	m_items.emplace_back(item);
 }
 
-bool GameObjectManager::isEmpty() const
+void GameObjectManager::createCollidable(const Collidable& collidable)
 {
-	return m_gameObjects.empty() && m_items.empty();
+	m_collidables.emplace_back(collidable);
 }
 
-int GameObjectManager::count() const
+//bool GameObjectManager::isEmpty() const
+//{
+//	return m_gameObjects.empty() && m_items.empty();
+//}
+//
+//int GameObjectManager::count() const
+//{
+//	return m_gameObjects.size() + m_items.size();
+//}
+
+bool GameObjectManager::isItemsEmpty() const
 {
-	return m_gameObjects.size() + m_items.size();
+	return m_items.empty();
+}
+
+int GameObjectManager::itemsCount() const
+{
+	return m_items.size();
+}
+
+bool GameObjectManager::isCollidablesEmpty() const
+{
+	return m_collidables.empty();
+}
+
+int GameObjectManager::collidablesCount() const
+{
+	return m_collidables.size();
 }
 
 void GameObjectManager::resetManager()
@@ -29,17 +54,62 @@ void GameObjectManager::resetManager()
 	m_items.clear();
 }
 
-void GameObjectManager::update()
+void GameObjectManager::updateCollidables()
+{
+	
+
+	for (auto it = m_collidables.begin(); it != m_collidables.end(); ) {
+		it->update();
+		if(it->detectCollision())
+		{
+			it->decrementHealth();
+			if(it->getHealth() < 1)
+			{
+				it = m_collidables.erase(it);
+				continue;
+			}
+
+		}
+		if(checkIfOutOfBounds(*it))
+		{
+			it = m_collidables.erase(it);
+		}else
+		{
+			it++;
+		}
+	}
+}
+
+void GameObjectManager::updateItems()
+{
+	for (auto& item : m_items)
+	{
+		item.update();
+	}
+}
+
+void GameObjectManager::updateGameObjects()
 {
 	for (auto& gameObject : m_gameObjects)
 	{
 		gameObject.update();
 	}
+}
 
-	for (auto& item : m_items)
-	{
-		item.update();
-	}
+void GameObjectManager::update()
+{
+	updateGameObjects();
+	updateItems();
+	updateCollidables();
+
+}
+
+bool GameObjectManager::checkIfOutOfBounds(const Collidable& collidable)
+{
+	const auto bounds = GameState::world_bounds.scaleWithMargins(150.f);
+	if (bounds.contains(collidable.getPosition()))
+		return false;
+	return true;
 }
 
 std::optional<ItemType> GameObjectManager::detectCollisionWithItems(const PlayerShip& playerShip)
@@ -72,7 +142,6 @@ void GameObjectManager::addItemPointValueToScore(const Item& item, const PlayerS
 
 void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 {
-	//TODO detect collisions with game objects
 	for (auto it = m_items.begin(); it != m_items.end(); it++)
 	{
 		if (it->detectCollision(playerShip))
@@ -82,9 +151,8 @@ void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 			it = m_items.erase(it);
 		}
 	}
-	
-	
 }
+
 
 void GameObjectManager::draw(sf::RenderTarget& target, const sf::RenderStates states) const
 {
@@ -95,5 +163,9 @@ void GameObjectManager::draw(sf::RenderTarget& target, const sf::RenderStates st
 	for (const auto& item : m_items)
 	{
 		target.draw(item, states);
+	}
+	for (const auto& collidable : m_collidables)
+	{
+		target.draw(collidable, states);
 	}
 }

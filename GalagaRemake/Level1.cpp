@@ -208,7 +208,7 @@ void Level1::enemyShipCreation()
 		enemyShipsManager.createShip(enemyShip);
 	}
 
-	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4){;
+	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4){
 		float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(enemyShip);
