@@ -60,7 +60,7 @@ public:
     void setItemType(ItemType type);
 
 private:
-    ItemType m_itemType;
+    ItemType m_itemType = ItemType::Repair_Kit;
 
 };
 
@@ -72,7 +72,7 @@ public:
     int getHealth() const;
     void setColor(const sf::Color& color);
     void decrementHealth();
-    void applyForce(sf::Vector2f vel);
+    void applyMomentum(const sf::Vector2f momentum);
     void update() override;
     bool detectCollision();
     void setMass(float mass);

@@ -294,9 +294,9 @@ void Collidable::explode()
 	//TODO add animation here
 }
 
-void Collidable::applyForce(const sf::Vector2f vel)
+void Collidable::applyMomentum(const sf::Vector2f momentum)
 {
-	m_velocity = (vel / m_mass) + m_velocity;
+	m_velocity = (m_mass * m_velocity + momentum) / m_mass;
 }
 
 void Collidable::update()
@@ -314,18 +314,18 @@ bool Collidable::detectCollision()
 		return false;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
 	}
     if (m_isThereRect) {
-		const auto optVel = playerProjectileManager.detectCollisionAndDestroyProjectileAndApplyForce(m_rectangle.getGlobalBounds());
-		if (!optVel.has_value())
+		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
+		if (!collisionResult.impact)
 			return false;
-		applyForce(optVel.value());
+		applyMomentum(collisionResult.impact.value());
 		return true;
 	}
 	if (m_isThereSprite)
 	{
-		const auto optVel = playerProjectileManager.detectCollisionAndDestroyProjectileAndApplyForce(m_sprite);
-		if (!optVel.has_value())
+		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_sprite);
+		if (!collisionResult.impact)
 			return false;
-		applyForce(optVel.value());
+		applyMomentum(collisionResult.impact.value());
 		return true;
 	}
 	return false;

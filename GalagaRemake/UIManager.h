@@ -9,7 +9,6 @@ class UIManager
 	: public sf::Drawable, public IManager
 {
 public:
-	UIManager();
 	void init(const Ship& shipModel, int totalExtraLives = 3, float windowMargin = 10.f);
 	void addUiText(TempText text);
 	bool isOutOfLives() const;
@@ -51,9 +50,9 @@ private:
 	sf::Text m_extraLivesText;
 	sf::Vector2f m_baseScale;
 	sf::RectangleShape m_healthBarSegment;
-	float m_windowMargin;
+	float m_windowMargin{};
 	Ship m_lifeSymbol;
-	int m_totalExtraLives;
+	int m_totalExtraLives{};
 	BoundedFloatRect m_windowDimensions;
 	TempText m_introPrimaryText;
 	TempText m_introSecondaryText;

@@ -30,9 +30,6 @@ void UIManager::initializePauseText()
 
 }
 
-UIManager::UIManager() = default;
-
-
 void UIManager::init(const Ship& shipModel, int totalExtraLives, float windowMargin)
 {
 	m_baseScale = sf::Vector2f(.45f, .55f);
@@ -183,7 +180,7 @@ void UIManager::initializeLevelOutroText(TempText& primaryText, TempText& second
 	m_texts.push_back(secondaryText);
 
 	TempText lifeScoreTally("Extra Lives: [", Fonts::galaxus);
-	GameState::score += (LIFE_SCORE_VALUE * m_lives.size());
+	GameState::score += LIFE_SCORE_VALUE * static_cast<int>(m_lives.size());
 	GameState::score += HEALTH_SEGMENT_SCORE_VALUE * playerShip.getHealth();
 
 	lifeScoreTally.setDelay(200);

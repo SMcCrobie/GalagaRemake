@@ -46,7 +46,7 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager)
 			++it;
 			continue;
 		}
-		auto pointValue = it->first.getPointValue();
+		const auto pointValue = it->first.getPointValue();
 		GameState::killCounter++;
 		if (pointValue >= 300)
 		{
@@ -74,7 +74,7 @@ bool ShipManager::isEmpty() const
 	return m_ships.empty();
 }
 
-int ShipManager::count() const
+size_t ShipManager::count() const
 {
 	return m_ships.size();
 }
@@ -86,11 +86,12 @@ void ShipManager::resetManager()
 
 void ShipManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	for (auto it = m_ships.begin(); it != m_ships.end(); it++) {
-		target.draw(it->first);
-		if (it->first.hasShield())
+	for (const auto& [ship, stateMachine] : m_ships)
+	{
+		target.draw(ship);
+		if (ship.hasShield())
 		{
-			target.draw(it->first.m_shield);
+			target.draw(ship.m_shield);
 		}
 			
 	}

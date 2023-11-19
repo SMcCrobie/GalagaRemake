@@ -14,8 +14,8 @@ public:
 	void updateShips();
 	void detectCollision(ProjectileManager& projectileManager);//and getScore
 	void offloadProjectiles(ProjectileManager& projectileManager);
-	bool isEmpty() const;
-	int	 count() const;
+	[[nodiscard]] bool isEmpty() const;
+	[[nodiscard]] size_t count() const;
 	void resetManager() override;
 
 private:

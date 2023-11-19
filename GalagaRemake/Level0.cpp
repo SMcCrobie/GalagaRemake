@@ -146,7 +146,7 @@ void Level0::enemyShipCreation()
 		const float xVel = RANDOM_FLOAT_WITHIN_LIMIT(-.5f, .5f);
 		const float rotation = RANDOM_FLOAT_WITHIN_LIMIT(-2.5f, 2.5f);
 		const float scale = RANDOM_FLOAT_WITHIN_LIMIT(.4f, 2.5f);
-		const float mass = 15.f * (scale*6.f);
+		const float mass  = std::pow(scale*6.6f, 2.55f);
 
 
 		meteor.setPosition(xCoordinate, -10);
@@ -159,11 +159,7 @@ void Level0::enemyShipCreation()
 
 		gameObjectManager.createCollidable(meteor);
 	}
-	/*
-	if (enemyShipsManager.count() < 2) {
-		laserTurret.setPosition(sf::Vector2f(GameState::world_bounds.left + 50.f, GameState::world_bounds.top - 50.f));
-		enemyShipsManager.createShip(laserTurret, laserTurretController);
-	}*/
+	
 }
 
 void Level0::killLevel()

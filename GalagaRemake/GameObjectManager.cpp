@@ -18,22 +18,12 @@ void GameObjectManager::createCollidable(const Collidable& collidable)
 	m_collidables.emplace_back(collidable);
 }
 
-//bool GameObjectManager::isEmpty() const
-//{
-//	return m_gameObjects.empty() && m_items.empty();
-//}
-//
-//int GameObjectManager::count() const
-//{
-//	return m_gameObjects.size() + m_items.size();
-//}
-
 bool GameObjectManager::isItemsEmpty() const
 {
 	return m_items.empty();
 }
 
-int GameObjectManager::itemsCount() const
+size_t GameObjectManager::itemsCount() const
 {
 	return m_items.size();
 }
@@ -43,7 +33,7 @@ bool GameObjectManager::isCollidablesEmpty() const
 	return m_collidables.empty();
 }
 
-int GameObjectManager::collidablesCount() const
+size_t GameObjectManager::collidablesCount() const
 {
 	return m_collidables.size();
 }

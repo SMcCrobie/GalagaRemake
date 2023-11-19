@@ -12,12 +12,10 @@ public:
 	void createGameObject(const GameObject& obj);
 	void createItem(const Item& item);
 	void createCollidable(const Collidable& collidable);
-	/*[[nodiscard]] bool isEmpty() const;
-	[[nodiscard]] int count() const;*/
 	[[nodiscard]] bool isItemsEmpty() const;
-	[[nodiscard]] int itemsCount() const;
+	[[nodiscard]] size_t itemsCount() const;
 	[[nodiscard]] bool isCollidablesEmpty() const;
-	[[nodiscard]] int collidablesCount() const;
+	[[nodiscard]] size_t collidablesCount() const;
 	void resetManager() override;
 	void update();
 	void detectItemCollision(PlayerShip& playerShip);

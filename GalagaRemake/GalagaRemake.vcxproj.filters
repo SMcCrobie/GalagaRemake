@@ -161,6 +161,9 @@
     <ClInclude Include="ItemType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Planets.png">

@@ -3,6 +3,7 @@
 #include "Projectile.h"
 #include <list>
 
+#include "CollisionResult.h"
 #include "IManager.h"
 
 class ProjectileManager 
@@ -12,11 +13,9 @@ public:
 	void collectProjectile(CircleProjectile& projectile);
 	void collectProjectile(Ship& ship);
 	void updateProjectiles();
-	bool detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject);
-	bool detectCollisionAndDestroyProjectile(const sf::Sprite& sprite);
-	bool detectCollisionAndDestroyProjectile(const CircleProjectile& shield);
-	std::optional<sf::Vector2f> detectCollisionAndDestroyProjectileAndApplyForce(const sf::FloatRect& gameObject);
-	std::optional<sf::Vector2f> detectCollisionAndDestroyProjectileAndApplyForce(const sf::Sprite& sprite);
+	CollisionResult detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject);
+	CollisionResult detectCollisionAndDestroyProjectile(const sf::Sprite& sprite);
+	CollisionResult detectCollisionAndDestroyProjectile(const CircleProjectile& shield);
 	void resetManager() override;
 
 private:

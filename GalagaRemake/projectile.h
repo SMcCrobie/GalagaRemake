@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 
 static float PROJECTILE_START_SPEED = 12;
+#define PROJECTILE_MASS 5.F
+
 
 class Projectile
 	: public sf::Shape{

@@ -66,7 +66,7 @@ void Ship::incrementRotation()
 {
 	auto temp = getOrigin();
 	rotate(m_rotationIncrement);
-	auto currentRotation = abs(getRotation());
+	const auto currentRotation = abs(getRotation());
 	if (currentRotation == 180.f || currentRotation == 0)
 	{
 		m_isTransitioning = false;
@@ -146,7 +146,7 @@ bool Ship::detectCollision(ProjectileManager& projectileManager)
 {
 	if (hasShield())
 	{
-		if (projectileManager.detectCollisionAndDestroyProjectile(m_shield)) {
+		if (projectileManager.detectCollisionAndDestroyProjectile(m_shield).impact) {
 			decrementShieldHealth();
 			return true;
 		}
@@ -154,7 +154,7 @@ bool Ship::detectCollision(ProjectileManager& projectileManager)
 	}
 	else if (hasHealth())
 	{
-		if (projectileManager.detectCollisionAndDestroyProjectile(*this)) {
+		if (projectileManager.detectCollisionAndDestroyProjectile(*this).impact) {
 			decrementHealth();
 			return true;
 		}

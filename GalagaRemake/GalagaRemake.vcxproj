@@ -180,6 +180,7 @@
     <ClInclude Include="Loader.h" />
     <ClInclude Include="LevelOrchestrator.h" />
     <ClInclude Include="IManager.h" />
+    <ClInclude Include="CollisionResult.h" />
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="RandMacros.h" />
     <ClInclude Include="resource1.h" />
