@@ -13,9 +13,9 @@ public:
 	void collectProjectile(CircleProjectile& projectile);
 	void collectProjectile(Ship& ship);
 	void updateProjectiles();
-	CollisionResult detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject);
-	CollisionResult detectCollisionAndDestroyProjectile(const sf::Sprite& sprite);
-	CollisionResult detectCollisionAndDestroyProjectile(const CircleProjectile& shield);
+	std::optional<CollisionResult> detectCollisionAndDestroyProjectile(const sf::FloatRect & gameObject);
+	std::optional<CollisionResult> detectCollisionAndDestroyProjectile(const sf::Sprite& sprite);
+	std::optional<CollisionResult> detectCollisionAndDestroyProjectile(const CircleProjectile& shield);
 	void resetManager() override;
 
 private:

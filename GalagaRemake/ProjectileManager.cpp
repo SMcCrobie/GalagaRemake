@@ -66,33 +66,33 @@ void ProjectileManager::updateProjectiles()
 //	return true;
 //}
 
-CollisionResult ProjectileManager::detectCollisionAndDestroyProjectile(
+std::optional<CollisionResult> ProjectileManager::detectCollisionAndDestroyProjectile(
 	const sf::FloatRect& gameObject)
 {
 	const auto it = findProjectileInCollision(gameObject);
 	if (it == m_projectiles.end())
-		return {};
+		return std::nullopt;
 	const auto vel = (*it)->getVelocity();
 	m_projectiles.erase(it);
 	return CollisionResult(vel* PROJECTILE_MASS);
 }
 
-CollisionResult ProjectileManager::detectCollisionAndDestroyProjectile(
+std::optional<CollisionResult> ProjectileManager::detectCollisionAndDestroyProjectile(
 	const sf::Sprite& sprite)
 {
 	const auto it = findProjectileInCollision(sprite);
 	if (it == m_projectiles.end())
-		return {};
+		return std::nullopt;
 	const auto vel = (*it)->getVelocity();
 	m_projectiles.erase(it);
 	return CollisionResult(vel * PROJECTILE_MASS);
 }
 
-CollisionResult ProjectileManager::detectCollisionAndDestroyProjectile(const CircleProjectile& shield)
+std::optional<CollisionResult> ProjectileManager::detectCollisionAndDestroyProjectile(const CircleProjectile& shield)
 {
 	const auto it = findProjectileInCollision(shield);
 	if (it == m_projectiles.end())
-		return {};
+		return std::nullopt; ;
 	const auto vel = (*it)->getVelocity();
 	m_projectiles.erase(it);
 	return CollisionResult(vel * PROJECTILE_MASS);

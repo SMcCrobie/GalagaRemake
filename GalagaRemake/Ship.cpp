@@ -146,7 +146,7 @@ bool Ship::detectCollision(ProjectileManager& projectileManager)
 {
 	if (hasShield())
 	{
-		if (projectileManager.detectCollisionAndDestroyProjectile(m_shield).impact) {
+		if (projectileManager.detectCollisionAndDestroyProjectile(m_shield)) {
 			decrementShieldHealth();
 			return true;
 		}
@@ -154,7 +154,7 @@ bool Ship::detectCollision(ProjectileManager& projectileManager)
 	}
 	else if (hasHealth())
 	{
-		if (projectileManager.detectCollisionAndDestroyProjectile(*this).impact) {
+		if (projectileManager.detectCollisionAndDestroyProjectile(*this)) {
 			decrementHealth();
 			return true;
 		}

@@ -315,17 +315,17 @@ bool Collidable::detectCollision()
 	}
     if (m_isThereRect) {
 		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
-		if (!collisionResult.impact)
+		if (collisionResult)
 			return false;
-		applyMomentum(collisionResult.impact.value());
+		applyMomentum(collisionResult.value().momentum);
 		return true;
 	}
 	if (m_isThereSprite)
 	{
 		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_sprite);
-		if (!collisionResult.impact)
+		if (!collisionResult)
 			return false;
-		applyMomentum(collisionResult.impact.value());
+		applyMomentum(collisionResult.value().momentum);
 		return true;
 	}
 	return false;

@@ -4,6 +4,6 @@
 
 struct CollisionResult
 {
-	std::optional<sf::Vector2f> impact;
+	sf::Vector2f momentum;
 };
 
