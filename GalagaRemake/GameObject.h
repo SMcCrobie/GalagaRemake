@@ -70,12 +70,16 @@ class Collidable :
 public:
     void setHealth(int health);
     int getHealth() const;
+    sf::Vector2f getMomentum() const;
     void setColor(const sf::Color& color);
     void decrementHealth();
     void applyMomentum(const sf::Vector2f momentum);
     void update() override;
-    bool detectCollision();
+    bool detectProjectileCollision();
     void setMass(float mass);
+    bool detectCollision(Collidable& collidable);
+    bool detectCollision(const sf::RectangleShape& rect) const;
+    bool detectCollision(const sf::Sprite& sprite) const;
 
 private:
     void updateObjectHitTimer();
@@ -84,3 +88,4 @@ private:
     float m_mass = 1.0;//baseline mass
     int m_objectHitTimer = -1;
 };
+

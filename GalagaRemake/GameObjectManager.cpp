@@ -50,7 +50,7 @@ void GameObjectManager::updateCollidables()
 
 	for (auto it = m_collidables.begin(); it != m_collidables.end(); ) {
 		it->update();
-		if(it->detectCollision())
+		if(it->detectProjectileCollision())
 		{
 			it->decrementHealth();
 			if(it->getHealth() < 1)
@@ -59,6 +59,28 @@ void GameObjectManager::updateCollidables()
 				continue;
 			}
 
+		}
+		for (auto innerIt = it; innerIt != m_collidables.end(); )
+		{
+			innerIt++;
+			if (innerIt == m_collidables.end())
+				break;
+			if (it->detectCollision(*innerIt))
+			{
+				innerIt->decrementHealth();
+				if(innerIt->getHealth() < 1)
+					innerIt = m_collidables.erase(innerIt);
+
+				it->decrementHealth();
+				if (it->getHealth() < 1) {
+					break;
+				}
+			}
+		}
+		if (it != m_collidables.end() && it->getHealth() < 1)
+		{
+			it = m_collidables.erase(it);
+			continue;
 		}
 		if(checkIfOutOfBounds(*it))
 		{

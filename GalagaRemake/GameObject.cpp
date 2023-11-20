@@ -261,6 +261,11 @@ int Collidable::getHealth() const
 	return m_health;
 }
 
+sf::Vector2f Collidable::getMomentum() const
+{
+	return m_velocity * m_mass;
+}
+
 void Collidable::setColor(const sf::Color& color)
 {
 	m_objectHitTimer += 3;
@@ -305,7 +310,7 @@ void Collidable::update()
 	updateObjectHitTimer();
 }
 
-bool Collidable::detectCollision()
+bool Collidable::detectProjectileCollision()
 {
 	extern ProjectileManager playerProjectileManager;
 	if (m_isThereCircle)
@@ -315,7 +320,7 @@ bool Collidable::detectCollision()
 	}
     if (m_isThereRect) {
 		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
-		if (collisionResult)
+		if (!collisionResult)
 			return false;
 		applyMomentum(collisionResult.value().momentum);
 		return true;
@@ -335,6 +340,81 @@ bool Collidable::detectCollision()
 void Collidable::setMass(float mass)
 {
 	m_mass = mass;
+}
+
+
+bool Collidable::detectCollision(Collidable& collidable)
+{
+	if (m_isThereCircle)
+	{
+		//TODO switch to circle shapes, everywhere
+		return false;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
+	}
+	if (m_isThereRect) {
+		if (!collidable.detectCollision(m_rectangle))
+			return false;
+		applyMomentum(collidable.getMomentum());
+		collidable.applyMomentum(getMomentum());
+		return true;
+	}
+	if (m_isThereSprite)
+	{
+		if (!collidable.detectCollision(m_sprite))
+			return false;
+		applyMomentum(collidable.getMomentum());
+		collidable.applyMomentum(getMomentum());
+		return true;
+	}
+	return false;
+}
+
+bool Collidable::detectCollision(const sf::RectangleShape& rect) const
+{
+	if (m_isThereCircle)
+	{
+		//todo
+		return false;
+	}
+	if (m_isThereRect) {
+		if (m_rectangle.getGlobalBounds().intersects(rect.getGlobalBounds()))
+			return true;
+		else
+			return false;
+	}
+	
+	if (m_isThereSprite)
+	{
+		if (Collision::pixelPerfectTest(m_sprite, rect))
+			return true;
+		else
+			return false;
+	}
+	return false;
+}
+
+
+bool Collidable::detectCollision(const sf::Sprite& sprite) const
+{
+	if (m_isThereCircle)
+	{
+		//todo
+		return false;
+	}
+	if (m_isThereRect) {
+		if (Collision::pixelPerfectTest(sprite, m_rectangle))
+			return true;
+		else
+			return false;
+	}
+
+	if (m_isThereSprite)
+	{
+		if (Collision::pixelPerfectTest(m_sprite, sprite))
+			return true;
+		else
+			return false;
+	}
+	return false;
 }
 
 void Collidable::updateObjectHitTimer()

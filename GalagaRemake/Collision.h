@@ -40,6 +40,7 @@ it freely, subject to the following restrictions:
 #include "Projectile.h"
 
 namespace Collision {
+	bool pixelPerfectTest(const sf::Sprite& sprite1, const sf::Sprite& sprite2, sf::Uint8 alphaLimit = 0);
 	bool pixelPerfectTest(const sf::Sprite& sprite, const sf::RectangleShape& rect, sf::Uint8 alphaLimit = 0);
 	bool pixelPerfectTest(const sf::Sprite& sprite, const RectangleProjectile& recProjectile, sf::Uint8 alphaLimit = 0);
 	bool pixelPerfectTest(const sf::Sprite& sprite, const CircleProjectile& cirProjectile, sf::Uint8 alphaLimit = 0);
