@@ -13,7 +13,7 @@ void GameObjectManager::createItem(const Item& item)
 	m_items.emplace_back(item);
 }
 
-void GameObjectManager::createCollidable(const Collidable& collidable)
+void GameObjectManager::createCollidable(Collidable& collidable)
 {
 	m_collidables.emplace_back(collidable);
 }
@@ -46,8 +46,6 @@ void GameObjectManager::resetManager()
 
 void GameObjectManager::updateCollidables()
 {
-	
-
 	for (auto it = m_collidables.begin(); it != m_collidables.end(); ) {
 		it->update();
 		if(it->detectProjectileCollision())
@@ -60,17 +58,18 @@ void GameObjectManager::updateCollidables()
 			}
 
 		}
+
 		for (auto innerIt = it; innerIt != m_collidables.end(); )
 		{
 			innerIt++;
 			if (innerIt == m_collidables.end())
 				break;
-			if (it->detectCollision(*innerIt))
+			if ( it->detectCollision(*innerIt))
 			{
 				innerIt->decrementHealth();
-				if(innerIt->getHealth() < 1)
+				if (innerIt->getHealth() < 1) {
 					innerIt = m_collidables.erase(innerIt);
-
+				}
 				it->decrementHealth();
 				if (it->getHealth() < 1) {
 					break;
@@ -90,6 +89,7 @@ void GameObjectManager::updateCollidables()
 			it++;
 		}
 	}
+	
 }
 
 void GameObjectManager::updateItems()
@@ -154,7 +154,7 @@ void GameObjectManager::addItemPointValueToScore(const Item& item, const PlayerS
 
 void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 {
-	for (auto it = m_items.begin(); it != m_items.end(); it++)
+	for (auto it = m_items.begin(); it != m_items.end();)
 	{
 		if (it->detectCollision(playerShip))
 		{
@@ -162,6 +162,9 @@ void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 			playerShip.useItem(it->getItemType());
 			it = m_items.erase(it);
 		}
+		if (it == m_items.end())
+			break;
+		it++;
 	}
 }
 

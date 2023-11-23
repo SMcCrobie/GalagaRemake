@@ -11,7 +11,7 @@ class GameObjectManager
 public:
 	void createGameObject(const GameObject& obj);
 	void createItem(const Item& item);
-	void createCollidable(const Collidable& collidable);
+	void createCollidable(Collidable& collidable);
 	[[nodiscard]] bool isItemsEmpty() const;
 	[[nodiscard]] size_t itemsCount() const;
 	[[nodiscard]] bool isCollidablesEmpty() const;

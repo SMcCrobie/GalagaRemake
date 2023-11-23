@@ -142,22 +142,30 @@ void Level0::enemyShipCreation()
 	if(gameObjectManager.collidablesCount() < 100)
 	{
 		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);
-		const float yVel = RANDOM_FLOAT_WITHIN_LIMIT(.1f, 2.f);
+		const float yVel = RANDOM_FLOAT_WITHIN_LIMIT(.8f, 2.f);
 		const float xVel = RANDOM_FLOAT_WITHIN_LIMIT(-.5f, .5f);
 		const float rotation = RANDOM_FLOAT_WITHIN_LIMIT(-2.5f, 2.5f);
 		const float scale = RANDOM_FLOAT_WITHIN_LIMIT(.4f, 2.5f);
-		const float mass  = std::pow(scale*6.6f, 2.55f);
+		const float mass = std::pow(scale * 12.6f, 1.55f);
 
-
-		meteor.setPosition(xCoordinate, -10);
-		meteor.setVelocity(xVel, yVel);
 		meteor.setRotation(rotation);
 		meteor.setScale(scale, scale);
-		meteor.setHealth(static_cast<int>(std::round(scale * 5)));
+		meteor.setHealth(static_cast<int>(std::round(scale * 12)));
 		meteor.setMass(mass);
 
+		if(GameState::gameCycleCounter % 2 == 0)
+		{
+			meteor.setPosition(xCoordinate, -30);
+			meteor.setVelocity(xVel, yVel);
+			gameObjectManager.createCollidable(meteor);
+		}
+		if(GameState::gameCycleCounter % 2 != 0 && GameState::killCounter > 10)
+		{
+			meteor.setPosition(xCoordinate, 1030);
+			meteor.setVelocity(-xVel, -yVel);
+			gameObjectManager.createCollidable(meteor);
+		}
 
-		gameObjectManager.createCollidable(meteor);
 	}
 	
 }

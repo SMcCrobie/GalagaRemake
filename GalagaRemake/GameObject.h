@@ -40,14 +40,13 @@ protected:
     int m_oscillationThreshold;
     sf::Vector2f m_velocity;
     float m_rotation;
+    sf::Vector2f m_localCenterOfMass;
     int m_pointValue{};
 
 
-    
-
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-    void moveObject();
+    void move();
     void rotateObject();
     void oscillateObject();
 };
@@ -74,18 +73,24 @@ public:
     void setColor(const sf::Color& color);
     void decrementHealth();
     void applyMomentum(const sf::Vector2f momentum);
+    void applyMomentum(sf::Vector2f momentum, sf::Vector2f impactLocation);
     void update() override;
     bool detectProjectileCollision();
     void setMass(float mass);
     bool detectCollision(Collidable& collidable);
     bool detectCollision(const sf::RectangleShape& rect) const;
-    bool detectCollision(const sf::Sprite& sprite) const;
+    std::optional<sf::Vector2f> detectCollision(const sf::Sprite& sprite) const;
+	int last_collision;
 
 private:
     void updateObjectHitTimer();
     void explode();
-    int m_health = 1;
+    sf::Transform getTransform();
+
+
+	int m_health = 1;
     float m_mass = 1.0;//baseline mass
     int m_objectHitTimer = -1;
+
 };
 

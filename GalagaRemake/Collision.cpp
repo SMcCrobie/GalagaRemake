@@ -7,6 +7,8 @@
 #include <vector>
 #include "Collision.h"
 
+#include <optional>
+
 namespace Collision
 {
 	using TextureMask = std::vector<sf::Uint8>;
@@ -83,12 +85,12 @@ namespace Collision
 		return false;
 	}
 
-
-	bool pixelPerfectTest(const sf::Sprite& sprite1, const sf::Sprite& sprite2 , sf::Uint8 alphaLimit)
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite1, const sf::Sprite& sprite2,
+	                                             sf::Uint8 alphaLimit)
 	{
 		sf::FloatRect intersection;
 		if (!sprite1.getGlobalBounds().intersects(sprite2.getGlobalBounds(), intersection))
-			return false;
+			return std::nullopt;
 
 		const auto s1SubRect = sprite1.getTextureRect();
 		const auto s2SubRect = sprite2.getTextureRect();
@@ -108,12 +110,12 @@ namespace Collision
 
 					if (getPixel(mask1, *sprite1.getTexture(), static_cast<int>(s1v.x) + s1SubRect.left, static_cast<int>(s1v.y) + s1SubRect.top) > alphaLimit
 						&& getPixel(mask2, *sprite2.getTexture(), static_cast<int>(s2v.x) + s2SubRect.left, static_cast<int>(s2v.y) + s2SubRect.top) > alphaLimit)
-						return true;
+						return sf::Vector2f(i, j);
 
 				}
 			}
 		}
-		return false;
+		return std::nullopt;
 	}
 
 	bool pixelPerfectTest(const sf::Sprite& sprite, const RectangleProjectile& recProjectile, sf::Uint8 alphaLimit)
@@ -175,11 +177,11 @@ namespace Collision
 	bool pixelPerfectTest(const CircleProjectile& circleProjectile, const RectangleProjectile& recProjectile,
 		sf::Uint8 alphaLimit)
 	{
-		sf::FloatRect fr = recProjectile.getGlobalBounds();
-		sf::Vector2f topLeft(fr.left, fr.top);
-		sf::Vector2f topRight(fr.left + fr.width, fr.top);
-		sf::Vector2f botLeft(fr.left, fr.top + fr.height);
-		sf::Vector2f botRight(fr.left + fr.width, fr.top + fr.height);
+		const sf::FloatRect fr = recProjectile.getGlobalBounds();
+		const sf::Vector2f topLeft(fr.left, fr.top);
+		const sf::Vector2f topRight(fr.left + fr.width, fr.top);
+		const sf::Vector2f botLeft(fr.left, fr.top + fr.height);
+		const sf::Vector2f botRight(fr.left + fr.width, fr.top + fr.height);
 
 		return contains(circleProjectile, topLeft) ||
 			contains(circleProjectile, topRight) ||
