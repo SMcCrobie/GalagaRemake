@@ -116,7 +116,7 @@ void UIManager::updateUI()
 
 }
 
-void UIManager::stylePrimaryText(sf::Text& primaryText)
+void UIManager::stylePrimaryText(sf::Text& primaryText) const
 {
 	primaryText.setScale(1.5f, 1.5f);
 	primaryText.setFillColor(sf::Color(0x05ecf1ff));
@@ -125,7 +125,7 @@ void UIManager::stylePrimaryText(sf::Text& primaryText)
 
 }
 
-void UIManager::styleSecondaryText(sf::Text& secondaryText)
+void UIManager::styleSecondaryText(sf::Text& secondaryText) const
 {
 	secondaryText.setScale(.5f, .5f);
 	sf::Vector2f windowPosition = centerElement(secondaryText.getGlobalBounds());
@@ -378,7 +378,7 @@ void UIManager::initializeHealthBarSegment()
 	m_healthBarSegment = healthBarSegment;
 }
 
-bool UIManager::isHealthBarSegmentInitialized()
+bool UIManager::isHealthBarSegmentInitialized() const
 {
 	return m_healthBarSegment.getSize().x < 1.f;
 }

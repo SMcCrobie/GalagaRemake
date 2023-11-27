@@ -39,6 +39,8 @@ static StateMachineController laserTurretController;
 static std::map<State, std::vector<ShipControl>> bossStateToShipControlInputsMap;
 static std::map<State, std::map<Input, State>> bossStateWithInputToStateMap;
 
+static RectangleProjectile bossSideKicksProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
+
 static std::map<State, std::vector<ShipControl>> laserTurretStateToShipControlInputsMap;
 static std::map<State, std::map<Input, State>> laserTurretStateWithInputToStateMap;
 
@@ -116,7 +118,16 @@ int Level0::initializeLevel()
 
 
 	playerShip.setHealth(1);
-	
+	bossSideKicksProjectile.setVelocity(sf::Vector2f(0, -12));
+
+
+	bossSideKicksProjectile.setFillColor(sf::Color(5, 236, 241));
+	bossSideKicksProjectile.setSize(sf::Vector2f(3.f, 16.f));
+	bossSideKicksProjectile.setInitOffSets(12, 10);
+	//playerShip.setProjectile1(playerProjectile);
+
+	bossSideKicksProjectile.setInitOffSets(-12, 10);
+	//playerShip.setProjectile2(playerProjectile);
 
 
 
@@ -130,7 +141,7 @@ void Level0::enemyShipCreation()
 	extern ShipManager enemyShipsManager;
 	extern GameObjectManager gameObjectManager;
 
-	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip)
+	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip-250)
 		return;
 	GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
 
@@ -159,7 +170,7 @@ void Level0::enemyShipCreation()
 			meteor.setVelocity(xVel, yVel);
 			gameObjectManager.createCollidable(meteor);
 		}
-		if(GameState::gameCycleCounter % 2 != 0 && GameState::killCounter > 10)
+		if(GameState::gameCycleCounter % 2 != 0 && GameState::gameCycleCounter > 2000)
 		{
 			meteor.setPosition(xCoordinate, 1030);
 			meteor.setVelocity(-xVel, -yVel);

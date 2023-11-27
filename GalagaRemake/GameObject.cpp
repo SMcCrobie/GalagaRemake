@@ -5,7 +5,7 @@
 #include "Collision.h"
 
 
-GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_rotation(0)
+GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_angularVelocity(0)
 {
 	m_isThereSprite = false;
 	m_isThereRect = false;
@@ -46,7 +46,7 @@ void GameObject::setCircle(const sf::CircleShape& circle)
 
 void GameObject::setRotation(const float rotation)
 {
-	m_rotation = rotation;
+	m_angularVelocity = rotation;
 }
 
 void GameObject::setVelocity(const sf::Vector2f& velocity)
@@ -131,19 +131,19 @@ void GameObject::setPointValue(const int pointValue)
 
 void GameObject::rotateObject()
 {
-	if (m_rotation == 0.0f)
+	if (m_angularVelocity == 0.0f)
 		return;
 	if (m_isThereSprite)
 	{
-		m_sprite.rotate(m_rotation);
+		m_sprite.rotate(m_angularVelocity);
 	}
 	if (m_isThereCircle)
 	{
-		m_circle.rotate(m_rotation);
+		m_circle.rotate(m_angularVelocity);
 	}
 	if (m_isThereRect)
 	{
-		m_rectangle.rotate(m_rotation);
+		m_rectangle.rotate(m_angularVelocity);
 	}
 	
 
@@ -304,7 +304,7 @@ void Collidable::explode()
 	//TODO add animation here
 }
 
-sf::Transform Collidable::getTransform()
+sf::Transform Collidable::getTransform() const
 {
 	if (m_isThereSprite)
 	{
@@ -319,7 +319,7 @@ sf::Transform Collidable::getTransform()
 	}
 }
 
-constexpr float coefficient_of_restitution = 0.6f;
+constexpr float coefficient_of_restitution = 0.65f;
 
 void Collidable::applyMomentum(const sf::Vector2f momentum)
 {
@@ -339,11 +339,11 @@ void Collidable::applyMomentum(sf::Vector2f momentum, const sf::Vector2f impactL
 	// Calculate the cross product of the impact-to-center vector and the momentum vector
 	const float crossProduct = impactToCenter.x * momentum.y - impactToCenter.y * momentum.x;
 
-	if(impactToCenter.x * momentum.x < 0)//less than zero is opposing
+	if (impactToCenter.x * momentum.x < 0)//less than zero is opposing
 	{
-		momentum.x = momentum.x * -0.4f ;
+		momentum.x = momentum.x * -0.4f;
 	}
-	if(impactToCenter.y * momentum.y < 0)
+	if (impactToCenter.y * momentum.y < 0)
 	{
 		momentum.y = momentum.y * -0.4f;
 	}
@@ -351,36 +351,66 @@ void Collidable::applyMomentum(sf::Vector2f momentum, const sf::Vector2f impactL
 	m_velocity = ((getMomentum() + momentum) / m_mass + sf::Vector2f(crossProduct * impactToCenter.y, -crossProduct * impactToCenter.x) / (m_mass * impactToCenter.x * impactToCenter.x + m_mass * impactToCenter.y * impactToCenter.y)) * coefficient_of_restitution;
 }
 
+
+void Collidable::applyAngularVelocity(const float angularVelocity, sf::Vector2f impactLocation, sf::Vector2f momentum)
+{
+	const float relativeRotation = m_angularVelocity - angularVelocity;
+	constexpr float spinnynessFactor = 2.f;
+
+	const sf::Vector2f centerOfMass = getTransform().transformPoint(m_localCenterOfMass);
+
+	// Calculate the vector from the impact location to the center of mass
+	const sf::Vector2f impactToCenter = centerOfMass - impactLocation;
+
+	// Calculate the cross product of the impact-to-center vector and the momentum vector
+	const float crossProduct = impactToCenter.x * momentum.y - impactToCenter.y * momentum.x;
+
+	// Calculate rotation matrix
+	const float cosTheta = cos(relativeRotation * 3.14159f / 180.0f); // Convert degrees to radians
+	const float sinTheta = sin(relativeRotation * 3.14159f / 180.0f);
+	git 
+	// Apply rotation matrix to impact vector
+	const float rotatedImpactX = cosTheta * impactToCenter.x - sinTheta * impactToCenter.y;
+	const float rotatedImpactY = sinTheta * impactToCenter.x + cosTheta * impactToCenter.y;
+
+	// Calculate angular velocity change using the rotated impact vector
+	const float angularVelocityChange = crossProduct / (m_mass * rotatedImpactX * rotatedImpactX + m_mass * rotatedImpactY * rotatedImpactY);
+
+	// Update rotation
+	m_angularVelocity -= angularVelocityChange * spinnynessFactor;
+}
+
+
+
+
 void Collidable::update()
 {
 	GameObject::update();
 	updateObjectHitTimer();
 }
 
-bool Collidable::detectProjectileCollision()
+std::optional<CollisionResult> Collidable::detectProjectileCollision()
 {
 	extern ProjectileManager playerProjectileManager;
 	if (m_isThereCircle)
 	{
 		//TODO switch to circle shapes, everywhere
-		return false;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
+		return std::nullopt;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
 	}
     if (m_isThereRect) {
 		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
-		if (!collisionResult)
-			return false;
-		applyMomentum(collisionResult.value().momentum);
-		return true;
+		if (collisionResult.has_value())
+			return collisionResult;
+		return std::nullopt;
 	}
 	if (m_isThereSprite)
 	{
 		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_sprite);
-		if (!collisionResult)
-			return false;
-		applyMomentum(collisionResult.value().momentum);
-		return true;
+		if (collisionResult.has_value())
+			return collisionResult;
+		return std::nullopt;
 	}
-	return false;
+	return std::nullopt;
 
 }
 
@@ -389,57 +419,68 @@ void Collidable::setMass(const float mass)
 	m_mass = mass;
 }
 
+float Collidable::getAngularVelocity() const
+{
+	return m_angularVelocity;
+}
 
-bool Collidable::detectCollision(Collidable& collidable)
+void Collidable::applyPhysicsToEachOther(Collidable& collidable, const sf::Vector2f pointOfImpact)
+{
+	const auto currentMomentum = getMomentum();
+	const auto currentAngularVelocity = getAngularVelocity();
+
+	applyMomentum(collidable.getMomentum(), pointOfImpact);
+	applyAngularVelocity(collidable.getAngularVelocity(), pointOfImpact, collidable.getMomentum());
+
+	collidable.applyMomentum(currentMomentum, pointOfImpact);
+	collidable.applyAngularVelocity(currentAngularVelocity, pointOfImpact, currentMomentum);
+}
+
+std::optional<sf::Vector2f> Collidable::detectCollision(const Collidable& collidable) const
 {
 	if (m_isThereCircle)
 	{
 		//TODO switch to circle shapes, everywhere
-		return false;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
+		return std::nullopt;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
 	}
 	if (m_isThereRect) {
-		if (!collidable.detectCollision(m_rectangle))
-			return false;
-		const auto currentMomentum = getMomentum();
-		applyMomentum(collidable.getMomentum());
-		collidable.applyMomentum(currentMomentum);
-		return true;
+		const auto pointOfImpact = collidable.detectCollision(m_rectangle);
+		if (pointOfImpact.has_value())
+			return pointOfImpact;
+		return std::nullopt;
 	}
 	if (m_isThereSprite)
 	{
 		const auto pointOfImpact = collidable.detectCollision(m_sprite);
-		if(!pointOfImpact.has_value())
-			return false;
-		const auto currentMomentum = getMomentum();
-		applyMomentum(collidable.getMomentum(), pointOfImpact.value());
-		collidable.applyMomentum(currentMomentum, pointOfImpact.value());
-		return true;
+		if(pointOfImpact.has_value())
+			return pointOfImpact;
+		return std::nullopt;
 	}
-	return false;
+	return std::nullopt;
 }
 
-bool Collidable::detectCollision(const sf::RectangleShape& rect) const
+std::optional<sf::Vector2f> Collidable::detectCollision(const sf::RectangleShape& rect) const
 {
 	if (m_isThereCircle)
 	{
 		//todo
-		return false;
+		return std::nullopt;
 	}
 	if (m_isThereRect) {
-		if (m_rectangle.getGlobalBounds().intersects(rect.getGlobalBounds()))
-			return true;
-		else
-			return false;
+		sf::FloatRect intersection;
+		if (m_rectangle.getGlobalBounds().intersects(rect.getGlobalBounds(), intersection ))
+			return sf::Vector2f(intersection.left, intersection.top);
+		return std::nullopt;
 	}
 	
 	if (m_isThereSprite)
 	{
-		if (Collision::pixelPerfectTest(m_sprite, rect))
-			return true;
-		else
-			return false;
+		auto pointOfImpact = Collision::pixelPerfectTest(m_sprite, rect);
+		if (pointOfImpact.has_value())
+			return pointOfImpact.value();
+		return std::nullopt;
 	}
-	return false;
+	return std::nullopt;
 }
 
 std::optional<sf::Vector2f> Collidable::detectCollision(const sf::Sprite& sprite) const
@@ -453,6 +494,12 @@ std::optional<sf::Vector2f> Collidable::detectCollision(const sf::Sprite& sprite
 	if (m_isThereSprite)
 		return Collision::pixelPerfectTest(m_sprite, sprite);
 	return std::nullopt;
+}
+
+void Collidable::applyPhysicsFromProjectile(const CollisionResult collisionResult)
+{
+	applyMomentum(collisionResult.momentum);
+	applyAngularVelocity(collisionResult.rotationalVelocity, collisionResult.pointOfImpact, collisionResult.momentum*5.f);
 }
 
 void Collidable::updateObjectHitTimer()

@@ -33,7 +33,7 @@ static Ship enemyShip;
 static Ship bossShip;
 static Ship bossSideKicks;
 static CircleProjectile bossProjectile = CircleProjectile();
-static RectangleProjectile enemyProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
+static RectangleProjectile bossSideKicksProjectile = RectangleProjectile(sf::Vector2f(3.f, 12.f));
 static sf::Color shieldColor;
 static Item repairKit;
 static sf::Sprite repairKitSprite;
@@ -140,20 +140,20 @@ int Level1::initializeLevel()
 	bossShip.setShield(bossProjectile, 50);
 
 	
-	enemyProjectile.setFillColor(sf::Color::Magenta);
-	enemyProjectile.setVelocity(sf::Vector2f(0, -8));
+	bossSideKicksProjectile.setFillColor(sf::Color::Magenta);
+	bossSideKicksProjectile.setVelocity(sf::Vector2f(0, -8));
 
-	enemyShip.setProjectile1(enemyProjectile);
+	enemyShip.setProjectile1(bossSideKicksProjectile);
 	enemyShip.rotate180();
 	enemyShip.setHealth(2);
 
-	enemyProjectile.setFillColor(sf::Color::Red);
-	enemyProjectile.setSize(sf::Vector2f(4.f, 16.f));
-	enemyProjectile.setInitOffSets(15, 10);
-	bossSideKicks.setProjectile1(enemyProjectile);
+	bossSideKicksProjectile.setFillColor(sf::Color::Red);
+	bossSideKicksProjectile.setSize(sf::Vector2f(4.f, 16.f));
+	bossSideKicksProjectile.setInitOffSets(15, 10);
+	bossSideKicks.setProjectile1(bossSideKicksProjectile);
 
-	enemyProjectile.setInitOffSets(-15, 10);
-	bossSideKicks.setProjectile2(enemyProjectile);
+	bossSideKicksProjectile.setInitOffSets(-15, 10);
+	bossSideKicks.setProjectile2(bossSideKicksProjectile);
 
 
 	bossSideKicksStateToShipControlInputsMap = std::map<State, std::vector<ShipControl>>{ BOSS_SIDE_KICKS_STATE_TO_SHIP_CONTROL_INPUTS_MAP};

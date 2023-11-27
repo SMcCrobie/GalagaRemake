@@ -29,7 +29,7 @@ namespace GameState
 		gameCycleCounter = 0;
 		timeOfLastGameLoop = 0;
 		timeOfLastEnemyShip = 0;
-		deltaTillNextEnemyShip = 50;//100, need to make this level specific
+		deltaTillNextEnemyShip = 300;//100, need to make this level specific
 		levelOutroDelay = -1;
 
 		world_bounds = BoundedFloatRect (0.0f, 0.0f, 600.0f, 1000.0f);

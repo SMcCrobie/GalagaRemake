@@ -39,7 +39,7 @@ protected:
     int m_oscillationTimer;
     int m_oscillationThreshold;
     sf::Vector2f m_velocity;
-    float m_rotation;
+    float m_angularVelocity;
     sf::Vector2f m_localCenterOfMass;
     int m_pointValue{};
 
@@ -74,18 +74,22 @@ public:
     void decrementHealth();
     void applyMomentum(const sf::Vector2f momentum);
     void applyMomentum(sf::Vector2f momentum, sf::Vector2f impactLocation);
-    void update() override;
-    bool detectProjectileCollision();
+    void applyAngularVelocity(float angularVelocity, sf::Vector2f impactLocation, sf::Vector2f momentum);
+	void update() override;
+    std::optional<CollisionResult> detectProjectileCollision();
     void setMass(float mass);
-    bool detectCollision(Collidable& collidable);
-    bool detectCollision(const sf::RectangleShape& rect) const;
+    float getAngularVelocity() const;
+    void applyPhysicsToEachOther(Collidable& collidable, const sf::Vector2f pointOfImpact);
+    std::optional<sf::Vector2f> detectCollision(const Collidable& collidable) const;
+    std::optional<sf::Vector2f> detectCollision(const sf::RectangleShape& rect) const;
     std::optional<sf::Vector2f> detectCollision(const sf::Sprite& sprite) const;
-	int last_collision;
+    void applyPhysicsFromProjectile(CollisionResult collisionResult);
+    int last_collision;
 
 private:
     void updateObjectHitTimer();
     void explode();
-    sf::Transform getTransform();
+    sf::Transform getTransform() const;
 
 
 	int m_health = 1;
