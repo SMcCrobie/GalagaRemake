@@ -42,6 +42,7 @@ void GameObjectManager::resetManager()
 {
 	m_gameObjects.clear();
 	m_items.clear();
+	m_collidables.clear();
 }
 
 void GameObjectManager::updateCollidables()

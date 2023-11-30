@@ -341,11 +341,11 @@ void Collidable::applyMomentum(sf::Vector2f momentum, const sf::Vector2f impactL
 
 	if (impactToCenter.x * momentum.x < 0)//less than zero is opposing
 	{
-		momentum.x = momentum.x * -0.4f;
+		momentum.x = momentum.x * -0.6f;
 	}
 	if (impactToCenter.y * momentum.y < 0)
 	{
-		momentum.y = momentum.y * -0.4f;
+		momentum.y = momentum.y * -0.6f;
 	}
 
 	m_velocity = ((getMomentum() + momentum) / m_mass + sf::Vector2f(crossProduct * impactToCenter.y, -crossProduct * impactToCenter.x) / (m_mass * impactToCenter.x * impactToCenter.x + m_mass * impactToCenter.y * impactToCenter.y)) * coefficient_of_restitution;
@@ -368,7 +368,7 @@ void Collidable::applyAngularVelocity(const float angularVelocity, sf::Vector2f 
 	// Calculate rotation matrix
 	const float cosTheta = cos(relativeRotation * 3.14159f / 180.0f); // Convert degrees to radians
 	const float sinTheta = sin(relativeRotation * 3.14159f / 180.0f);
-	git 
+
 	// Apply rotation matrix to impact vector
 	const float rotatedImpactX = cosTheta * impactToCenter.x - sinTheta * impactToCenter.y;
 	const float rotatedImpactY = sinTheta * impactToCenter.x + cosTheta * impactToCenter.y;
@@ -380,6 +380,23 @@ void Collidable::applyAngularVelocity(const float angularVelocity, sf::Vector2f 
 	m_angularVelocity -= angularVelocityChange * spinnynessFactor;
 }
 
+void Collidable::applyPhysicsToEachOther(Collidable& collidable, const sf::Vector2f pointOfImpact)
+{
+	const auto currentMomentum = getMomentum();
+	const auto currentAngularVelocity = getAngularVelocity();
+
+	applyMomentum(collidable.getMomentum(), pointOfImpact);
+	applyAngularVelocity(collidable.getAngularVelocity(), pointOfImpact, collidable.getMomentum());
+
+	collidable.applyMomentum(currentMomentum, pointOfImpact);
+	collidable.applyAngularVelocity(currentAngularVelocity, pointOfImpact, currentMomentum);
+}
+
+void Collidable::applyPhysicsFromProjectile(const CollisionResult collisionResult)
+{
+	applyMomentum(collisionResult.momentum);
+	applyAngularVelocity(collisionResult.rotationalVelocity, collisionResult.pointOfImpact, collisionResult.momentum * 4.5f);
+}
 
 
 
@@ -422,18 +439,6 @@ void Collidable::setMass(const float mass)
 float Collidable::getAngularVelocity() const
 {
 	return m_angularVelocity;
-}
-
-void Collidable::applyPhysicsToEachOther(Collidable& collidable, const sf::Vector2f pointOfImpact)
-{
-	const auto currentMomentum = getMomentum();
-	const auto currentAngularVelocity = getAngularVelocity();
-
-	applyMomentum(collidable.getMomentum(), pointOfImpact);
-	applyAngularVelocity(collidable.getAngularVelocity(), pointOfImpact, collidable.getMomentum());
-
-	collidable.applyMomentum(currentMomentum, pointOfImpact);
-	collidable.applyAngularVelocity(currentAngularVelocity, pointOfImpact, currentMomentum);
 }
 
 std::optional<sf::Vector2f> Collidable::detectCollision(const Collidable& collidable) const
@@ -494,12 +499,6 @@ std::optional<sf::Vector2f> Collidable::detectCollision(const sf::Sprite& sprite
 	if (m_isThereSprite)
 		return Collision::pixelPerfectTest(m_sprite, sprite);
 	return std::nullopt;
-}
-
-void Collidable::applyPhysicsFromProjectile(const CollisionResult collisionResult)
-{
-	applyMomentum(collisionResult.momentum);
-	applyAngularVelocity(collisionResult.rotationalVelocity, collisionResult.pointOfImpact, collisionResult.momentum*5.f);
 }
 
 void Collidable::updateObjectHitTimer()
