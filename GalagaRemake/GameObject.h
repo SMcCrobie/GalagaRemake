@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "PlayerShip.h"
-#include "ItemType.h"
 
 
 class GameObject :
@@ -39,48 +38,14 @@ protected:
     int m_oscillationTimer;
     int m_oscillationThreshold;
     sf::Vector2f m_velocity;
-    float m_rotation;
+    float m_angularVelocity;
+    sf::Vector2f m_localCenterOfMass;
     int m_pointValue{};
 
 
-    
-
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-    void moveObject();
+    void move();
     void rotateObject();
     void oscillateObject();
-};
-
-class Item :
-	public GameObject
-{
-public:
-    ItemType getItemType() const;
-    void setItemType(ItemType type);
-
-private:
-    ItemType m_itemType = ItemType::Repair_Kit;
-
-};
-
-class Collidable :
-	public GameObject
-{
-public:
-    void setHealth(int health);
-    int getHealth() const;
-    void setColor(const sf::Color& color);
-    void decrementHealth();
-    void applyMomentum(const sf::Vector2f momentum);
-    void update() override;
-    bool detectCollision();
-    void setMass(float mass);
-
-private:
-    void updateObjectHitTimer();
-    void explode();
-    int m_health = 1;
-    float m_mass = 1.0;//baseline mass
-    int m_objectHitTimer = -1;
 };

@@ -14,8 +14,8 @@ public:
 	bool isOutOfLives() const;
 	void playerLostLife();
 	void updateUI();
-	void stylePrimaryText(sf::Text& primaryText);
-	void styleSecondaryText(sf::Text& secondaryText);
+	void stylePrimaryText(sf::Text& primaryText) const;
+	void styleSecondaryText(sf::Text& secondaryText) const;
 	void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
 	void initializeLevelOutroText(TempText& primaryText, TempText& secondaryText);
 	void resetManager() override;
@@ -34,7 +34,7 @@ private:
 	void initializeExtraLivesText();
 	void initializeHealthBar();
 	void initializeHealthBarSegment();
-	bool isHealthBarSegmentInitialized();
+	bool isHealthBarSegmentInitialized() const;
 	void initializePlayerHealth();
 	void initializeShipPointValue();
 	

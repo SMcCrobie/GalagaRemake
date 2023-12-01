@@ -138,11 +138,11 @@ int main(int, char const**)
 	while (window.isOpen())
 	{ 
 		levelOrchestrator.updateWindow(window);
-		if(levelOrchestrator.shouldRunLoop() == false)
+		if(LevelOrchestrator::shouldRunLoop() == false)
 			continue;
 
 		if (GameState::isMovementSet == false)
-			levelOrchestrator.pollForMovementSetting(window);
+			LevelOrchestrator::pollForMovementSetting(window);
 
 		//Poll for events
 		playerController.PollEventsAndUpdateShipState(window, playerShip);

@@ -145,10 +145,12 @@
   <ItemGroup>
     <ClCompile Include="BackgroundManager.cpp" />
     <ClCompile Include="BoundedFloatRect.cpp" />
+    <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Fonts.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="Level0.cpp" />
     <ClCompile Include="LevelOrchestrator.cpp" />
     <ClCompile Include="Level1.cpp" />
@@ -164,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackgroundManager.h" />
+    <ClInclude Include="Collidable.h" />
     <ClInclude Include="GameCoordinator.h" />
     <ClInclude Include="GameObjectManager.h" />
     <ClInclude Include="ILevel.h" />
@@ -174,6 +177,7 @@
     <ClInclude Include="DebugMacros.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="ItemType.h" />
     <ClInclude Include="Level0.h" />
     <ClInclude Include="Level1.h" />

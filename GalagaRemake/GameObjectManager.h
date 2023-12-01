@@ -2,8 +2,10 @@
 #include <list>
 #include <SFML/Graphics/Drawable.hpp>
 
+#include "Collidable.h"
 #include "GameObject.h"
 #include "IManager.h"
+#include "Item.h"
 
 class GameObjectManager
 	: public sf::Drawable, public IManager
@@ -11,7 +13,7 @@ class GameObjectManager
 public:
 	void createGameObject(const GameObject& obj);
 	void createItem(const Item& item);
-	void createCollidable(const Collidable& collidable);
+	void createCollidable(Collidable& collidable);
 	[[nodiscard]] bool isItemsEmpty() const;
 	[[nodiscard]] size_t itemsCount() const;
 	[[nodiscard]] bool isCollidablesEmpty() const;

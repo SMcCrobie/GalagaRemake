@@ -1,3 +1,13 @@
+Need to transfer kinetic energy vs momentum as velocity has a bigger impact than mass
+	objects with large mass shooting other objects off of it feels weird
+Conflating detecting and object changes may not be the best idea
+Need to fix the id system IDK why its so buggy
+
+
+
+
+
+
 Design Themes(*will be updated as/if themes change)
 ---------------------------------------------------------------
 - Every manager should know how to manage their assets for the production of the game
@@ -10,7 +20,7 @@ Design Themes(*will be updated as/if themes change)
 
 TODOs
 ---------------------------------------------------------------
-- Make a closing screen that gives extra points, and also one on game over as well I guess  ;
+
 
 - Think every object that has points to be had, should pocess their own version of what they want that temp text to look like
 - remove control selection widow, tie control changes to function keys instead for now, menus further down the line
@@ -33,3 +43,4 @@ Bugs/Visual issues
 Code Comments
 ---------------------------------------------------------------
 "this is why you need to standardize ship creation, prob set position before any creation period"
+

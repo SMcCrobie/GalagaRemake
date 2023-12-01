@@ -4,13 +4,14 @@
 
 #include "Collision.h"
 
-GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_rotation(0)
+
+GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_angularVelocity(0)
 {
 	m_isThereSprite = false;
 	m_isThereRect = false;
 	m_isThereCircle = false;
+	m_isThereCircle = false;
 }
-
 
 //remove with collision box option
 void GameObject::setSprite(const sf::Sprite& sprite, const bool withCollisionBox)
@@ -18,6 +19,7 @@ void GameObject::setSprite(const sf::Sprite& sprite, const bool withCollisionBox
 	m_sprite = sprite;
 	m_isThereSprite = true;
 	m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
+	m_localCenterOfMass = m_sprite.getOrigin();
 
 	if(withCollisionBox)
 	{
@@ -31,6 +33,7 @@ void GameObject::setRect(const sf::RectangleShape& rect)
 	m_rectangle = rect;
 	m_isThereRect = true;
 	m_rectangle.setOrigin(m_rectangle.getLocalBounds().width / 2.0f, m_rectangle.getLocalBounds().height / 2.0f);
+	m_localCenterOfMass = m_rectangle.getOrigin();
 }
 
 void GameObject::setCircle(const sf::CircleShape& circle)
@@ -38,11 +41,12 @@ void GameObject::setCircle(const sf::CircleShape& circle)
 	m_circle = circle;
 	m_isThereCircle = true;
 	m_circle.setOrigin(m_circle.getRadius(), m_circle.getRadius());
+	m_localCenterOfMass = m_circle.getOrigin();
 }
 
 void GameObject::setRotation(const float rotation)
 {
-	m_rotation = rotation;
+	m_angularVelocity = rotation;
 }
 
 void GameObject::setVelocity(const sf::Vector2f& velocity)
@@ -127,19 +131,19 @@ void GameObject::setPointValue(const int pointValue)
 
 void GameObject::rotateObject()
 {
-	if (m_rotation == 0.0f)
+	if (m_angularVelocity == 0.0f)
 		return;
 	if (m_isThereSprite)
 	{
-		m_sprite.rotate(m_rotation);
+		m_sprite.rotate(m_angularVelocity);
 	}
 	if (m_isThereCircle)
 	{
-		m_circle.rotate(m_rotation);
+		m_circle.rotate(m_angularVelocity);
 	}
 	if (m_isThereRect)
 	{
-		m_rectangle.rotate(m_rotation);
+		m_rectangle.rotate(m_angularVelocity);
 	}
 	
 
@@ -174,7 +178,7 @@ void GameObject::oscillateObject()
 }
 
 
-void GameObject::moveObject()
+void GameObject::move()
 {
 	if(m_velocity.x == 0.0f && m_velocity.y == 0.0f)
 		return;
@@ -192,9 +196,10 @@ void GameObject::moveObject()
 	}
 }
 
+
 void GameObject::update()
 {
-	moveObject();
+	move();
 	rotateObject();
 	oscillateObject();
 }
@@ -233,115 +238,4 @@ void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	if (m_isThereRect) {
 		target.draw(m_rectangle, states);
 	}
-}
-
-
-
-
-//Item
-//--------------------------------------------------------------------------
-
-ItemType Item::getItemType() const
-{
-	return m_itemType;
-}
-
-void Item::setItemType(ItemType type)
-{
-	m_itemType = type;
-}
-
-void Collidable::setHealth(const int health)
-{
-	m_health = health;
-}
-
-int Collidable::getHealth() const
-{
-	return m_health;
-}
-
-void Collidable::setColor(const sf::Color& color)
-{
-	m_objectHitTimer += 3;
-	if (m_isThereSprite)
-	{
-		m_sprite.setColor(color);
-		return;
-	}
-	if (m_isThereCircle)
-	{
-		m_circle.setFillColor(color);
-		return;
-	}
-	if (m_isThereRect) {
-		m_rectangle.setFillColor(color);
-	}
-}
-
-void Collidable::decrementHealth()
-{
-	if(m_health > 0)
-	{
-		m_objectHitTimer += 1;
-		m_health--;
-		setColor(sf::Color(218, 160, 109));
-	}
-}
-
-void Collidable::explode()
-{
-	//TODO add animation here
-}
-
-void Collidable::applyMomentum(const sf::Vector2f momentum)
-{
-	m_velocity = (m_mass * m_velocity + momentum) / m_mass;
-}
-
-void Collidable::update()
-{
-	GameObject::update();
-	updateObjectHitTimer();
-}
-
-bool Collidable::detectCollision()
-{
-	extern ProjectileManager playerProjectileManager;
-	if (m_isThereCircle)
-	{
-		//TODO switch to circle shapes, everywhere
-		return false;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
-	}
-    if (m_isThereRect) {
-		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
-		if (collisionResult)
-			return false;
-		applyMomentum(collisionResult.value().momentum);
-		return true;
-	}
-	if (m_isThereSprite)
-	{
-		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_sprite);
-		if (!collisionResult)
-			return false;
-		applyMomentum(collisionResult.value().momentum);
-		return true;
-	}
-	return false;
-
-}
-
-void Collidable::setMass(float mass)
-{
-	m_mass = mass;
-}
-
-void Collidable::updateObjectHitTimer()
-{
-	if (m_objectHitTimer < 0 )
-		return;
-	if (m_objectHitTimer == 0)
-		setColor(sf::Color::White);
-	m_objectHitTimer--;
 }

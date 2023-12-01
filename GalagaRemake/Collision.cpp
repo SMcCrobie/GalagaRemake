@@ -7,6 +7,8 @@
 #include <vector>
 #include "Collision.h"
 
+#include <optional>
+
 namespace Collision
 {
 	using TextureMask = std::vector<sf::Uint8>;
@@ -56,11 +58,12 @@ namespace Collision
 	}
 
 
-	bool pixelPerfectTest(const sf::Sprite& sprite, const sf::RectangleShape& rect, sf::Uint8 alphaLimit)
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite, const sf::RectangleShape& rect,
+	                                             sf::Uint8 alphaLimit)
 	{
 		sf::FloatRect intersection;
 		if (!sprite.getGlobalBounds().intersects(rect.getGlobalBounds(), intersection))
-			return false;
+			return std::nullopt;
 
 		const auto s1SubRect = sprite.getTextureRect();
 
@@ -75,19 +78,53 @@ namespace Collision
 				if (s1v.x > 0 && s1v.y > 0 && s1v.x < s1SubRect.width && s1v.y < s1SubRect.height) {
 
 					if (getPixel(mask1, *sprite.getTexture(), static_cast<int>(s1v.x) + s1SubRect.left, static_cast<int>(s1v.y) + s1SubRect.top) > alphaLimit)
-						return true;
+						return sf::Vector2f(i,j);
 
 				}
 			}
 		}
-		return false;
+		return std::nullopt;
 	}
 
-	bool pixelPerfectTest(const sf::Sprite& sprite, const RectangleProjectile& recProjectile, sf::Uint8 alphaLimit)
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite1, const sf::Sprite& sprite2,
+	                                             sf::Uint8 alphaLimit)
+	{
+		sf::FloatRect intersection;
+		if (!sprite1.getGlobalBounds().intersects(sprite2.getGlobalBounds(), intersection))
+			return std::nullopt;
+
+		const auto s1SubRect = sprite1.getTextureRect();
+		const auto s2SubRect = sprite2.getTextureRect();
+
+		const auto& mask1 = bitmasks().get(*sprite1.getTexture());
+		const auto& mask2 = bitmasks().get(*sprite2.getTexture());
+
+		// Loop through our pixels
+		for (auto i = intersection.left; i < intersection.left + intersection.width; ++i) {
+			for (auto j = intersection.top; j < intersection.top + intersection.height; ++j) {
+				const auto s1v = sprite1.getInverseTransform().transformPoint(i, j);
+				const auto s2v = sprite2.getInverseTransform().transformPoint(i, j);
+
+				// Make sure pixels fall within the sprite's subrect
+				if ((s1v.x > 0 && s1v.y > 0 && s1v.x < s1SubRect.width && s1v.y < s1SubRect.height)
+					&& (s2v.x > 0 && s2v.y > 0 && s2v.x < s2SubRect.width && s2v.y < s2SubRect.height)) {
+
+					if (getPixel(mask1, *sprite1.getTexture(), static_cast<int>(s1v.x) + s1SubRect.left, static_cast<int>(s1v.y) + s1SubRect.top) > alphaLimit
+						&& getPixel(mask2, *sprite2.getTexture(), static_cast<int>(s2v.x) + s2SubRect.left, static_cast<int>(s2v.y) + s2SubRect.top) > alphaLimit)
+						return sf::Vector2f(i, j);
+
+				}
+			}
+		}
+		return std::nullopt;
+	}
+
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite, const RectangleProjectile& recProjectile,
+	                                             sf::Uint8 alphaLimit)
 	{
 		sf::FloatRect intersection;
 		if (!sprite.getGlobalBounds().intersects(recProjectile.getGlobalBounds(), intersection))
-			return false;
+			return std::nullopt;
 
 		const auto s1SubRect = sprite.getTextureRect();
 
@@ -102,19 +139,20 @@ namespace Collision
 				if (s1v.x > 0 && s1v.y > 0 && s1v.x < s1SubRect.width && s1v.y < s1SubRect.height) {
 
 					if (getPixel(mask1, *sprite.getTexture(), static_cast<int>(s1v.x) + s1SubRect.left, static_cast<int>(s1v.y) + s1SubRect.top) > alphaLimit)
-						return true;
+						return sf::Vector2f(i, j);
 
 				}
 			}
 		}
-		return false;
+		return std::nullopt;
 	}
 
-	bool pixelPerfectTest(const sf::Sprite& sprite, const CircleProjectile& cirProjectile, sf::Uint8 alphaLimit)
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite, const CircleProjectile& cirProjectile,
+	                                             sf::Uint8 alphaLimit)
 	{
 		sf::FloatRect intersection;
 		if (!sprite.getGlobalBounds().intersects(cirProjectile.getGlobalBounds(), intersection))
-			return false;
+			return std::nullopt;
 
 		const auto s1SubRect = sprite.getTextureRect();
 
@@ -131,34 +169,41 @@ namespace Collision
 
 					if (getPixel(mask1, *sprite.getTexture(), static_cast<int>(s1v.x) + s1SubRect.left, static_cast<int>(s1v.y) + s1SubRect.top) > alphaLimit
 						&& contains(cirProjectile, sf::Vector2f(i,j) ) )
-						return true;
+						return sf::Vector2f(i, j);
 
 				}
 			}
 		}
-		return false;
+		return std::nullopt;
 	}
 
-	bool pixelPerfectTest(const CircleProjectile& circleProjectile, const RectangleProjectile& recProjectile,
-		sf::Uint8 alphaLimit)
+	std::optional<sf::Vector2f> pixelPerfectTest(const CircleProjectile& circleProjectile,
+	                                             const RectangleProjectile& recProjectile,
+	                                             sf::Uint8 alphaLimit)
 	{
-		sf::FloatRect fr = recProjectile.getGlobalBounds();
-		sf::Vector2f topLeft(fr.left, fr.top);
-		sf::Vector2f topRight(fr.left + fr.width, fr.top);
-		sf::Vector2f botLeft(fr.left, fr.top + fr.height);
-		sf::Vector2f botRight(fr.left + fr.width, fr.top + fr.height);
+		const sf::FloatRect fr = recProjectile.getGlobalBounds();
+		const sf::Vector2f topLeft(fr.left, fr.top);
+		const sf::Vector2f topRight(fr.left + fr.width, fr.top);
+		const sf::Vector2f botLeft(fr.left, fr.top + fr.height);
+		const sf::Vector2f botRight(fr.left + fr.width, fr.top + fr.height);
 
-		return contains(circleProjectile, topLeft) ||
-			contains(circleProjectile, topRight) ||
-			contains(circleProjectile, botLeft) ||
-			contains(circleProjectile, botRight);
+		if (contains(circleProjectile, topLeft))
+			return topLeft;
+		if (contains(circleProjectile, topRight))
+			return topRight;
+		if (contains(circleProjectile, botLeft))
+			return botLeft;
+		if (contains(circleProjectile, botRight))
+			return botRight;
+		return std::nullopt;
 	}
 
-	bool pixelPerfectTest(const CircleProjectile& circleProjectile1, const CircleProjectile& circleProjectile2,
-		sf::Uint8 alphaLimit)
+	std::optional<sf::Vector2f> pixelPerfectTest(const CircleProjectile& circleProjectile1,
+	                                             const CircleProjectile& circleProjectile2,
+	                                             sf::Uint8 alphaLimit)
 	{
 		//TODO	
-		return false;
+		return std::nullopt;
 	}
 
 	bool contains(const CircleProjectile& c, const sf::Vector2f& p)

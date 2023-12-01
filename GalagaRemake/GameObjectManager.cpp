@@ -13,7 +13,7 @@ void GameObjectManager::createItem(const Item& item)
 	m_items.emplace_back(item);
 }
 
-void GameObjectManager::createCollidable(const Collidable& collidable)
+void GameObjectManager::createCollidable(Collidable& collidable)
 {
 	m_collidables.emplace_back(collidable);
 }
@@ -42,23 +42,46 @@ void GameObjectManager::resetManager()
 {
 	m_gameObjects.clear();
 	m_items.clear();
+	m_collidables.clear();
 }
 
 void GameObjectManager::updateCollidables()
 {
-	
-
 	for (auto it = m_collidables.begin(); it != m_collidables.end(); ) {
 		it->update();
-		if(it->detectCollision())
+		auto collisionResult = it->detectProjectileCollision();
+		if(collisionResult.has_value())
 		{
-			it->decrementHealth();
+			it->applyPhysicsFromProjectile(collisionResult.value());
 			if(it->getHealth() < 1)
 			{
 				it = m_collidables.erase(it);
 				continue;
 			}
 
+		}
+
+		for (auto innerIt = it; innerIt != m_collidables.end(); )
+		{
+			innerIt++;
+			if (innerIt == m_collidables.end())
+				break;
+			auto pointOfImpact = it->detectCollision(*innerIt);
+			if (pointOfImpact.has_value())
+			{
+				it->applyPhysicsToEachOther(*innerIt, pointOfImpact.value());
+				if (innerIt->getHealth() < 1) {
+					innerIt = m_collidables.erase(innerIt);
+				}
+				if (it->getHealth() < 1) {
+					break;
+				}
+			}
+		}
+		if (it != m_collidables.end() && it->getHealth() < 1)
+		{
+			it = m_collidables.erase(it);
+			continue;
 		}
 		if(checkIfOutOfBounds(*it))
 		{
@@ -68,6 +91,7 @@ void GameObjectManager::updateCollidables()
 			it++;
 		}
 	}
+	
 }
 
 void GameObjectManager::updateItems()
@@ -132,7 +156,7 @@ void GameObjectManager::addItemPointValueToScore(const Item& item, const PlayerS
 
 void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 {
-	for (auto it = m_items.begin(); it != m_items.end(); it++)
+	for (auto it = m_items.begin(); it != m_items.end();)
 	{
 		if (it->detectCollision(playerShip))
 		{
@@ -140,6 +164,9 @@ void GameObjectManager::detectItemCollision(PlayerShip& playerShip)
 			playerShip.useItem(it->getItemType());
 			it = m_items.erase(it);
 		}
+		if (it == m_items.end())
+			break;
+		it++;
 	}
 }
 
