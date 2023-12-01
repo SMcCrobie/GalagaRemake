@@ -2,8 +2,10 @@
 #include <list>
 #include <SFML/Graphics/Drawable.hpp>
 
+#include "Collidable.h"
 #include "GameObject.h"
 #include "IManager.h"
+#include "Item.h"
 
 class GameObjectManager
 	: public sf::Drawable, public IManager

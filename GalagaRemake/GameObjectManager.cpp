@@ -53,7 +53,6 @@ void GameObjectManager::updateCollidables()
 		if(collisionResult.has_value())
 		{
 			it->applyPhysicsFromProjectile(collisionResult.value());
-			it->decrementHealth();
 			if(it->getHealth() < 1)
 			{
 				it = m_collidables.erase(it);
@@ -71,11 +70,9 @@ void GameObjectManager::updateCollidables()
 			if (pointOfImpact.has_value())
 			{
 				it->applyPhysicsToEachOther(*innerIt, pointOfImpact.value());
-				innerIt->decrementHealth();
 				if (innerIt->getHealth() < 1) {
 					innerIt = m_collidables.erase(innerIt);
 				}
-				it->decrementHealth();
 				if (it->getHealth() < 1) {
 					break;
 				}

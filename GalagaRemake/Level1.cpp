@@ -12,6 +12,7 @@
 #include "GameObject.h"
 #include "GameObjectManager.h"
 #include "GameState.h"
+#include "Item.h"
 #include "Loader.h"
 #include "RandMacros.h"
 #include "Ship.h"

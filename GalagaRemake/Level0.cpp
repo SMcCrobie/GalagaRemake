@@ -3,11 +3,11 @@
 #include <iostream>
 
 #include "BackgroundManager.h"
+#include "Collidable.h"
 #include "Fonts.h"
 #include "GameState.h"
 #include "Loader.h"
 #include "RandMacros.h"
-#include "ControllerConfigs.h"
 #include "GameObject.h"
 #include "GameObjectManager.h"
 
@@ -74,7 +74,7 @@ void Level0::enemyShipCreation()
 
 		meteor.setRotation(rotation);
 		meteor.setScale(scale, scale);
-		meteor.setHealth(static_cast<int>(std::round(scale * 14)));
+		meteor.setHealth(mass);
 		meteor.setMass(mass);
 
 		if(GameState::gameCycleCounter % 2 == 0)
