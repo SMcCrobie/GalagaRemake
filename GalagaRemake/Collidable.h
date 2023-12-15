@@ -24,16 +24,17 @@ public:
     std::optional<sf::Vector2f> detectCollision(const sf::Sprite& sprite) const;
     void applyPhysicsFromProjectile(CollisionResult collisionResult);
     void decrementHealth(const sf::Vector2f& changeInMomentum);
+    void animateOnHealth(int amountOfFrames, const sf::IntRect frame);
 
 private:
+    void updateFrame() override;
     void updateObjectHitTimer();
     void explode();
     sf::Transform getTransform() const;
     float vectorMagnitude(const sf::Vector2f& vector) const;
 
-
+    bool m_isAnimatedBasedOnHealth = false;
     float m_health = 1.f;
     float m_mass = 1.0f;//baseline mass
     int m_objectHitTimer = -1;
-
 };

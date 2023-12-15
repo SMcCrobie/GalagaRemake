@@ -24,7 +24,7 @@ public:
 	void updateWindow(sf::RenderWindow& window) const;
 	static void pollForMovementSetting(sf::RenderWindow& window);
 
-	int loadLevel(std::shared_ptr<ILevel> level);
+	void loadLevel(std::shared_ptr<ILevel> level);
 	void initializeLevelIntroText(UIManager& uiManager) const;
 	void initializeLevelOutroText(UIManager& uiManager) const;
 	void enemyShipCreation() const;

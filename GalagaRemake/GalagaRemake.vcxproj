@@ -200,6 +200,8 @@
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\BossSideKicksAnimations.png" />
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\LaserTurretAnimations.png" />
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\MeteorAnimations1.png" />
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\repairKitAnimation.png" />
     <Image Include="..\x64\Release\repairKit.png">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -210,6 +212,7 @@
     </Image>
     <Image Include="icon1.ico" />
     <Image Include="meteor.png" />
+    <Image Include="MeteorAnimations1.png" />
     <Image Include="Planets(1).png" />
     <Image Include="Planets.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

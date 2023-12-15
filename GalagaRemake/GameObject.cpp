@@ -1,11 +1,14 @@
 #include "GameObject.h"
 
 #include <iostream>
-
+#include "GameState.h"
 #include "Collision.h"
+#include "DebugMacros.h"
 
 
-GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_angularVelocity(0)
+GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_angularVelocity(0), m_pointValue(0),
+                          m_framesCount(0), m_currentFrame(0),
+                          m_timeOfLastFrame(0), m_deltaBetweenFrames(0)
 {
 	m_isThereSprite = false;
 	m_isThereRect = false;
@@ -14,12 +17,13 @@ GameObject::GameObject(): m_oscillationTimer(0), m_oscillationThreshold(0), m_an
 }
 
 //remove with collision box option
-void GameObject::setSprite(const sf::Sprite& sprite, const bool withCollisionBox)
+void GameObject::setSprite(const sf::Sprite& sprite, const char* spriteName, const bool withCollisionBox)
 {
 	m_sprite = sprite;
 	m_isThereSprite = true;
 	m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
 	m_localCenterOfMass = m_sprite.getOrigin();
+	m_spriteName = spriteName;
 
 	if(withCollisionBox)
 	{
@@ -60,7 +64,7 @@ void GameObject::setVelocity(const float x, const float y)
 	m_velocity.y = y;
 }
 
-void GameObject::setScale(float x, float y)
+void GameObject::setScale(const float x, const float y)
 {
 	if (m_isThereSprite)
 	{
@@ -81,7 +85,7 @@ sf::Vector2f GameObject::getVelocity() const
 	return m_velocity;
 }
 
-void GameObject::setOscillation(const sf::Vector2f& scalar, int framesTillSwitch)
+void GameObject::setOscillation(const sf::Vector2f& scalar, const int framesTillSwitch)
 {
 	m_scalar = scalar;
 	m_oscillationThreshold = framesTillSwitch;
@@ -202,6 +206,7 @@ void GameObject::update()
 	move();
 	rotateObject();
 	oscillateObject();
+	updateFrame();
 }
 
 bool GameObject::detectCollision(const PlayerShip& playerShip) const
@@ -223,7 +228,57 @@ int GameObject::getPointValue() const
 	return m_pointValue;
 }
 
-void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void GameObject::changeSpriteFrame(const sf::IntRect frame)
+{
+	m_sprite.setTextureRect(frame);
+	m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
+	m_localCenterOfMass = m_sprite.getOrigin();
+}
+
+void GameObject::validateSufficientFramesInSingleRowSprite(const int amountOfFrames, const sf::IntRect frame) const
+{
+	if (m_sprite.getGlobalBounds().width >= frame.width * amountOfFrames)
+		return;
+
+	std::cout << "There is not enough frames in (" << m_spriteName << ") to support the animation request" << std::endl
+		<< "Requested (" << amountOfFrames << ")" << frame.width << "px frames; Sprite only supports ("
+		<< m_sprite.getGlobalBounds().width / static_cast<float>(frame.width) << ")" << frame.width << "px frames" << std::endl;
+	ShowConsole();
+	std::cin.get();
+	abort();
+	
+}
+
+void GameObject::animateOnTimeLoop(const int amountOfFrames, const int deltaBetweenFrames, const sf::IntRect frame)
+{
+	
+	validateSufficientFramesInSingleRowSprite(amountOfFrames, frame);
+
+	changeSpriteFrame(frame);
+	m_framesCount = amountOfFrames;
+	m_deltaBetweenFrames = deltaBetweenFrames;
+}
+
+
+void GameObject::updateFrame()
+{
+	if(m_framesCount == 0 && m_deltaBetweenFrames == 0)
+		return;
+
+	if(GameState::gameCycleCounter - m_timeOfLastFrame < m_deltaBetweenFrames)
+		return;
+
+	m_timeOfLastFrame = GameState::gameCycleCounter;
+	m_currentFrame++;
+	if (m_currentFrame >= m_framesCount)
+		m_currentFrame = 0;
+
+	const auto frame = m_sprite.getTextureRect();
+	m_sprite.setTextureRect(sf::IntRect(sf::Vector2i(frame.width* m_currentFrame, frame.top), sf::Vector2i(frame.width, frame.height)));
+
+}
+
+void GameObject::draw(sf::RenderTarget& target, const sf::RenderStates states) const
 {
 	if(m_isThereSprite)
 	{
@@ -239,3 +294,4 @@ void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		target.draw(m_rectangle, states);
 	}
 }
+

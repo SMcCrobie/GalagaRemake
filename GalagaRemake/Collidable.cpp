@@ -1,6 +1,7 @@
 #include "Collidable.h"
 
 #include "Collision.h"
+#include "DebugMacros.h"
 
 
 float Collidable::vectorMagnitude(const sf::Vector2f& vector) const
@@ -52,6 +53,16 @@ void Collidable::decrementHealth(const sf::Vector2f& changeInMomentum)
 		setColor(sf::Color(218, 160, 109));
 	}
 }
+
+void Collidable::animateOnHealth(const int amountOfFrames, const sf::IntRect frame)
+{
+	validateSufficientFramesInSingleRowSprite(amountOfFrames, frame);
+
+	changeSpriteFrame(frame);
+	m_framesCount = amountOfFrames;
+	m_isAnimatedBasedOnHealth = true;
+}
+
 
 void Collidable::explode()
 {
@@ -162,6 +173,7 @@ void Collidable::applyPhysicsFromProjectile(const CollisionResult collisionResul
 void Collidable::update()
 {
 	GameObject::update();
+	updateFrame();
 	updateObjectHitTimer();
 }
 
@@ -258,6 +270,28 @@ std::optional<sf::Vector2f> Collidable::detectCollision(const sf::Sprite& sprite
 	if (m_isThereSprite)
 		return Collision::pixelPerfectTest(m_sprite, sprite);
 	return std::nullopt;
+}
+
+void Collidable::updateFrame()
+{
+	GameObject::updateFrame();
+	if (!m_isAnimatedBasedOnHealth || !m_isThereSprite)
+		return;
+
+	const auto frameMassInterval = m_mass / static_cast<float>(m_framesCount);
+	const auto frame = m_sprite.getTextureRect();
+
+	for (int i = 0; i < m_framesCount; i++)
+	{
+		const float lowerBound = frameMassInterval * static_cast<float>(i);
+		const float upperBound = (static_cast<float>(i) + 1.f) * frameMassInterval;
+
+		if (m_mass - m_health >= lowerBound && m_mass - m_health < upperBound)
+		{
+			m_sprite.setTextureRect(sf::IntRect(sf::Vector2i(i * frame.width, 0), sf::Vector2i(frame.width, frame.height)));
+			break;
+		}
+	}
 }
 
 void Collidable::updateObjectHitTimer()

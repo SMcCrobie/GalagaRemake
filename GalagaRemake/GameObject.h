@@ -8,7 +8,7 @@ class GameObject :
 {
 public:
     GameObject();
-    void setSprite(const sf::Sprite& sprite, bool withCollisionBox = true);
+    void setSprite(const sf::Sprite& sprite, const char* spriteName, bool withCollisionBox = true);
     void setRect(const sf::RectangleShape& rect);
     void setCircle(const sf::CircleShape& circle);
     void setRotation(float rotation);
@@ -24,8 +24,13 @@ public:
     virtual void update();
     bool detectCollision(const PlayerShip& playerShip) const;
     int getPointValue() const;
+    void animateOnTimeLoop(int amountOfFrames, int deltaBetweenFrames, sf::IntRect frame);
 
 protected:
+    virtual void updateFrame();
+    void changeSpriteFrame(sf::IntRect frame);
+    void validateSufficientFramesInSingleRowSprite(int amountOfFrames, sf::IntRect frame) const;
+
     sf::Sprite m_sprite;
     sf::RectangleShape m_rectangle;
     sf::CircleShape m_circle;
@@ -40,10 +45,16 @@ protected:
     sf::Vector2f m_velocity;
     float m_angularVelocity;
     sf::Vector2f m_localCenterOfMass;
-    int m_pointValue{};
-
+    sf::Vector2i m_animationFrame;
+    int m_pointValue;
+    int m_framesCount;
+    int m_currentFrame;
+    int m_timeOfLastFrame;
+    int m_deltaBetweenFrames;
+    const char* m_spriteName;
 
 private:
+   
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
     void move();
     void rotateObject();

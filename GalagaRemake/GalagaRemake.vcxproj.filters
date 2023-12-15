@@ -211,6 +211,15 @@
     <Image Include="..\x64\Release\repairKit.png">
       <Filter>Source Files\Images</Filter>
     </Image>
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\MeteorAnimations1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\repairKitAnimation.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
+    <Image Include="MeteorAnimations1.png">
+      <Filter>Source Files\Images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Galaxus.ttf">

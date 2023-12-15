@@ -137,13 +137,11 @@ void LevelOrchestrator::pollForMovementSetting(sf::RenderWindow& window)
 }
 
 
-int LevelOrchestrator::loadLevel(std::shared_ptr<ILevel> level)
+void LevelOrchestrator::loadLevel(std::shared_ptr<ILevel> level)
 {
-	if (level->initializeLevel() == EXIT_FAILURE)
-		return EXIT_FAILURE;
-
+	level->initializeLevel();
 	m_level = level;
-	return 0;
+
 }
 
 void LevelOrchestrator::initializeLevelIntroText(UIManager& uiManager) const

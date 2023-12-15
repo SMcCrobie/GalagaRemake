@@ -19,18 +19,12 @@ static sf::Texture meteorTexture;
 extern BackgroundManager backgroundManager;
 extern PlayerShip playerShip;
 
-int Level0::initializeLevel()
+void Level0::initializeLevel()
 {
 	backgroundManager.removeForegroundPlanet();
 
-	try {
-		Loader::LOAD_SAFELY(meteorTexture, "meteor.png");
-	}
-	catch (std::invalid_argument& e) {
-		std::cout << e.what() << std::endl;
-		std::cin.get();
-		return EXIT_FAILURE;
-	}
+	Loader::LOAD_SAFELY(meteorTexture, "MeteorAnimations1.png");//this sprite needs work
+
 
 
 	level_into_text_primary = TempText("Level 0", Fonts::galaxus);
@@ -40,17 +34,12 @@ int Level0::initializeLevel()
 	level_outro_text_secondary = TempText("Escaped Starship SaberII", Fonts::playFair);
 
 	meteorSprite.setTexture(meteorTexture);
-	meteor.setSprite(meteorSprite, false);
+	meteor.setSprite(meteorSprite, "Meteor", false);
+	meteor.animateOnHealth(4, sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(48, 48)));
+
 	meteor.setHealth(5);
 	meteor.setVelocity(0.3f, 1.5f);
 	meteor.setRotation(1.8f);
-	
-
-
-
-
-
-	return 0;
 }
 
 void Level0::enemyShipCreation()

@@ -55,25 +55,18 @@ static StateMachineController bossController;
 
 static sf::Texture planetsSheet;
 
-int Level1::initializeLevel()
-{
-	extern PlayerShip playerShip;
-	bossProjectileTexture = std::make_shared<sf::Texture>();
-	try {
-		//textures
-		Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
-		Loader::LOAD_SAFELY(bossAnimations, "bossAnimations.png");
-		Loader::LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
-		Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
-		Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
-		Loader::LOAD_SAFELY(repairKitAnimations, "repairKit3.png");
+extern PlayerShip playerShip;
 
-	}
-	catch (std::invalid_argument& e) {
-		std::cout << e.what() << std::endl;
-		std::cin.get();
-		return EXIT_FAILURE;
-	}
+void Level1::initializeLevel()
+{
+	bossProjectileTexture = std::make_shared<sf::Texture>();
+	//textures
+	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
+	Loader::LOAD_SAFELY(bossAnimations, "bossAnimations.png");
+	Loader::LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
+	Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
+	Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
+	Loader::LOAD_SAFELY(repairKitAnimations, "repairKitAnimation.png");
 
 
 	planetsSheet.setSmooth(true);
@@ -182,16 +175,12 @@ int Level1::initializeLevel()
 	repairKitSprite.setTexture(repairKitAnimations);
 	repairKitSprite.setPosition(sf::Vector2f(300.f, 100.f));
 	repairKitSprite.setScale(.9f, .9f);
-	repairKit.setSprite(repairKitSprite);
+	repairKitSprite.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(32, 32)));
+	repairKit.setSprite(repairKitSprite, "repair Kit");
 	repairKit.setRotation(-1.5f);
 	repairKit.setOscillation(sf::Vector2f(1.0045f, 1.0045f), 80);
 	repairKit.setItemType(ItemType::Repair_Kit);
 
-
-
-
-
-	return 0;
 }
 
 void Level1::enemyShipCreation()

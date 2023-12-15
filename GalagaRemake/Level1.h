@@ -6,7 +6,7 @@ class Level1 :
 	public ILevel
 {
 public:
-	int initializeLevel() override;
+	void initializeLevel() override;
 
 	void enemyShipCreation() override;
 

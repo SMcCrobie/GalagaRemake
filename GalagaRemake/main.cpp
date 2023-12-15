@@ -73,19 +73,13 @@ int main(int, char const**)
 	auto meteorTexture = std::make_shared<sf::Texture>();
 
 	//LOADING
-	try {
-		//textures
-		Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
-		Loader::LOAD_SAFELY(*meteorTexture, "meteor.png");
-		//fonts
-		Fonts::load();
+	//textures
+	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations1.png");
+	Loader::LOAD_SAFELY(*meteorTexture, "meteor.png");
+	//fonts
+	Fonts::load();
 
-	}
-	catch (std::invalid_argument& e) {
-		std::cout << e.what() << std::endl;
-		std::cin.get();
-		return EXIT_FAILURE;
-	}
+	
 
 	//intialize ships
 	playerShip.init(shipAnimations);
@@ -117,17 +111,6 @@ int main(int, char const**)
 	/////////////////////////////////////////////////////////////
 	levelOrchestrator.loadLevel(level0);
 	/////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
 
 
 
