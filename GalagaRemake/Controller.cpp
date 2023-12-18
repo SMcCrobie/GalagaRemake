@@ -3,6 +3,7 @@
 
 void KeyboardController::initKeyMappings()
 {
+	//Controller A
 	m_keyboardToShipControlMap = {
 		{ sf::Keyboard::W, MoveUp},
 		{ sf::Keyboard::S, MoveDown },
@@ -11,22 +12,21 @@ void KeyboardController::initKeyMappings()
 		{ sf::Keyboard::Enter, FireWeapon1 },
 		{ sf::Keyboard::Space, Rotate }
 	};
+
+	//Controller B
+	//m_keyboardToShipControlMap = {
+	//	{ sf::Keyboard::Up, MoveUp},
+	//	{ sf::Keyboard::Down, MoveDown },
+	//	{ sf::Keyboard::Left, MoveLeft },
+	//	{ sf::Keyboard::Right, MoveRight },
+	//	{ sf::Keyboard::Space, FireWeapon1 },
+	//	{ sf::Keyboard::LShift, Rotate }
+	//};
 }
 
 KeyboardController::KeyboardController()
 {
-	//Controller A
 	initKeyMappings();
-
-	//Controller B
-	/*m_keyboardToShipControlMap = {
-		{ sf::Keyboard::Up, MoveUp},
-		{ sf::Keyboard::Down, MoveDown },
-		{ sf::Keyboard::Left, MoveLeft },
-		{ sf::Keyboard::Right, MoveRight },
-		{ sf::Keyboard::Space, FireWeapon1 },
-		{ sf::Keyboard::LShift, Rotate }
-	};*/
 }
 
 void KeyboardController::flipHorizontalControls()

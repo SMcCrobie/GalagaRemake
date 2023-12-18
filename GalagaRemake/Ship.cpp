@@ -1,5 +1,7 @@
 #include "Ship.h"
 
+#include <iostream>
+
 #include "GameState.h"
 #include "ProjectileManager.h"
 
@@ -29,7 +31,10 @@ Ship::Ship() : sf::Sprite()
 	m_isTransitioning = false;
 	setOrigin(getGlobalBounds().width / 2, getGlobalBounds().height / 2);
 	m_rotationIncrement = 10.f;
+	m_rotationCounter = 0.f;
 	m_pointValue = 100;
+
+	resetRotationTypes();
 	
 	for (int i = MoveUp; i < InvalidShipControl; i++) {
 		m_shipControlsStateMappings[static_cast<ShipControl>(i)] = false;
@@ -59,36 +64,70 @@ void Ship::initRotation()
 	else
 		m_rotationIncrement = -abs(m_rotationIncrement);
 
+	m_rotationTypes[RotationType::Right] = m_shipControlsStateMappings.at(MoveRight) && !m_shipControlsStateMappings.at(MoveLeft);
+	m_rotationTypes[RotationType::Left] = m_shipControlsStateMappings.at(MoveLeft) && !m_shipControlsStateMappings.at(MoveRight);
+	m_rotationTypes[RotationType::Forward] = m_shipControlsStateMappings.at(MoveUp) && !m_shipControlsStateMappings.at(MoveDown);
+	m_rotationTypes[RotationType::Backward] = m_shipControlsStateMappings.at(MoveDown) && !m_shipControlsStateMappings.at(MoveUp);
+	
 	m_isBackwards = !m_isBackwards;
+}
+
+bool Ship::isInInitialHalfOfRotation() const
+{
+	return m_rotationCounter < 90.f;
+}
+
+void Ship::resetRotationTypes()
+{
+	m_rotationTypes[RotationType::Right] = false;
+	m_rotationTypes[RotationType::Left] = false;
+	m_rotationTypes[RotationType::Forward] = false;
+	m_rotationTypes[RotationType::Backward] = false;
+	m_rotationTypes[RotationType::None] = false;
 }
 
 void Ship::incrementRotation()
 {
 	auto temp = getOrigin();
 	rotate(m_rotationIncrement);
+	m_rotationCounter += abs(m_rotationIncrement);
 	const auto currentRotation = abs(getRotation());
 	if (currentRotation == 180.f || currentRotation == 0)
 	{
 		m_isTransitioning = false;
+		m_rotationCounter = 0.f;
+		resetRotationTypes();
 		return;
 	}
-	if((currentRotation >= 90.f && currentRotation <=180.f)
-		|| (currentRotation >= 270.f && currentRotation <= 359.f))
+	if(isInInitialHalfOfRotation())
 	{
-		m_velocity.y += (m_moveUpIncrement*2.f);
-	}
-	else 
-	{
-		m_velocity.y -= (m_moveUpIncrement*1.f);
-	}
-	
-	if (m_rotationIncrement > 0)
-	{
-		setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x * 2, m_shipAnimationFrame.y*2), m_shipAnimationFrame));
-		m_velocity.x -= m_horizontalDirectionIncrement;
+		if(m_rotationTypes.at(RotationType::Forward))
+			m_velocity.y += (m_moveUpIncrement * 2.25f);
+		else if (m_rotationTypes.at(RotationType::Backward))
+			m_velocity.y += (m_moveUpIncrement * 0.75f);
+		else
+			m_velocity.y += m_moveUpIncrement * 1.f;
+		std::cout << "Initial Rotation Velocity Increase, currentCounter: " << m_rotationCounter << std::endl;
 	}
 	else
 	{
+		if (m_rotationTypes.at(RotationType::Forward))
+			m_velocity.y -= (m_moveUpIncrement * 0.75f);
+		else if (m_rotationTypes.at(RotationType::Backward))
+ 			m_velocity.y -= (m_moveUpIncrement * 1.75f);
+		else
+			m_velocity.y -= m_moveUpIncrement * 1.f;
+		std::cout << "Secondary Rotation Velocity Increase, currentCounter: " << m_rotationCounter << std::endl;
+	}
+
+	setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x * 2, m_shipAnimationFrame.y * 2), m_shipAnimationFrame));
+	if (m_rotationTypes.at(RotationType::Right))
+	{
+		m_velocity.x -= m_horizontalDirectionIncrement;
+	}
+	else if (m_rotationTypes.at(RotationType::Left))
+	{
+		
 		m_velocity.x += m_horizontalDirectionIncrement;
 		setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x * 2, m_shipAnimationFrame.y), m_shipAnimationFrame));
 	}

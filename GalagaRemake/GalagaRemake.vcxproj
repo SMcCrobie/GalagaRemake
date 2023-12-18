@@ -162,6 +162,7 @@
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="TempText.cpp" />
+    <ClCompile Include="TestLevel1.cpp" />
     <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -188,12 +189,14 @@
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="RandMacros.h" />
     <ClInclude Include="resource1.h" />
+    <ClInclude Include="RotationType.h" />
     <ClInclude Include="ShipManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="TempText.h" />
+    <ClInclude Include="TestLevel1.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="WindowUtil.h" />
   </ItemGroup>

@@ -1,7 +1,5 @@
 #include "Level0.h"
 
-#include <iostream>
-
 #include "BackgroundManager.h"
 #include "Collidable.h"
 #include "Fonts.h"
@@ -21,11 +19,7 @@ extern PlayerShip playerShip;
 
 void Level0::initializeLevel()
 {
-	backgroundManager.removeForegroundPlanet();
-
 	Loader::LOAD_SAFELY(meteorTexture, "MeteorAnimations1.png");//this sprite needs work
-
-
 
 	level_into_text_primary = TempText("Level 0", Fonts::galaxus);
 	level_into_text_secondary = TempText("Escaping Starship SaberII", Fonts::playFair);

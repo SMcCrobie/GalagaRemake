@@ -31,6 +31,7 @@
 #include "GameObjectManager.h"
 #include "Level0.h"
 #include "Level1.h"
+#include "TestLevel1.h"
 //YOU HAVE TODOS TODO
 
 //Managers Class declaration
@@ -74,7 +75,7 @@ int main(int, char const**)
 
 	//LOADING
 	//textures
-	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations1.png");
+	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
 	Loader::LOAD_SAFELY(*meteorTexture, "meteor.png");
 	//fonts
 	Fonts::load();
@@ -96,6 +97,7 @@ int main(int, char const**)
 
 	std::shared_ptr<ILevel> level0 = std::make_shared<Level0>();
 	std::shared_ptr<ILevel> level1 = std::make_shared<Level1>();
+	std::shared_ptr<ILevel> flightTester = std::make_shared<TestLevel1>();
 
 
 
@@ -109,7 +111,7 @@ int main(int, char const**)
 
 	//current way to hotswap any level in
 	/////////////////////////////////////////////////////////////
-	levelOrchestrator.loadLevel(level0);
+	levelOrchestrator.loadLevel(level1);
 	/////////////////////////////////////////////////////////////
 
 

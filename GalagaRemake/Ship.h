@@ -3,6 +3,9 @@
 #include "BoundedFloatRect.h"
 #include "Projectile.h"
 #include <optional>
+#include <unordered_map>
+
+#include "RotationType.h"
 
 
 enum ShipControl
@@ -57,6 +60,8 @@ public:
 	void moveShip();
 	virtual void rotate180();
 	virtual void initRotation();
+	bool isInInitialHalfOfRotation() const;
+	void resetRotationTypes();
 	virtual void respawnShip();
 	virtual void respawnShip(int respawnTimer);
 	bool isBackwards() const;
@@ -117,6 +122,8 @@ protected:
     std::map<ShipControl, bool> m_shipControlsStateMappings;
 	bool m_isTransitioning;
 	float m_rotationIncrement;
+	float m_rotationCounter;
+	std::unordered_map<RotationType, bool> m_rotationTypes;
 	int m_startHealth;
 	int m_pointValue;
 
