@@ -27,7 +27,6 @@ void UIManager::initializePauseText()
 	m_pauseTextByline2.setFillColor(sf::Color(0x05ecf1ff));
 	m_pauseTextByline2.setOutlineThickness(1.f);
 
-
 }
 
 void UIManager::init(const Ship& shipModel, int totalExtraLives, float windowMargin)

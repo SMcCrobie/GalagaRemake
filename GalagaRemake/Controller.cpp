@@ -103,13 +103,24 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 			ship.disableCurrentShipStates();
 			GameState::isPaused = !GameState::isPaused;
 		}
+		if(event.type == sf::Event::Resized && !GameState::ignoreNextResizeEvent){
+			ship.disableCurrentShipStates();
+			GameState::isPaused = true;
+		}
+		if(event.type == sf::Event::Resized && GameState::ignoreNextResizeEvent){
+			GameState::ignoreNextResizeEvent = false;
+		}
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2) {
 			GameState::requiresLevelRestart = true;
 			return;
 		}
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+			GameState::resetWindow = true;
+			return;
+		}
 
 
-		 if(GameState::isPaused)
+		if(GameState::isPaused)
 			continue;
 
 		if (event.type == sf::Event::MouseButtonPressed) {

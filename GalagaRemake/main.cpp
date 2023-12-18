@@ -1,22 +1,16 @@
 #include <cstdlib> 
 #include <ctime>
 #include <iostream>
-#include <list>
-#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <climits>
 
 #include "BackgroundManager.h"
-#include "BoundedFloatRect.h"
 #include "Controller.h"
-#include "ControllerConfigs.h"
 #include "DebugMacros.h"
 #include "GameState.h"
 #include "LevelOrchestrator.h"
 #include "PlayerShip.h"
-#include "Projectile.h"
 #include "ProjectileManager.h"
-#include "RandMacros.h"
 #include "Ship.h"
 #include "ShipManager.h"
 #include "UIManager.h"
@@ -25,7 +19,6 @@
 #include "resource1.h"
 #include "WindowUtil.h"
 
-#include <cstdio>
 #include <conio.h>
 
 #include "GameObjectManager.h"
@@ -129,6 +122,8 @@ int main(int, char const**)
 		if (GameState::isMovementSet == false)
 			LevelOrchestrator::pollForMovementSetting(window);
 
+		if (GameState::resetWindow)
+			Window::reset_window_size_dynamically(window);
 		//Poll for events
 		playerController.PollEventsAndUpdateShipState(window, playerShip);
 
