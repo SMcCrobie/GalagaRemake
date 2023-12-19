@@ -64,12 +64,9 @@ int main(int, char const**)
 	//textures
 	sf::Texture shipAnimations;
 
-	auto meteorTexture = std::make_shared<sf::Texture>();
-
 	//LOADING
 	//textures
 	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
-	Loader::LOAD_SAFELY(*meteorTexture, "meteor.png");
 	//fonts
 	Fonts::load();
 
@@ -91,10 +88,6 @@ int main(int, char const**)
 	std::shared_ptr<ILevel> level0 = std::make_shared<Level0>();
 	std::shared_ptr<ILevel> level1 = std::make_shared<Level1>();
 	std::shared_ptr<ILevel> flightTester = std::make_shared<TestLevel1>();
-
-
-
-
 
 
 

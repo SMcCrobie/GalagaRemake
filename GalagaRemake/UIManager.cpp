@@ -13,19 +13,24 @@ extern PlayerShip playerShip;
 
 void UIManager::initializePauseText()
 {
-	m_pauseText = sf::Text("Game Paused", Fonts::galaxus);
-	stylePrimaryText(m_pauseText);
-	m_pauseText.setFillColor(sf::Color(255,255,255,255));
+	auto text = sf::Text("Game Paused", Fonts::galaxus);
+	stylePrimaryText(text);
+	text.setFillColor(sf::Color(255,255,255,255));
+	m_pauseTexts.push_back(text);
 
-	m_pauseTextByline = sf::Text("Press [       ] to resume", Fonts::playFair);
-	styleSecondaryText(m_pauseTextByline);
 
-	m_pauseTextByline2 = sf::Text("tab", Fonts::playFair);
-	styleSecondaryText(m_pauseTextByline2);
-	m_pauseTextByline2.move(-16.f, -1.f);
-	m_pauseTextByline2.setOutlineColor(sf::Color(0x05ecf1ff));
-	m_pauseTextByline2.setFillColor(sf::Color(0x05ecf1ff));
-	m_pauseTextByline2.setOutlineThickness(1.f);
+	text = sf::Text("Press [       ] to resume", Fonts::playFair);
+	styleSecondaryText(text);
+	m_pauseTexts.push_back(text);
+
+	text = sf::Text("tab", Fonts::playFair);
+	styleSecondaryText(text);
+	text.move(-16.f, -1.f);
+	text.setOutlineColor(sf::Color(0x05ecf1ff));
+	text.setFillColor(sf::Color(0x05ecf1ff));
+	text.setOutlineThickness(1.f);
+	m_pauseTexts.push_back(text);
+
 
 }
 
@@ -319,19 +324,23 @@ void UIManager::initializeScore()
 
 void UIManager::initializeGameOverText()
 {
-	m_gameOverText = sf::Text("Game Over", Fonts::galaxus);
-	stylePrimaryText(m_gameOverText);
+	auto text = sf::Text("Game Over", Fonts::galaxus);
+	stylePrimaryText(text);
+	m_gameOverTexts.push_back(text);
 
 
-	m_gameOverByline = sf::Text("Press [      ] to restart", Fonts::playFair);
-	styleSecondaryText(m_gameOverByline);
+	text = sf::Text("Press [      ] to restart", Fonts::playFair);
+	styleSecondaryText(text);
+	m_gameOverTexts.push_back(text);
 
-	m_gameOverByline2 = sf::Text("F2", Fonts::playFair);
-	styleSecondaryText(m_gameOverByline2);
-	m_gameOverByline2.move(-14.5f, -2.f);
-	m_gameOverByline2.setOutlineColor(sf::Color(0x05ecf1ff));
-	m_gameOverByline2.setFillColor(sf::Color(0x05ecf1ff));
-	m_gameOverByline2.setOutlineThickness(1.f);
+
+	text = sf::Text("F2", Fonts::playFair);
+	styleSecondaryText(text);
+	text.move(-14.5f, -2.f);
+	text.setOutlineColor(sf::Color(0x05ecf1ff));
+	text.setFillColor(sf::Color(0x05ecf1ff));
+	text.setOutlineThickness(1.f);
+	m_gameOverTexts.push_back(text);
 }
 
 void UIManager::initializeExtraLivesText()
@@ -408,17 +417,15 @@ void UIManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 	if (GameState::isGameOver)
 	{
-		target.draw(m_gameOverText);
-		target.draw(m_gameOverByline);
-		target.draw(m_gameOverByline2);
+		for (const auto& text : m_gameOverTexts)
+			target.draw(text);
 
 	}
 		
 	if (GameState::isPaused && !GameState::isGameOver)
 	{
-		target.draw(m_pauseText);
-		target.draw(m_pauseTextByline);
-		target.draw(m_pauseTextByline2);
+		for (const auto& text : m_pauseTexts)
+			target.draw(text);
 	}
 		
 }

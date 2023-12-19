@@ -42,10 +42,9 @@ private:
 	std::vector<Ship> m_lives;
 	std::vector<sf::RectangleShape> m_healthBarSegments;
 	std::vector<TempText> m_texts;
-	sf::Text m_gameOverText;
-	sf::Text m_pauseText;
-	sf::Text m_pauseTextByline;
-	sf::Text m_pauseTextByline2;
+	std::vector<sf::Text> m_gameOverTexts;
+	std::vector<sf::Text> m_pauseTexts;
+
 	sf::Text m_scoreText;
 	sf::Text m_extraLivesText;
 	sf::Vector2f m_baseScale;
@@ -57,8 +56,6 @@ private:
 	TempText m_introPrimaryText;
 	TempText m_introSecondaryText;
 	TempText m_shipPointValue;
-	sf::Text m_gameOverByline;
-	sf::Text m_gameOverByline2;
 
 
 	// Inherited via Drawable

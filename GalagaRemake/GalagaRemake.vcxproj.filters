@@ -116,12 +116,6 @@
     <ClInclude Include="BackgroundManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DebugMacros.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ControllerConfigs.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="RandMacros.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -158,9 +152,6 @@
     <ClInclude Include="Level0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameCoordinator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WindowUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -183,6 +174,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RotationType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ControllerConfigs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

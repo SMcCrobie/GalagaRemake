@@ -168,7 +168,6 @@
   <ItemGroup>
     <ClInclude Include="BackgroundManager.h" />
     <ClInclude Include="Collidable.h" />
-    <ClInclude Include="GameCoordinator.h" />
     <ClInclude Include="GameObjectManager.h" />
     <ClInclude Include="ILevel.h" />
     <ClInclude Include="BoundedFloatRect.h" />

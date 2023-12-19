@@ -34,6 +34,6 @@ private:
 	std::optional<ItemType> detectCollisionWithItems(const PlayerShip& playerShip);
 	static void addItemPointValueToScore(const Item& item, const PlayerShip& playerShip);
 	// Inherited via Drawable
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
