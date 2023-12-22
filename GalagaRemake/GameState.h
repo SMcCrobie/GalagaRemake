@@ -1,4 +1,5 @@
 #pragma once
+#include "BoundedFloatRect.h"
 
 namespace GameState
 {
@@ -18,7 +19,7 @@ namespace GameState
 		isGameOver = false;
 		isPaused = false;
 		requiresLevelRestart = false;
-		isBossCreated = false;
+		isBossCreated = true;
 		isBossDestroyed = false;
 		isPlayerDead = false;
 		isKeyTrapActivated = false;
@@ -27,7 +28,7 @@ namespace GameState
 		ignoreNextResizeEvent = false;
 
 		score = 0;
-		killCounter = 0;
+		killCounter = 50;
 		gameCycleCounter = 0;
 		timeOfLastGameLoop = 0;
 		timeOfLastEnemyShip = 0;

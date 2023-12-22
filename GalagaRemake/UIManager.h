@@ -4,6 +4,12 @@
 #include "TempText.h"
 #include "PlayerShip.h"
 #include "Fonts.h"
+#include "MultiColorText.h"
+
+#define CENTER_ELEMENT_HORIZONTALLY(elementWidth) ((GameState::world_bounds.width - (elementWidth)) / 2)
+#define CENTER_ELEMENT_VERTICALLY(elementHeight) ((GameState::world_bounds.height - (elementHeight)) / 2)
+
+
 
 class UIManager
 	: public sf::Drawable, public IManager
@@ -14,19 +20,22 @@ public:
 	bool isOutOfLives() const;
 	void playerLostLife();
 	void updateUI();
-	void stylePrimaryText(sf::Text& primaryText) const;
-	void styleSecondaryText(sf::Text& secondaryText) const;
-	void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
+	static void formatPrimaryText(sf::Text& primaryText);
+	static void formatSecondaryText(sf::Text& secondaryText, sf::FloatRect primaryText);
+	static void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
 	void initializeLevelOutroText(TempText& primaryText, TempText& secondaryText);
 	void resetManager() override;
 	void addPointValue(sf::Vector2f position, int pointValue, sf::Color color = sf::Color::White, float scale = 0.f);
 
 
 private:
+	template<typename TextType>
+	static void formatSecondaryText(MultiColorText<TextType>& secondaryText, const sf::FloatRect& primaryText);
 	void initializePauseText();
 	void updateTempText();
 	void updateHealthBar();
-	sf::Vector2f centerElement(sf::FloatRect rect) const;
+	static sf::Vector2f getPrimaryTitlePosition(sf::FloatRect rect);
+	static sf::Vector2f getSecondaryTitlePosition(sf::FloatRect secondaryTitle, sf::FloatRect primaryTitle);
 
 	void initializeLives();
 	void initializeScore();
@@ -61,4 +70,5 @@ private:
 	// Inherited via Drawable
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
+
 

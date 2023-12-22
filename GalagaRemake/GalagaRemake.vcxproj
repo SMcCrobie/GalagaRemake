@@ -154,6 +154,7 @@
     <ClCompile Include="Level0.cpp" />
     <ClCompile Include="LevelOrchestrator.cpp" />
     <ClCompile Include="Level1.cpp" />
+    <ClCompile Include="MultiColorText.cpp" />
     <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="ShipManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="LevelOrchestrator.h" />
     <ClInclude Include="IManager.h" />
     <ClInclude Include="CollisionResult.h" />
+    <ClInclude Include="MultiColorText.h" />
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="RandMacros.h" />
     <ClInclude Include="resource1.h" />
