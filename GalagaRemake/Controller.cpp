@@ -1,6 +1,7 @@
 #include "Controller.h"
+#include "GameState.h"
 
-KeyboardController::KeyboardController()
+void KeyboardController::initKeyMappings()
 {
 	//Controller A
 	m_keyboardToShipControlMap = {
@@ -13,41 +14,134 @@ KeyboardController::KeyboardController()
 	};
 
 	//Controller B
-	/*m_keyboardToShipControlMap = {
-		{ sf::Keyboard::Up, MoveUp},
-		{ sf::Keyboard::Down, MoveDown },
-		{ sf::Keyboard::Left, MoveLeft },
-		{ sf::Keyboard::Right, MoveRight },
-		{ sf::Keyboard::Space, FireWeapon1 },
-		{ sf::Keyboard::LShift, Rotate }
-	};*/
+	//m_keyboardToShipControlMap = {
+	//	{ sf::Keyboard::Up, MoveUp},
+	//	{ sf::Keyboard::Down, MoveDown },
+	//	{ sf::Keyboard::Left, MoveLeft },
+	//	{ sf::Keyboard::Right, MoveRight },
+	//	{ sf::Keyboard::Space, FireWeapon1 },
+	//	{ sf::Keyboard::LShift, Rotate }
+	//};
+}
+
+KeyboardController::KeyboardController()
+{
+	initKeyMappings();
+}
+
+void KeyboardController::flipHorizontalControls()
+{
+	sf::Keyboard::Key leftKey, rightKey;
+	for(auto& [key, shipControl] : m_keyboardToShipControlMap)
+	{
+		if (shipControl == MoveLeft)
+			leftKey = key;
+		if (shipControl == MoveRight)
+			rightKey = key;
+	}
+	m_keyboardToShipControlMap[leftKey] = MoveRight;
+	m_keyboardToShipControlMap[rightKey] = MoveLeft;
+}
+
+void KeyboardController::flipVerticalControls()
+{
+	sf::Keyboard::Key upKey, downKey;
+	for (auto& [key, shipControl] : m_keyboardToShipControlMap)
+	{
+		if (shipControl == MoveUp)
+			upKey = key;
+		if (shipControl == MoveDown)
+			downKey = key;
+	}
+	m_keyboardToShipControlMap[upKey] = MoveDown;
+	m_keyboardToShipControlMap[downKey] = MoveUp;
 }
 
 
-bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& ship)
+void KeyboardController::swapControlsAndStatesBasedOnMovementSetting(Ship& ship)
+{
+	using namespace GameState;
+	switch (movementControlSetting)
+	{
+	case full_ship_orientation:
+		break;
+	case window_and_ship_orientation:
+		flipHorizontalControls();
+		ship.flipHorizontalMovementStates();
+		break;
+	case full_window_orientation:
+		flipHorizontalControls();
+		ship.flipHorizontalMovementStates();
+		flipVerticalControls();
+		ship.flipVerticalMovementStates();
+		break;
+		
+	}
+}
+
+void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, PlayerShip& ship)
 {
 	sf::Event event{};
 
 	//Poll all game inputs and map
 	while (window.pollEvent(event)) {
 
-		if (event.type == sf::Event::Closed) {
+		if (event.type == sf::Event::Closed ||
+			(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
 			window.close();
 		}
-
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
-			return true;
+		if(event.type == sf::Event::LostFocus){
+			GameState::isPaused = true;
+			continue;
 		}
+		if (event.type == sf::Event::GainedFocus) {
+			GameState::isPaused = false;
+			continue;
+		}
+
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab ) {
+			ship.disableCurrentShipStates();
+			GameState::isPaused = !GameState::isPaused;
+		}
+		if(event.type == sf::Event::Resized && !GameState::ignoreNextResizeEvent){
+			ship.disableCurrentShipStates();
+			GameState::isPaused = true;
+		}
+		if(event.type == sf::Event::Resized && GameState::ignoreNextResizeEvent){
+			GameState::ignoreNextResizeEvent = false;
+		}
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2) {
+			GameState::requiresLevelRestart = true;
+			return;
+		}
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+			GameState::resetWindow = true;
+			return;
+		}
+
+
+		if(GameState::isPaused)
+			continue;
 
 		if (event.type == sf::Event::MouseButtonPressed) {
 			if (event.key.code == sf::Mouse::Left) {
 				ship.m_shipControlsStateMappings[FireWeapon1] = true;
 			}
 		}
+		//continue if not a key press or release
+		if (event.type != sf::Event::KeyPressed && event.type != sf::Event::KeyReleased)
+			continue;
 
 		//continue if key isn't mapped
 		if (m_keyboardToShipControlMap.find(event.key.code) == m_keyboardToShipControlMap.end())
 			continue;
+
+		if (!GameState::isKeyTrapActivated && event.key.code != sf::Keyboard::Key::Enter)
+		{
+			ship.disableCurrentShipStates();
+			GameState::isKeyTrapActivated = true;
+		}
+			
 
 		// KEY PRESSED, Runs oen Key input at a time
 		if (event.type == sf::Event::KeyPressed) {
@@ -63,8 +157,6 @@ bool KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Ship& 
 		}
 
 	}
-
-	return false;
 }
 
 StateMachineController::StateMachineController() :
@@ -116,38 +208,50 @@ StateMachineController::StateMachineController(std::map<State, std::vector<ShipC
 {
 }
 
-bool StateMachineController::isItTimeToUpdateState(const sf::Clock& clock, const sf::Int32& currentTime) const
+bool StateMachineController::isItTimeToUpdateState(const sf::Int32& currentTime) const
 {
 	if (currentTime - m_timeOfLastStateChange < m_deltaBeforeStateChange)
-		return true;
-	return false;
+		return false;
+	return true;
 }
 
-void StateMachineController::updateControllerStateAndShipState(const sf::Clock& clock, Ship& ship)
+void StateMachineController::updateControllerStateAndShipState(Ship& ship)
 {
-	const sf::Int32 currentTime = clock.getElapsedTime().asMilliseconds();
-	if (isItTimeToUpdateState(clock, currentTime)) return;
+	const sf::Int32 currentTime = GameState::clock.getElapsedTime().asMilliseconds();
+	bool isNewState = false;
+	if (isItTimeToUpdateState(currentTime))
+	{
+		isNewState = true;
+		m_timeOfLastStateChange = currentTime;
+		const auto newInput = static_cast<Input>(rand() % m_totalInputs);
 
-	m_timeOfLastStateChange = currentTime;
-	const auto newInput = static_cast<Input>(rand() % m_totalInputs);
+		//update state
+		const auto inputToStateEntry = m_stateWithInputToStateMap.at(m_currentState).find(newInput);
+		if (inputToStateEntry != m_stateWithInputToStateMap.at(m_currentState).end())
+			m_currentState = inputToStateEntry->second;//if current state is new state, mov not reassigned
+	}
+	const std::vector<ShipControl>& currentShipControlVec = m_stateToShipControlInputsMap.at(m_currentState);
 
-	//update state
-	const auto inputToStateEntry = m_stateWithInputToStateMap.at(m_currentState).find(newInput);
-	if (inputToStateEntry != m_stateWithInputToStateMap.at(m_currentState).end())
-		m_currentState = inputToStateEntry->second;//if current state is new state, mov not reassigned
-
-	//Can't do this currently because the ship currently shuts its own fire1 off
-	//if (m_currentState == m_previousState)
-	//	return;
+	if (!isNewState)
+	{
+		for (auto& shipControl : currentShipControlVec)
+		{
+			if(shipControl == FireWeapon1 || shipControl == FireWeapon2)
+				ship.m_shipControlsStateMappings[shipControl] = true;
+		}
+		return;
+	}
+	
 
 	//clear previous states commands
-	for (auto it = ship.m_shipControlsStateMappings.begin(); it != ship.m_shipControlsStateMappings.end(); it++) {
-		it->second = false;
+	for (auto& m_shipControlsStateMapping : ship.m_shipControlsStateMappings)
+	{
+		m_shipControlsStateMapping.second = false;
 	}
-
 	//update ship inputs based on new state
-	std::vector<ShipControl>& currentShipControlVec = m_stateToShipControlInputsMap.at(m_currentState);
-	for (auto it = currentShipControlVec.begin(); it != currentShipControlVec.end(); it++) {
-		ship.m_shipControlsStateMappings[*it] = true;
+	
+	for (auto& shipControl : currentShipControlVec)
+	{
+		ship.m_shipControlsStateMappings[shipControl] = true;
 	}
 }

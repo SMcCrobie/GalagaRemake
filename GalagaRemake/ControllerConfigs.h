@@ -1,6 +1,22 @@
 #pragma once
 #include "Ship.h"
 
+#define LASER_TURRET_STATE_TO_SHIP_CONTROL_INPUTS_MAP \
+		{ State0, std::vector{ MoveUp, FireWeapon1}},\
+		{ State1, std::vector{ FireWeapon1  }}
+
+#define LASER_TURRET_STATE_WITH_INPUT_TO_STATE_MAP \
+		{ State0, { \
+			{Hold,		State0},\
+			{Input1,	State1}}\
+		},\
+		{ State1, { \
+			{Hold,		State0},\
+			{Input1,	State1}}\
+		}
+
+
+
 
 #define BOSS_SIDE_KICKS_STATE_TO_SHIP_CONTROL_INPUTS_MAP_B \
 		{ State0, std::vector{ MoveUp, FireWeapon1, FireWeapon2}}, \
@@ -35,7 +51,7 @@
 
 
 
-#define BOSS_STATE_WITH_INPUT_TO_STATE_MAP_CONFIG \
+#define BOSS_STATE_WITH_INPUT_TO_STATE_MAP \
 			{State0, {	\
 				{Hold,	State3},								\
 				{Input1,	State0},							\
@@ -74,7 +90,7 @@
 			}
 
 
-#define BOSS_STATE_TO_SHIP_CONTROL_INPUT_MAP_CONFIG \
+#define BOSS_STATE_TO_SHIP_CONTROL_INPUT_MAP \
 		{ State0, std::vector{ MoveUp, FireWeapon1}},\
 		{ State1, std::vector{ MoveLeft, FireWeapon1 }},	\
 		{ State2, std::vector{ MoveRight, FireWeapon1 } },	\

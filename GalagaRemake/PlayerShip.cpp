@@ -1,66 +1,91 @@
 #include "PlayerShip.h"
 
-PlayerShip::PlayerShip(const sf::Texture& texture, BoundedFloatRect worldDimensions)
+#include "Controller.h"
+#include "GameState.h"
+
+void PlayerShip::initStartHealth()
+{
+
+	m_shipHealth = 5;
+}
+
+void PlayerShip::initStartState()
+{
+	if (isBackwards())
+		rotate180();
+	m_gameCyclesTillRespawned = 0;
+	setShipColor(sf::Color::White);
+	m_velocity = sf::Vector2f(0.0f, -6.0f);
+
+	initStartHealth();
+	setPosition(m_startPosition);
+	disableCurrentShipStates();
+	m_isVerticallyWorldBound = false;
+	m_shipControlsStateMappings[MoveUp] = true;
+	m_horizontalDirectionIncrement = HORIZONTAL_DIRECTION_INCREMENT;
+	m_moveUpIncrement = SINGLE_THRUST_DIRECTION_INCREMENT;
+	m_moveDownIncrement = SINGLE_THRUST_DIRECTION_INCREMENT / 2;
+}
+
+void PlayerShip::calculateStartPosition()
+{
+	const sf::FloatRect shipSize = getGlobalBounds();
+	const float xPos = (GameState::world_bounds.width / 2.f) - (shipSize.width / 2.f);
+	const float yPos = GameState::world_bounds.height + 50.f;
+	m_startPosition = sf::Vector2f(xPos, yPos);
+}
+
+PlayerShip::PlayerShip(const sf::Texture& texture)
 	: Ship()
 {
 	setTexture(texture);
 	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 
-	const sf::FloatRect shipSize = getGlobalBounds();
-	const float xPos = (worldDimensions.width / 2.f) - (shipSize.width / 2.f);
-	const float yPos = worldDimensions.height/3 * 2;
-	m_shipHealth = 3;
-	
-	setPosition(xPos, yPos);
+	calculateStartPosition();
+	initStartState();
 }
 
-void PlayerShip::updateShip(BoundedFloatRect worldBounds)
+PlayerShip::PlayerShip()
+= default;
+
+void PlayerShip::respawnShip()
 {
-	Ship::updateShip(worldBounds);
+	initStartHealth();
+	m_gameCyclesTillRespawned = 100;
 }
 
-void PlayerShip::setTextureRectBasedOnShipState()
+void PlayerShip::init(const sf::Texture& texture)
 {
-	if (m_gameCyclesTillRespawned == 100) {
-		setTextureRect(sf::IntRect(sf::Vector2i(m_shipAnimationFrame.x, 0), m_shipAnimationFrame));
-		return;
-	}
-	if (m_isBackwards) {
-		applyBackwardsTexture();
-	}
-	else {
-		applyStandardTexture();
-	}
+	setTexture(texture);
+	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
+
+	calculateStartPosition();
+	initStartState();
 }
 
-void PlayerShip::updateShipVelocity(BoundedFloatRect worldBounds)
+void PlayerShip::handleIntro()
 {
-	BoundedFloatRect shipBounds = getGlobalBounds();
-	//apply resistence
-	if (m_velocity.y != 0)
-		m_velocity.y = m_velocity.y * RESISTENCE_MULTIPLIER;
-
-	if (m_velocity.x != 0)
-		m_velocity.x = m_velocity.x * RESISTENCE_MULTIPLIER;
-
-	//apply thrust to shipVelocity, after State update, opposing Thrusts cancel
-	if (m_isBackwards) {
-		applyBackwardsVelocity();
+	if(GameState::gameCycleCounter > 24 && !GameState::isIntroDone)
+	{
+		if(!GameState::isKeyTrapActivated)
+			disableCurrentShipStates();
+		m_isVerticallyWorldBound = true;
+		GameState::isIntroDone = true;
 	}
-	else {
-		applyStandardVelocity();
-	}
-	//Need to figure out why right and top cushions won't work
-	//testAndApplyCushion(shipBounds, worldBounds, 100.f);
-
-	testAndApplyHorizontalWorldBounds(shipBounds, worldBounds);
-
-	if (!m_isHorizontallyWorldBound)
-		return;
-
-	testAndApplyVerticalWorldBounds(shipBounds, worldBounds);
-
 }
+
+void PlayerShip::updateShip(KeyboardController& controller)
+{
+	handleIntro();
+	bool swapControls = false;
+	if (m_shipControlsStateMappings.at(Rotate) && !m_isTransitioning)//should be its own variable
+		swapControls = true;
+	Ship::updateShip(GameState::world_bounds);
+	if(swapControls)
+		controller.swapControlsAndStatesBasedOnMovementSetting(*this);
+}
+
+
 
 void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatRect worldBounds, float cushion)
 {
@@ -80,81 +105,39 @@ void PlayerShip::testAndApplyCushion(BoundedFloatRect& shipBounds, BoundedFloatR
 
 }
 
-void PlayerShip::testAndApplyVerticalWorldBounds(BoundedFloatRect & shipBounds, BoundedFloatRect & worldBounds)
+
+void PlayerShip::resetManager()
 {
-	while (shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN
-		|| shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN) {
-
-		if (shipBounds.bottom > worldBounds.bottom - WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = 0;// (worldBounds.bottom - WORLD_BOUNDS_MARGIN) - shipBounds.bottom;
-			break;
-		}
-		if (shipBounds.top < worldBounds.top + WORLD_BOUNDS_MARGIN) {
-			m_velocity.y = 0;// shipBounds.top - (worldBounds.top + WORLD_BOUNDS_MARGIN);
-			break;
-		}
-		m_velocity.y = m_velocity.y * .5f;
-
-	}
+	initStartState();
 }
 
-void PlayerShip::testAndApplyHorizontalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+void PlayerShip::useItem(const ItemType itemType)
 {
-	while (shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN
-		|| shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN) {
-
-
-
-		if (abs(shipBounds.right - worldBounds.right - WORLD_BOUNDS_MARGIN) < .01f
-			|| (abs(shipBounds.left - worldBounds.left + WORLD_BOUNDS_MARGIN) < .01f)) {
-			m_velocity.x = 0;
-			break;
-		}
-		m_velocity.x = m_velocity.x * .5f;
-
-
-
-	}
-}
-
-void PlayerShip::rotateIfTriggered()
-{
-	if (!m_shipControlsStateMappings.at(Rotate))
+	if (itemType == ItemType::Repair_Kit)
+	{
+		initStartHealth();
 		return;
-	m_shipControlsStateMappings[Rotate] = false;
-	rotate180();
-}
-
-void PlayerShip::rotate180()
-{
-	m_isBackwards = !m_isBackwards;
-	
-	m_weapon1Projectile->setVelocity(sf::Vector2f(0, -m_weapon1Projectile->getVelocity().y));
-	rotate(180.f);//origin is now bottom right, but global bounds still correctly gives top and left
-	const sf::FloatRect localBounds = getLocalBounds();
-	if (m_isBackwards)
-		move(localBounds.width, localBounds.height);
-	else
-		move(-localBounds.width, -localBounds.height);
+	}
+	throw std::invalid_argument("Item Type Not Mapped for Ship interaction");
 }
 
 
-bool PlayerShip::isWithinLeftCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+bool PlayerShip::isWithinLeftCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds) const
 {
 	return shipBounds.left + m_velocity.x < worldBounds.left + WORLD_BOUNDS_MARGIN && m_velocity.x < 0;
 }
 
-bool PlayerShip::isWithinRightCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+bool PlayerShip::isWithinRightCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds) const
 {
 	return shipBounds.right + m_velocity.x > worldBounds.right - WORLD_BOUNDS_MARGIN && m_velocity.x > 0;
 }
 
-bool PlayerShip::isShipWithinTopCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+bool PlayerShip::isShipWithinTopCusionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds) const
 {
 	return shipBounds.top + m_velocity.y < worldBounds.top + WORLD_BOUNDS_MARGIN && m_velocity.y < 0;
 }
 
-bool PlayerShip::isShipwithBottomCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds)
+bool PlayerShip::isShipwithBottomCushionAndMovingThatDirection(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds) const
 {
 	return shipBounds.bottom + m_velocity.y > worldBounds.bottom - WORLD_BOUNDS_MARGIN && m_velocity.y > 0;
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ProjectileManager.h"
 #include "Collision.h"
+#include "GameState.h"
 
 
 void ProjectileManager::collectProjectile(CircleProjectile& projectile)
@@ -19,14 +20,14 @@ void ProjectileManager::collectProjectile(Ship& ship)
 		m_projectiles.push_back(projectile2.value());
 }
 
-void ProjectileManager::updateProjectiles(const BoundedFloatRect& worldBounds)
+void ProjectileManager::updateProjectiles()
 {
 	auto it = m_projectiles.begin();
 	while (it != m_projectiles.end())
 	{
 		(*it)->updateProjectile();
 		sf::FloatRect projectileBounds = (*it)->getGlobalBounds();
-		if (worldBounds.intersects(projectileBounds))
+		if (GameState::world_bounds.intersects(projectileBounds))
 			it++;
 		else {
 			it = m_projectiles.erase(it);
@@ -36,36 +37,110 @@ void ProjectileManager::updateProjectiles(const BoundedFloatRect& worldBounds)
 	}
 }
 
-bool ProjectileManager::detectCollision(const sf::FloatRect& gameObject)
+
+
+//bool ProjectileManager::detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject)
+//{
+//	auto it = findProjectileInCollision(gameObject);
+//	if (it == m_projectiles.end())
+//		return false;
+//	m_projectiles.erase(it);
+//	return true;
+//}
+//
+//bool ProjectileManager::detectCollisionAndDestroyProjectile(const sf::Sprite& sprite)
+//{
+//	auto it = findProjectileInCollision(sprite);
+//	if (it == m_projectiles.end())
+//		return false;
+//	m_projectiles.erase(it);
+//	return true;
+//}
+//
+//bool ProjectileManager::detectCollisionAndDestroyProjectile(const CircleProjectile& shield)
+//{
+//	auto it = findProjectileInCollision(shield);
+//	if (it == m_projectiles.end())
+//		return false;
+//	m_projectiles.erase(it);
+//	return true;
+//}
+
+std::optional<CollisionResult> ProjectileManager::detectCollisionAndDestroyProjectile(
+	const sf::FloatRect& gameObject)
 {
-	return findProjectileInCollision(gameObject) != m_projectiles.end();
+	const auto it = findProjectileInCollision(gameObject);
+	if (it == m_projectiles.end())
+		return std::nullopt;
+	const auto vel = (*it)->getVelocity();
+	sf::FloatRect pointOfImpact;
+	(*it)->getGlobalBounds().intersects(gameObject, pointOfImpact);
+	m_projectiles.erase(it);
+	return CollisionResult(vel * PROJECTILE_MASS, sf::Vector2f(pointOfImpact.left, pointOfImpact.top), 0.f);
 }
 
-bool ProjectileManager::detectCollisionAndDestroyProjectile(const sf::FloatRect& gameObject)
+sf::Vector2f ProjectileManager::getPointOfImpact(std::list<std::shared_ptr<Projectile>>::iterator it,
+	const sf::Sprite& sprite) const
 {
-	auto it = findProjectileInCollision(gameObject);
-	if (it == m_projectiles.end())
-		return false;
-	m_projectiles.erase(it);
-	return true;
+	if ((*it)->getPointCount() > 10)
+	{
+		const auto pointOfImpact = Collision::pixelPerfectTest(sprite, *std::dynamic_pointer_cast<CircleProjectile>(*it));
+		if (pointOfImpact.has_value()) {
+			std::cout << "Collision Detected" << std::endl;
+			return pointOfImpact.value();
+		}
+
+	}
+	else
+	{
+		const auto pointOfImpact = Collision::pixelPerfectTest(sprite, *std::dynamic_pointer_cast<RectangleProjectile>(*it));
+		if (pointOfImpact.has_value()) {
+			std::cout << "Collision Detected" << std::endl;
+			return pointOfImpact.value();
+		}
+
+	}
+	return {};
 }
 
-bool ProjectileManager::detectCollisionAndDestroyProjectile(const sf::Sprite& sprite)
+sf::Vector2f ProjectileManager::getPointOfImpact(std::list<std::shared_ptr<Projectile>>::iterator it,
+	const CircleProjectile& shield)
 {
-	auto it = findProjectileInCollision(sprite);
-	if (it == m_projectiles.end())
-		return false;
-	m_projectiles.erase(it);
-	return true;
+	if ((*it)->getPointCount() > 10)
+	{
+		return {};
+
+	}
+	else
+	{
+		return {};
+
+	}
+	return {};
 }
 
-bool ProjectileManager::detectCollisionAndDestroyProjectile(const CircleProjectile& shield)
+
+std::optional<CollisionResult> ProjectileManager::detectCollisionAndDestroyProjectile(
+	const sf::Sprite& sprite)
 {
-	auto it = findProjectileInCollision(shield);
+	const auto it = findProjectileInCollision(sprite);
 	if (it == m_projectiles.end())
-		return false;
+		return std::nullopt;
+	const auto pointOfImpact = getPointOfImpact(it, sprite);
+	const auto vel = (*it)->getVelocity();
 	m_projectiles.erase(it);
-	return true;
+	return CollisionResult(vel * PROJECTILE_MASS, pointOfImpact);
+}
+
+std::optional<CollisionResult> ProjectileManager::detectCollisionAndDestroyProjectile(const CircleProjectile& shield)
+{
+	const auto it = findProjectileInCollision(shield);
+	if (it == m_projectiles.end())
+		return std::nullopt;
+	const auto pointOfImpact = getPointOfImpact(it, shield);
+	const auto vel = (*it)->getVelocity();
+	m_projectiles.erase(it);
+	return CollisionResult(vel * PROJECTILE_MASS, pointOfImpact);
 }
 
 std::list< std::shared_ptr<Projectile>>::iterator ProjectileManager::findProjectileInCollision(const sf::FloatRect& gameObject)
@@ -82,7 +157,6 @@ std::list< std::shared_ptr<Projectile>>::iterator ProjectileManager::findProject
 std::list<std::shared_ptr<Projectile>>::iterator ProjectileManager::findProjectileInCollision(const sf::Sprite& sprite)
 {
 	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); it++) {
-		//auto& explicitProjectile = (*it)->getPointCount() > 10 ? std::dynamic_pointer_cast<CircleProjectile>(*it) : std::dynamic_pointer_cast<RectangleProjectile>(*it);
 		if((*it)->getPointCount() > 10)
 		{
 			if (Collision::pixelPerfectTest(sprite, *std::dynamic_pointer_cast<CircleProjectile>(*it))) {
@@ -135,5 +209,10 @@ void ProjectileManager::draw(sf::RenderTarget& target, sf::RenderStates states) 
 	for (auto& projectile : m_projectiles) {
 		target.draw(*projectile);
 	}
+}
+
+void ProjectileManager::resetManager()
+{
+	m_projectiles.clear();
 }
 

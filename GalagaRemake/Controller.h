@@ -1,5 +1,5 @@
 #pragma once
-#include "Ship.h"
+#include "PlayerShip.h"
 
 
 enum State {
@@ -31,8 +31,13 @@ enum Input {
 class KeyboardController
 {
 public:
+	void initKeyMappings();
 	KeyboardController();
-	bool PollEventsAndUpdateShipState(sf::Window& window, Ship& ship);
+
+	void flipHorizontalControls();
+	void flipVerticalControls();
+	void swapControlsAndStatesBasedOnMovementSetting(Ship& ship);
+	void PollEventsAndUpdateShipState(sf::Window& window, PlayerShip& ship);
 
 private:
 	std::map<sf::Keyboard::Key, ShipControl> m_keyboardToShipControlMap;
@@ -47,8 +52,8 @@ public:
 	                       std::map<State, std::map<Input, State>> stateWithInputToStateMap,
 	                       int totalInputs,
 	                       int deltaBeforeStateChange = 200);
-	bool isItTimeToUpdateState(const sf::Clock& clock, const sf::Int32& currentTime) const;
-	void updateControllerStateAndShipState(const sf::Clock& clocks, Ship& ship);
+	bool isItTimeToUpdateState(const sf::Int32& currentTime) const;
+	void updateControllerStateAndShipState(Ship& ship);
 private:
 	State m_currentState;
 	State m_previousState;
