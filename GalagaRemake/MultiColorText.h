@@ -15,7 +15,7 @@ public:
     explicit MultiColorText(const TextType& templateText);
     MultiColorText<TextType>& addTextSegment(const std::string& text, const sf::Color& color, float leftMargin = 0.f, bool isBold = false);
     void setCharacterSize(int size);
-    void setPosition(sf::Vector2f pos);
+    void setPosition(sf::Vector2f newPos);
     void horizontallyCenter();
     void verticallyCenter();
     void dumpSegments(std::vector<TextType>& targetVector);

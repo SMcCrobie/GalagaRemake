@@ -19,7 +19,7 @@ namespace GameState
 		isGameOver = false;
 		isPaused = false;
 		requiresLevelRestart = false;
-		isBossCreated = true;
+		isBossCreated = false;
 		isBossDestroyed = false;
 		isPlayerDead = false;
 		isKeyTrapActivated = false;
@@ -28,7 +28,7 @@ namespace GameState
 		ignoreNextResizeEvent = false;
 
 		score = 0;
-		killCounter = 50;
+		killCounter = 0;
 		gameCycleCounter = 0;
 		timeOfLastGameLoop = 0;
 		timeOfLastEnemyShip = 0;

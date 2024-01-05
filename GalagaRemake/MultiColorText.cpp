@@ -1,6 +1,8 @@
 #include "MultiColorText.h"
 #include "GameState.h"
 
+
+//indirectly controlling what types can be used by template
 template class MultiColorText<sf::Text>;
 template class MultiColorText<TempText>;
 
@@ -35,31 +37,30 @@ MultiColorText<TextType>& MultiColorText<TextType>::addTextSegment(const std::st
     return *this;
 }
 
-//REVIEW---------------------------------------------------------------------
+
 template <typename TextType>
 void MultiColorText<TextType>::setCharacterSize(int size)
 {
     if (m_segments.empty())
         return;
 
-    // Store the original distances (margins) between the end of one segment and the start of the next
     std::vector<float> margins;
-    for (std::size_t i = 0; i < m_segments.size() - 1; ++i) {
+    for (auto i = 0; i < m_segments.size() - 1; i++) {
 	    const float currentSegmentRight = m_segments[i].getPosition().x + m_segments[i].getGlobalBounds().width;
 	    const float nextSegmentLeft = m_segments[i + 1].getPosition().x;
         margins.push_back(nextSegmentLeft - currentSegmentRight);
     }
 
-    // Update character size for the template text
+ 
     m_templateText.setCharacterSize(size);
 
-    // Update the character size for each segment and adjust their positions
-    float currentX = m_segments.front().getPosition().x; // Starting X position of the first segment
-    for (std::size_t i = 0; i < m_segments.size(); ++i) {
+    
+    float currentX = m_segments.front().getPosition().x; 
+    for (auto i = 0; i < m_segments.size(); i++) {
         m_segments[i].setCharacterSize(size);
         m_segments[i].setPosition(currentX, m_segments[i].getPosition().y);
 
-        // Update currentX for the next segment, including the original margin
+        
         if (i < m_segments.size() - 1) {
             currentX += m_segments[i].getGlobalBounds().width + margins[i];
         }
@@ -67,35 +68,29 @@ void MultiColorText<TextType>::setCharacterSize(int size)
 }
 
 template <typename TextType>
-void MultiColorText<TextType>::setPosition(const sf::Vector2f pos)
+void MultiColorText<TextType>::setPosition(const sf::Vector2f newPos)
 {
     if (m_segments.empty())
         return;
+   
+    auto initialPos = m_segments.front().getPosition().x - m_segments.front().getGlobalBounds().left;
+    auto currentX = newPos.x + initialPos;
 
-    // Calculate the initial offset of the first segment
-    auto initialOffset = m_segments.front().getPosition().x - m_segments.front().getGlobalBounds().left;
-
-    // Start with the new position plus the initial offset
-    auto currentX = pos.x + initialOffset;
-
-    for (size_t i = 0; i < m_segments.size(); ++i) {
+    for (auto i = 0; i < m_segments.size(); ++i) {
         auto& segment = m_segments[i];
         auto currentSegmentRight = segment.getGlobalBounds().left + segment.getGlobalBounds().width;
 
-        segment.setPosition(currentX, pos.y); // Set the new position
+        segment.setPosition(currentX, newPos.y);
 
-        // Only add the gap if this is not the last segment
+        
         if (i < m_segments.size() - 1) {
-            // Calculate the gap (distance) to the next segment
             auto nextSegmentLeft = m_segments[i + 1].getGlobalBounds().left;
         	auto gap = nextSegmentLeft - currentSegmentRight;
 
-			// Update currentX for the next segment, including the gap
 			currentX += segment.getGlobalBounds().width + gap;
         }
     }
 }
-//REVIEW---------------------------------------------------------------------
 
 
 template <typename TextType>
