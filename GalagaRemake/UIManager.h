@@ -22,7 +22,7 @@ public:
 	void updateUI();
 	static void formatPrimaryText(sf::Text& primaryText);
 	static void formatSecondaryText(sf::Text& secondaryText, sf::FloatRect primaryText);
-	static void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
+	void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
 	void initializeLevelOutroText(TempText& primaryText, TempText& secondaryText);
 	void resetManager() override;
 	void addPointValue(sf::Vector2f position, int pointValue, sf::Color color = sf::Color::White, float scale = 0.f);

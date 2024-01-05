@@ -163,12 +163,17 @@ void UIManager::initializeLevelIntroText(TempText& primaryText, TempText& second
 {
 	primaryText.setDuration(200);
 	primaryText.setFadeOut(80);
+	primaryText.setFillColor(SECONDARY_COLOR);
 	formatPrimaryText(primaryText);
 
 
 	secondaryText.setDuration(200);
 	secondaryText.setFadeOut(80);
 	formatSecondaryText(secondaryText, primaryText.getGlobalBounds());
+
+
+	m_texts.push_back(primaryText);
+	m_texts.push_back(secondaryText);
 }
 
 void UIManager::initializeLevelOutroText(TempText& primaryText, TempText& secondaryText)
