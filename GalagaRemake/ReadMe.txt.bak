@@ -3,7 +3,6 @@ TODOs
 - Switch all CircleProjectiles to sf::circle, so that it can be used for more than just the projectile
 - Come up with an easier way to write text in UI, in formatted bi colorized way
 
-- Maybe have BaseScale scale all text additionally so that it can be used as a settings scale across all text;
 
 
 - Think every object that has points to be had, should pocess their own version of what they want that temp text to look like

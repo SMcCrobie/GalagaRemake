@@ -165,10 +165,10 @@ void Level1::initializeLevel()
 	bossController = StateMachineController(bossStateToShipControlInputsMap,
 		bossStateWithInputToStateMap, 4);
 	level_into_text_primary = TempText("Level 1", Fonts::galaxus);
-	level_into_text_secondary = TempText("Entering Tarkion III Orbit", Fonts::playFair);
+	level_into_text_secondary = TempText("Entering Tarkion III Orbit", Fonts::play_fair);
 
 	level_outro_text_primary = TempText("Level Complete", Fonts::galaxus);
-	level_outro_text_secondary = TempText("Exiting Tarkion III Orbit", Fonts::playFair);
+	level_outro_text_secondary = TempText("Exiting Tarkion III Orbit", Fonts::play_fair);
 
 
 

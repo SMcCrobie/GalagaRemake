@@ -1,36 +1,42 @@
 #include "UIManager.h"
 #include "GameState.h"
+#include "MultiColorText.h"
+
 #include <format>
 
+constexpr float element_buffer = 5.f;
+constexpr float health_bar_max_width = 150.f;
+constexpr int life_score_value = 1000;
+constexpr int health_segment_score_value = 100;
 
-#define CENTER_ELEMENT_HORIZONTALLY(elementWidth) ((m_windowDimensions.width - (elementWidth)) / 2)
-#define ELEMENT_BUFFER 5.F
-#define HEALTH_BAR_MAX_WIDTH 150.F
-#define LIFE_SCORE_VALUE 1000
-#define HEALTH_SEGMENT_SCORE_VALUE 100
 
 extern PlayerShip playerShip;
 
+
+
 void UIManager::initializePauseText()
 {
-	auto text = sf::Text("Game Paused", Fonts::galaxus);
-	stylePrimaryText(text);
-	text.setFillColor(sf::Color(255,255,255,255));
-	m_pauseTexts.push_back(text);
+	auto primaryText = sf::Text("Game Paused", Fonts::galaxus);
+	formatPrimaryText(primaryText);
+	primaryText.setFillColor(PRIMARY_COLOR);
+	m_pauseTexts.push_back(primaryText);
+
+	auto templateText = sf::Text("", Fonts::play_fair);
+
+	auto pauseHelpText = MultiColorText(templateText);
+	pauseHelpText.addTextSegment("Press [", PRIMARY_COLOR)
+		.addTextSegment("tab", SECONDARY_COLOR, 1.f, true)
+		.addTextSegment("] to resume", PRIMARY_COLOR);
+	formatSecondaryText(pauseHelpText, primaryText.getGlobalBounds());
+	pauseHelpText.dumpSegments(m_pauseTexts);
 
 
-	text = sf::Text("Press [       ] to resume", Fonts::playFair);
-	styleSecondaryText(text);
-	m_pauseTexts.push_back(text);
-
-	text = sf::Text("tab", Fonts::playFair);
-	styleSecondaryText(text);
-	text.move(-16.f, -1.f);
-	text.setOutlineColor(sf::Color(0x05ecf1ff));
-	text.setFillColor(sf::Color(0x05ecf1ff));
-	text.setOutlineThickness(1.f);
-	m_pauseTexts.push_back(text);
-
+	auto windowResizeHelpText = MultiColorText(templateText);
+	windowResizeHelpText.addTextSegment("Press [", PRIMARY_COLOR)
+		.addTextSegment("r", SECONDARY_COLOR, 2.5f, true)
+		.addTextSegment("] to reset window size", PRIMARY_COLOR);
+	formatSecondaryText(windowResizeHelpText, pauseHelpText.getGlobalBounds());
+	windowResizeHelpText.dumpSegments(m_pauseTexts);
 
 }
 
@@ -52,7 +58,7 @@ void UIManager::init(const Ship& shipModel, int totalExtraLives, float windowMar
 	initializeShipPointValue();
 }
 
-void UIManager::addUiText(TempText text)
+void UIManager::addUiText(const TempText text)
 {
 	m_texts.push_back(text);
 }
@@ -89,7 +95,6 @@ void UIManager::updateTempText()
 
 void UIManager::updateHealthBar()
 {
-	extern PlayerShip playerShip;
 	if(playerShip.getHealth() > m_healthBarSegments.size())
 	{
 		initializePlayerHealth();
@@ -120,132 +125,104 @@ void UIManager::updateUI()
 
 }
 
-void UIManager::stylePrimaryText(sf::Text& primaryText) const
+void UIManager::formatPrimaryText(sf::Text& primaryText)
 {
-	primaryText.setScale(1.5f, 1.5f);
-	primaryText.setFillColor(sf::Color(0x05ecf1ff));
-	sf::Vector2f windowPosition = centerElement(primaryText.getGlobalBounds());
+	primaryText.setCharacterSize(46);
+	const sf::Vector2f windowPosition = getPrimaryTitlePosition(primaryText.getGlobalBounds());
 	primaryText.setPosition(windowPosition);
 
 }
 
-void UIManager::styleSecondaryText(sf::Text& secondaryText) const
+void UIManager::formatSecondaryText(sf::Text& secondaryText, const sf::FloatRect primaryText)
 {
-	secondaryText.setScale(.5f, .5f);
-	sf::Vector2f windowPosition = centerElement(secondaryText.getGlobalBounds());
-	windowPosition.y += 30.f;
+	secondaryText.setCharacterSize(18);
+	const sf::Vector2f windowPosition = getSecondaryTitlePosition(secondaryText.getGlobalBounds(), primaryText);
 	secondaryText.setPosition(windowPosition);
 }
 
+
+template <typename TextType>
+void UIManager::formatSecondaryText(MultiColorText<TextType>& secondaryText, const sf::FloatRect& primaryText)
+{
+	secondaryText.setCharacterSize(16);
+	const sf::Vector2f windowPosition = getSecondaryTitlePosition(secondaryText.getGlobalBounds(), primaryText);
+	secondaryText.setPosition(windowPosition);
+}
+
+
 void UIManager::initializeShipPointValue()
 {
-	m_shipPointValue = TempText("100", Fonts::playFair);
+	m_shipPointValue = TempText("100", Fonts::play_fair);
 	m_shipPointValue.setDuration(80);
 	m_shipPointValue.setFadeOut(80);
-	//m_shipPointValue.setFillColor(sf::Color(0x05ecf1ff));
 	m_shipPointValue.setScale(.6f, .6f);
 }
 
 
 void UIManager::initializeLevelIntroText(TempText& primaryText, TempText& secondaryText)
 {
-	//sf::Vector2f windowPosition = centerElement(primaryText.getGlobalBounds());
-	stylePrimaryText(primaryText);
 	primaryText.setDuration(200);
 	primaryText.setFadeOut(80);
-	m_introPrimaryText = primaryText;
-	m_texts.push_back(primaryText);
+	formatPrimaryText(primaryText);
 
 
-	styleSecondaryText(secondaryText);
 	secondaryText.setDuration(200);
 	secondaryText.setFadeOut(80);
-	m_introSecondaryText = secondaryText;
-	m_texts.push_back(secondaryText);
+	formatSecondaryText(secondaryText, primaryText.getGlobalBounds());
 }
 
 void UIManager::initializeLevelOutroText(TempText& primaryText, TempText& secondaryText)
 {
-	primaryText.setScale(1.4f, 1.4f);
-	primaryText.setFillColor(sf::Color(0x05ecf1ff));
-	sf::Vector2f windowPosition = centerElement(primaryText.getGlobalBounds());
-	primaryText.setPosition(windowPosition);
 	primaryText.setDuration(1000);
 	primaryText.setFadeOut(80);
-	m_texts.push_back(primaryText);
+	primaryText.setFillColor(SECONDARY_COLOR);
+	formatPrimaryText(primaryText);
 
-
-	secondaryText.setScale(.5f, .5f);
-	windowPosition = centerElement(secondaryText.getGlobalBounds());
-	windowPosition.y += 30.f;
-	secondaryText.setPosition(windowPosition);
 	secondaryText.setDuration(200);
 	secondaryText.setFadeOut(80);
+	formatSecondaryText(secondaryText, primaryText.getGlobalBounds());
+
+
+
+	m_texts.push_back(primaryText);
 	m_texts.push_back(secondaryText);
 
-	TempText lifeScoreTally("Extra Lives: [", Fonts::galaxus);
-	GameState::score += LIFE_SCORE_VALUE * static_cast<int>(m_lives.size());
-	GameState::score += HEALTH_SEGMENT_SCORE_VALUE * playerShip.getHealth();
 
-	lifeScoreTally.setDelay(200);
-	lifeScoreTally.setScale(.5f, .5f);
-	lifeScoreTally.setDuration(800);
-	lifeScoreTally.setFadeOut(80);
-	windowPosition = centerElement(lifeScoreTally.getGlobalBounds());
-	windowPosition.y += 30.f;
-	windowPosition.x += -90.f;
-	auto leftMargin = windowPosition.x;
-	lifeScoreTally.setPosition(windowPosition);
+	TempText lifeScoreTemplateText("", Fonts::galaxus);
+	GameState::score += life_score_value * static_cast<int>(m_lives.size());
+	GameState::score += health_segment_score_value * playerShip.getHealth();
+
+	lifeScoreTemplateText.setDelay(200);
+	lifeScoreTemplateText.setDuration(800);
+	lifeScoreTemplateText.setFadeOut(80);
+	lifeScoreTemplateText.setCharacterSize(32);
 	
+	auto lifeScoreTally = MultiColorText(lifeScoreTemplateText);
+	lifeScoreTally.addTextSegment("Extra Lives: [", PRIMARY_COLOR)
+		.addTextSegment(std::to_string(m_lives.size()), SECONDARY_COLOR)
+		.addTextSegment("] " + std::to_string(life_score_value) + " = ", PRIMARY_COLOR)
+		.addTextSegment("+" + std::to_string(life_score_value * m_lives.size()), SECONDARY_COLOR);
 
-	TempText lifeScoreTally1(lifeScoreTally);
-	lifeScoreTally1.setString(std::to_string(m_lives.size()));
-	lifeScoreTally1.setFillColor(sf::Color(0x05ecf1ff));
-	windowPosition.x += lifeScoreTally.getGlobalBounds().width;
-	lifeScoreTally1.setPosition(windowPosition);
-
-	TempText lifeScoreTally2(lifeScoreTally);
-	lifeScoreTally2.setString("] " + std::to_string(LIFE_SCORE_VALUE) + " = ");
-	windowPosition.x += lifeScoreTally1.getGlobalBounds().width;
-	lifeScoreTally2.setPosition(windowPosition);
-
-	TempText lifeScoreTally3(lifeScoreTally1);
-	lifeScoreTally3.setString("+" +std::to_string(LIFE_SCORE_VALUE * m_lives.size()));
-	windowPosition.x += lifeScoreTally2.getGlobalBounds().width;
-	lifeScoreTally3.setPosition(windowPosition);
-
-	TempText healthScoreTally(lifeScoreTally);
-	healthScoreTally.setString("Extra Health: [");
-	windowPosition.x = leftMargin;
-	windowPosition.y += lifeScoreTally.getGlobalBounds().height + ELEMENT_BUFFER;
-	healthScoreTally.setPosition(windowPosition);
-
-	TempText healthScoreTally1(lifeScoreTally1);
-	healthScoreTally1.setString(std::to_string(playerShip.getHealth()));
-	windowPosition.x += healthScoreTally.getGlobalBounds().width;
-	healthScoreTally1.setPosition(windowPosition);
-
-	TempText healthScoreTally2(healthScoreTally);
-	healthScoreTally2.setString("] " + std::to_string(HEALTH_SEGMENT_SCORE_VALUE) + " = ");
-	windowPosition.x += healthScoreTally1.getGlobalBounds().width;
-	healthScoreTally2.setPosition(windowPosition);
-
-	TempText healthScoreTally3(healthScoreTally1);
-	healthScoreTally3.setString("+" + std::to_string(HEALTH_SEGMENT_SCORE_VALUE * playerShip.getHealth()));
-	windowPosition.x += healthScoreTally2.getGlobalBounds().width;
-	healthScoreTally3.setPosition(windowPosition);
+	formatSecondaryText(lifeScoreTally, primaryText.getGlobalBounds());
+	lifeScoreTally.dumpSegments(m_texts);
 
 
-	m_texts.push_back(lifeScoreTally);
-	m_texts.push_back(lifeScoreTally1);
-	m_texts.push_back(lifeScoreTally2);
-	m_texts.push_back(lifeScoreTally3);
+	auto healthScoreTally = MultiColorText(lifeScoreTemplateText);
+	healthScoreTally.addTextSegment("Extra Health: [", PRIMARY_COLOR)
+		.addTextSegment(std::to_string(playerShip.getHealth()), SECONDARY_COLOR)
+		.addTextSegment("] " + std::to_string(health_segment_score_value) + " = ", PRIMARY_COLOR)
+		.addTextSegment("+" + std::to_string(health_segment_score_value * playerShip.getHealth()), SECONDARY_COLOR);
 
-	m_texts.push_back(healthScoreTally);
-	m_texts.push_back(healthScoreTally1);
-	m_texts.push_back(healthScoreTally2);
-	m_texts.push_back(healthScoreTally3);
+	formatSecondaryText(healthScoreTally, lifeScoreTally.getGlobalBounds());
+	healthScoreTally.dumpSegments(m_texts);
 }
+
+
+
+
+
+
+
 
 void UIManager::resetManager()
 {
@@ -273,13 +250,20 @@ void UIManager::addPointValue(sf::Vector2f position, int pointValue, sf::Color c
 }
 
 
-
-sf::Vector2f UIManager::centerElement(const sf::FloatRect rect) const
+sf::Vector2f UIManager::getPrimaryTitlePosition(const sf::FloatRect rect)
 {
 	const float xPos = CENTER_ELEMENT_HORIZONTALLY(rect.width);
-	const float yPos = (m_windowDimensions.height / 2.5f) - rect.height;
+	const float yPos = CENTER_ELEMENT_VERTICALLY(rect.height) - 100;
 
 	return {xPos, yPos};
+}
+
+sf::Vector2f UIManager::getSecondaryTitlePosition(sf::FloatRect secondaryTitle, sf::FloatRect primaryTitle)
+{
+	const float xPos = CENTER_ELEMENT_HORIZONTALLY(secondaryTitle.width);
+	const float yPos = primaryTitle.top + primaryTitle.height + element_buffer;
+
+	return { xPos, yPos };
 }
 
 
@@ -291,22 +275,22 @@ void UIManager::initializeLives()
 	lifeSymbol.setOrigin(0.f, 0.f);
 
 	lifeSymbol.setScale(.4f, .4f);
-	auto temp = lifeSymbol.getTextureRect();
+	sf::IntRect temp = lifeSymbol.getTextureRect();
 	temp.left = temp.width;
 	lifeSymbol.setTextureRect(temp);
 
-	sf::FloatRect extraLivesTextSize = m_extraLivesText.getGlobalBounds();
-	sf::FloatRect lifeSymbolSize = lifeSymbol.getGlobalBounds();
-	float xPos = extraLivesTextSize.left + extraLivesTextSize.width + ELEMENT_BUFFER;
-	float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - (lifeSymbolSize.height);
-	float lifeXOffest = lifeSymbolSize.width + ELEMENT_BUFFER;
+	const sf::FloatRect extraLivesTextSize = m_extraLivesText.getGlobalBounds();
+	const sf::FloatRect lifeSymbolSize = lifeSymbol.getGlobalBounds();
+	const float xPos = extraLivesTextSize.left + extraLivesTextSize.width + element_buffer;
+	const float yPos = m_windowDimensions.top + m_windowDimensions.height - m_windowMargin - (lifeSymbolSize.height);
+	const float lifeXOffset = lifeSymbolSize.width + element_buffer;
 
 	lifeSymbol.setPosition(xPos, yPos);
 	lifeSymbol.setVelocity(0, 0);
 	lifeSymbol.setStatic();
 	for (int i = 1; i < m_totalExtraLives; i++) {
 		m_lives.push_back(m_lives[0]);
-		m_lives[i].move(lifeXOffest *(float)i, 0.f);
+		m_lives[i].move(lifeXOffset *static_cast<float>(i), 0.f);
 	}
 }
 
@@ -319,27 +303,12 @@ void UIManager::initializeScore()
 
 	m_scoreText.setPosition(xPos, yPos);
 	m_scoreText.setScale(m_baseScale);
-	//m_scoreText.setFillColor(sf::Color(0x05ecf1ff));
 }
 
 void UIManager::initializeGameOverText()
 {
 	auto text = sf::Text("Game Over", Fonts::galaxus);
-	stylePrimaryText(text);
-	m_gameOverTexts.push_back(text);
-
-
-	text = sf::Text("Press [      ] to restart", Fonts::playFair);
-	styleSecondaryText(text);
-	m_gameOverTexts.push_back(text);
-
-
-	text = sf::Text("F2", Fonts::playFair);
-	styleSecondaryText(text);
-	text.move(-14.5f, -2.f);
-	text.setOutlineColor(sf::Color(0x05ecf1ff));
-	text.setFillColor(sf::Color(0x05ecf1ff));
-	text.setOutlineThickness(1.f);
+	formatPrimaryText(text);
 	m_gameOverTexts.push_back(text);
 }
 
@@ -354,7 +323,7 @@ void UIManager::initializeExtraLivesText()
 						- m_windowMargin - textSize.height - 4.f;//needed since the text height doesnt correctly match shown text height
 
 	m_extraLivesText.setPosition(xPos, yPos);
-	m_extraLivesText.setFillColor(sf::Color(0x05ecf1ff));
+	m_extraLivesText.setFillColor(SECONDARY_COLOR);
 }
 
 void UIManager::initializeHealthBar()
@@ -369,17 +338,17 @@ void UIManager::initializeHealthBar()
 	for(int i = 0; i < playerShip.getHealth(); i++)
 	{
 		m_healthBarSegments.push_back(m_healthBarSegment);
-		m_healthBarSegment.move(-m_healthBarSegment.getGlobalBounds().width - ELEMENT_BUFFER, 0.f);
+		m_healthBarSegment.move(-m_healthBarSegment.getGlobalBounds().width - element_buffer, 0.f);
 	}
 }
 
 void UIManager::initializeHealthBarSegment()
 {
 	sf::RectangleShape healthBarSegment;
-	healthBarSegment.setFillColor(sf::Color::White);
+	healthBarSegment.setFillColor(PRIMARY_COLOR);
 
-	auto health = static_cast<float>(playerShip.getHealth());
-	auto healthSegmentWidth = (HEALTH_BAR_MAX_WIDTH - (ELEMENT_BUFFER * (health-1))) / health;
+	const auto health = static_cast<float>(playerShip.getHealth());
+	const auto healthSegmentWidth = (health_bar_max_width - (element_buffer * (health-1))) / health;
 
 	healthBarSegment.setSize(sf::Vector2f(healthSegmentWidth, 6.f));
 

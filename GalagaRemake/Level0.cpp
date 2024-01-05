@@ -22,10 +22,10 @@ void Level0::initializeLevel()
 	Loader::LOAD_SAFELY(meteorTexture, "MeteorAnimations1.png");//this sprite needs work
 
 	level_into_text_primary = TempText("Level 0", Fonts::galaxus);
-	level_into_text_secondary = TempText("Escaping Starship SaberII", Fonts::playFair);
+	level_into_text_secondary = TempText("Escaping Starship SaberII", Fonts::play_fair);
 
 	level_outro_text_primary = TempText("Level Complete", Fonts::galaxus);
-	level_outro_text_secondary = TempText("Escaped Starship SaberII", Fonts::playFair);
+	level_outro_text_secondary = TempText("Escaped Starship SaberII", Fonts::play_fair);
 
 	meteorSprite.setTexture(meteorTexture);
 	meteor.setSprite(meteorSprite, "Meteor", false);

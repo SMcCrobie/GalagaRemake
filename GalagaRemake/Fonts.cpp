@@ -4,13 +4,12 @@
 namespace Fonts
 {
 	sf::Font galaxus;
-	sf::Font playFair;
-
+	sf::Font play_fair;
 
 	void load()
 	{
 		Loader::LOAD_SAFELY(galaxus, "ClimateCrisis-Regular.ttf");
-		Loader::LOAD_SAFELY(playFair, "PlayfairDisplay.ttf");
+		Loader::LOAD_SAFELY(play_fair, "PlayfairDisplay.ttf");
 	}
 
 	
