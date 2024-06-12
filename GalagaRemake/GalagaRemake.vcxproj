@@ -112,7 +112,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\Sean McCrobie\source\pkgs\SFML\include;</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +130,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\Sean McCrobie\source\pkgs\SFML\include;</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
@@ -145,8 +145,16 @@
   <ItemGroup>
     <ClCompile Include="BackgroundManager.cpp" />
     <ClCompile Include="BoundedFloatRect.cpp" />
+    <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Fonts.cpp" />
+    <ClCompile Include="GameObjectManager.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Level0.cpp" />
+    <ClCompile Include="LevelOrchestrator.cpp" />
+    <ClCompile Include="Level1.cpp" />
+    <ClCompile Include="MultiColorText.cpp" />
     <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="ShipManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -155,31 +163,60 @@
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="TempText.cpp" />
+    <ClCompile Include="TestLevel1.cpp" />
     <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackgroundManager.h" />
+    <ClInclude Include="Collidable.h" />
+    <ClInclude Include="GameObjectManager.h" />
+    <ClInclude Include="ILevel.h" />
     <ClInclude Include="BoundedFloatRect.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="ControllerConfigs.h" />
     <ClInclude Include="DebugMacros.h" />
+    <ClInclude Include="Fonts.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemType.h" />
+    <ClInclude Include="Level0.h" />
+    <ClInclude Include="Level1.h" />
+    <ClInclude Include="Loader.h" />
+    <ClInclude Include="LevelOrchestrator.h" />
+    <ClInclude Include="IManager.h" />
+    <ClInclude Include="CollisionResult.h" />
+    <ClInclude Include="MultiColorText.h" />
     <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="RandMacros.h" />
+    <ClInclude Include="resource1.h" />
+    <ClInclude Include="RotationType.h" />
     <ClInclude Include="ShipManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="TempText.h" />
+    <ClInclude Include="TestLevel1.h" />
     <ClInclude Include="UIManager.h" />
+    <ClInclude Include="WindowUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\SpriteAttempts\BossSideKicksAnimations.png" />
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\LaserTurretAnimations.png" />
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\MeteorAnimations1.png" />
+    <Image Include="..\..\..\..\Desktop\SpriteAttempts\repairKitAnimation.png" />
+    <Image Include="..\x64\Release\repairKit.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </Image>
+    <Image Include="BossAnimations.ico" />
     <Image Include="BossAnimations.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Image>
+    <Image Include="icon1.ico" />
     <Image Include="meteor.png" />
+    <Image Include="MeteorAnimations1.png" />
     <Image Include="Planets(1).png" />
     <Image Include="Planets.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -199,6 +236,13 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ControlsConfig.txt" />
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GalagaRemake.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

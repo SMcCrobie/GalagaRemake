@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 
 static float PROJECTILE_START_SPEED = 12;
+#define PROJECTILE_MASS 10.F
+
 
 class Projectile
 	: public sf::Shape{
@@ -32,6 +34,7 @@ public:
     std::size_t getPointCount() const override;
     sf::Vector2f getPoint(std::size_t index) const override;
     std::shared_ptr<Projectile> clone() override;
+    void setGrowthSpeed(sf::Vector2f& growthAmount);
 
 private:
     sf::Vector2f m_size;

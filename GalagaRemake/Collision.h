@@ -35,15 +35,23 @@ it freely, subject to the following restrictions:
  */
 
 #pragma once
+#include <optional>
 #include <SFML/Graphics.hpp>
 
 #include "Projectile.h"
 
 namespace Collision {
-
-	bool pixelPerfectTest(const sf::Sprite& sprite, const RectangleProjectile& recProjectile, sf::Uint8 alphaLimit = 0);
-	bool pixelPerfectTest(const sf::Sprite& sprite, const CircleProjectile& cirProjectile, sf::Uint8 alphaLimit = 0);
-	bool pixelPerfectTest(const CircleProjectile& circleProjectile, const RectangleProjectile& recProjectile, sf::Uint8 alphaLimit = 0);
-	bool pixelPerfectTest(const CircleProjectile& circleProjectile1, const CircleProjectile& circleProjectile2, sf::Uint8 alphaLimit = 0);
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite1, const sf::Sprite& sprite2,
+	                                             sf::Uint8 alphaLimit = 0);
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite, const sf::RectangleShape& rect,
+	                                             sf::Uint8 alphaLimit = 0);
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite, const RectangleProjectile& recProjectile,
+	                                             sf::Uint8 alphaLimit = 0);
+	std::optional<sf::Vector2f> pixelPerfectTest(const sf::Sprite& sprite, const CircleProjectile& cirProjectile,
+	                                             sf::Uint8 alphaLimit = 0);
+	std::optional<sf::Vector2f> pixelPerfectTest(const CircleProjectile& circleProjectile,
+	                                             const RectangleProjectile& recProjectile, sf::Uint8 alphaLimit = 0);
+	std::optional<sf::Vector2f> pixelPerfectTest(const CircleProjectile& circleProjectile1,
+	                                             const CircleProjectile& circleProjectile2, sf::Uint8 alphaLimit = 0);
 	bool contains(const CircleProjectile& c, const sf::Vector2f& p);
 }

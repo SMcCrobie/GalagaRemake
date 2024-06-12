@@ -3,6 +3,9 @@
 #include "BoundedFloatRect.h"
 #include "Projectile.h"
 #include <optional>
+#include <unordered_map>
+
+#include "RotationType.h"
 
 
 enum ShipControl
@@ -52,30 +55,45 @@ public:
 	void setStatic();
 	void decrementShieldHealth();
 	void setTextureRect(const sf::IntRect& rectangle);
+	void applyVerticalResistance();
+	void applyHorizontalResistance();
 	void moveShip();
 	virtual void rotate180();
-	void respawnShip();
-	void respawnShip(int respawnTimer);
+	virtual void initRotation();
+	bool isInInitialHalfOfRotation() const;
+	void resetRotationTypes();
+	virtual void respawnShip();
+	virtual void respawnShip(int respawnTimer);
 	bool isBackwards() const;
 	bool isRespawning() const;
 	bool hasShield() const;
-	void setShield(const CircleProjectile& shield, const int shieldHealth = 10);
+	void setShield(const CircleProjectile& shield, int shieldHealth = 10);
 	const CircleProjectile& getShield();
 	const std::map<ShipControl, bool>& getShipControlStateMappings();
-	virtual void rotateIfTriggered();
+	void rotateIfTriggered();
 	bool hasHealth() const;
 	void decrementHealth();
 	void setHealth(int healthTotal);
 	const int& getHealth() const;
 	void setShipColor(const sf::Color& color);
+	void disableCurrentShipStates();
+	void setWeaponRechargeTime(int gameCycles);
+	void flipHorizontalMovementStates();
+	void flipVerticalMovementStates();
+	void setMovementIncrements(float horizontal, float up, float down);
+	void setPointValue(int pointValue);
+	int getPointValue() const;
+	//void setStartHealth(int startHealth);//TODO fix this shit
+
 
 protected:
 	void updateShadingIfRespawning();
-	void applyBackwardsVelocity();//kinda not needed
-	void applyStandardVelocity();
-	void applyStandardTexture();
-	void applyBackwardsTexture();
-	//sf::IntRect MoveRight();
+	void applyHorizontalVelocity();
+	void applyVerticalVelocity();
+	void applyStandardResistance();
+	void testAndApplyVerticalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
+	void testAndApplyHorizontalWorldBounds(BoundedFloatRect& shipBounds, BoundedFloatRect& worldBounds);
+
 	virtual void updateShipVelocity(BoundedFloatRect worldBounds);
 
 	virtual std::optional<std::shared_ptr<Projectile>> fireWeapon1IfFired();
@@ -84,9 +102,10 @@ protected:
 	bool m_isBackwards;
 	bool m_isStatic = false;
 	int m_gameCyclesTillRespawned{};
-	bool m_isHorizontallyWorldBound;
+	bool m_isVerticallyWorldBound;
 	float m_horizontalDirectionIncrement;
-	float m_verticalDirectionIncrement;
+	float m_moveUpIncrement;
+	float m_moveDownIncrement;
 	sf::Vector2i m_shipAnimationFrame;
     sf::Vector2f m_velocity;
     sf::RectangleShape m_collisionBox;
@@ -96,11 +115,23 @@ protected:
 	int m_shipHitTimer;
 	sf::Color m_shipColor;
 	std::shared_ptr<Projectile> m_weapon1Projectile;
+	int m_weapon1ProjectileCounter;
 	std::shared_ptr<Projectile> m_weapon2Projectile;
+	int m_weapon2ProjectileCounter;
+	int m_weaponRechargeTime;
     std::map<ShipControl, bool> m_shipControlsStateMappings;
+	bool m_isTransitioning;
+	float m_rotationIncrement;
+	float m_rotationCounter;
+	std::unordered_map<RotationType, bool> m_rotationTypes;
+	int m_startHealth;
+	int m_pointValue;
 
 private:
+	void incrementRotation();
 	void refreshColors();
 	void setColor(const sf::Color& color);//makes higher level function private
+	void applyStandardTexture();
+
 };
 
