@@ -90,7 +90,7 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 			(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
 			window.close();
 		}
-		if(event.type == sf::Event::LostFocus){
+		if(event.type == sf::Event::LostFocus && !GameState::isMainMenu){
 			GameState::isPaused = true;
 			continue;
 		}
@@ -99,11 +99,11 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 			continue;
 		}
 
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab ) {
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab && !GameState::isMainMenu) {
 			ship.disableCurrentShipStates();
 			GameState::isPaused = !GameState::isPaused;
 		}
-		if(event.type == sf::Event::Resized && !GameState::ignoreNextResizeEvent){
+		if(event.type == sf::Event::Resized && !GameState::ignoreNextResizeEvent && !GameState::isMainMenu){
 			ship.disableCurrentShipStates();
 			GameState::isPaused = true;
 		}

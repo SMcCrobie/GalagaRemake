@@ -8,7 +8,7 @@ public:
 	virtual ~ILevel() = default;
 	virtual void initializeLevel() = 0;
 
-	virtual void enemyShipCreation() = 0;
+	virtual void updateLevel() = 0;
 
 	virtual void killLevel() = 0 ;
 

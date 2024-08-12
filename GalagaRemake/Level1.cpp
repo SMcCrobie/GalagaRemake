@@ -183,7 +183,7 @@ void Level1::initializeLevel()
 
 }
 
-void Level1::enemyShipCreation()
+void Level1::updateLevel()
 {
 	extern ShipManager enemyShipsManager;
 	extern GameObjectManager gameObjectManager;

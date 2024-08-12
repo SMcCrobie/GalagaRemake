@@ -26,10 +26,14 @@ Design Themes(*will be updated as/if themes change)
 
 Notes
 ---------------------------------------------------------------
-- all sprites need to be placed in C:\Users\Sean McCrobie\source\repos\GalageRemake\GalagaRemake in order to be loaded correctly
+- all sprites need to be placed in C:\...\source\repos\GalagaRemake\GalagaRemake in order to be loaded correctly
+- The Direction of rotate, visually, improvement
+	- Have it be based off the current momentum, on the x-axis, being positive or negative
+	- If its neutral, rand()
 
 
 Bugs/Visual issues
 ---------------------------------------------------------------
 - Sometimes point values can appear to close to the edge of the screen, should investigate
+- double firing immediatly after a turn, bug or feature??
 

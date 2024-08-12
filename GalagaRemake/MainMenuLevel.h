@@ -1,6 +1,6 @@
 #pragma once
 #include "ILevel.h"
-class Level0 :
+class MainMenuLevel :
     public ILevel
 {
 public:

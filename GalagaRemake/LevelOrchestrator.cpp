@@ -22,7 +22,7 @@ LevelOrchestrator& LevelOrchestrator::addDrawableLayer(Drawable* drawable)
 	return *this;
 }
 
-void LevelOrchestrator::initDefaultManager()
+void LevelOrchestrator::initDefaultManagers()
 {
 
 	addDrawableLayer(&backgroundManager)
@@ -154,9 +154,9 @@ void LevelOrchestrator::initializeLevelOutroText(UIManager& uiManager) const
 	uiManager.initializeLevelOutroText(m_level->level_outro_text_primary, m_level->level_outro_text_secondary);
 }
 
-void LevelOrchestrator::enemyShipCreation() const
+void LevelOrchestrator::updateLevel() const
 {
-	m_level->enemyShipCreation();
+	m_level->updateLevel();
 }
 
 void LevelOrchestrator::posePlayerQuestion()

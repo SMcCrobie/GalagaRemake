@@ -9,6 +9,7 @@ namespace Fonts
 	//fonts
 	extern sf::Font galaxus;
 	extern sf::Font play_fair;
+	extern sf::Font roboto;
 
 	//Load all fonts from files
 	void load();

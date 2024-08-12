@@ -16,7 +16,7 @@ public:
 
 	LevelOrchestrator& addManager(IManager* manager);
 	LevelOrchestrator& addDrawableLayer(Drawable* drawable);
-	void initDefaultManager();
+	void initDefaultManagers();
 	void initDefaultDrawableLayersAndOrder();
 	bool checkForGameEvent(KeyboardController& playerController) const;
 	void reset(KeyboardController& playerController) const;
@@ -27,7 +27,7 @@ public:
 	void loadLevel(std::shared_ptr<ILevel> level);
 	void initializeLevelIntroText(UIManager& uiManager) const;
 	void initializeLevelOutroText(UIManager& uiManager) const;
-	void enemyShipCreation() const;
+	void updateLevel() const;
 	void gameObjectCreation() const;
 
 

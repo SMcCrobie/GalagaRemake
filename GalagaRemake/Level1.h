@@ -8,7 +8,7 @@ class Level1 :
 public:
 	void initializeLevel() override;
 
-	void enemyShipCreation() override;
+	void updateLevel() override;
 
 	void killLevel() override;
 

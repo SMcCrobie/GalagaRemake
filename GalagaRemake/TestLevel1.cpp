@@ -10,7 +10,7 @@ void TestLevel1::initializeLevel()
 	level_into_text_primary = TempText("Flight Tester", Fonts::galaxus);
 }
 
-void TestLevel1::enemyShipCreation()
+void TestLevel1::updateLevel()
 {
 }
 

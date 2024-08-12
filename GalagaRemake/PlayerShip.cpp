@@ -30,7 +30,7 @@ void PlayerShip::initStartState()
 void PlayerShip::calculateStartPosition()
 {
 	const sf::FloatRect shipSize = getGlobalBounds();
-	const float xPos = (GameState::world_bounds.width / 2.f) - (shipSize.width / 2.f);
+	const float xPos = (GameState::world_bounds.width / 2.f);
 	const float yPos = GameState::world_bounds.height + 50.f;
 	m_startPosition = sf::Vector2f(xPos, yPos);
 }

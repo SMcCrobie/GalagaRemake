@@ -5,7 +5,7 @@ namespace GameState
 {
 	enum movement_control { full_window_orientation, window_and_ship_orientation, full_ship_orientation };
 
-	inline bool isGameOver, isPaused, requiresLevelRestart, isBossCreated, isBossDestroyed, isPlayerDead, isKeyTrapActivated, isIntroDone, resetWindow, ignoreNextResizeEvent;
+	inline bool isGameOver, isPaused, requiresLevelRestart, isBossCreated, isBossDestroyed, isPlayerDead, isKeyTrapActivated, isIntroDone, resetWindow, ignoreNextResizeEvent, isMainMenu;
 	inline int killCounter, gameCycleCounter, timeOfLastGameLoop, timeOfLastEnemyShip, deltaTillNextEnemyShip, levelOutroDelay, score;
 	inline sf::Clock clock;
 	inline movement_control movementControlSetting = window_and_ship_orientation;
@@ -26,6 +26,7 @@ namespace GameState
 		isIntroDone = false;
 		resetWindow = false;
 		ignoreNextResizeEvent = false;
+		isMainMenu = false;//finale straw, this is going to get bad
 
 		score = 0;
 		killCounter = 0;

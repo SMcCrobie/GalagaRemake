@@ -36,7 +36,7 @@ void Level0::initializeLevel()
 	meteor.setRotation(1.8f);
 }
 
-void Level0::enemyShipCreation()
+void Level0::updateLevel()
 {
 	extern ShipManager enemyShipsManager;
 	extern GameObjectManager gameObjectManager;

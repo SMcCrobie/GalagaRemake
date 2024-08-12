@@ -24,6 +24,7 @@
 #include "GameObjectManager.h"
 #include "Level0.h"
 #include "Level1.h"
+#include "MainMenuLevel.h"
 #include "TestLevel1.h"
 //YOU HAVE TODOS TODO
 
@@ -88,6 +89,7 @@ int main(int, char const**)
 	std::shared_ptr<ILevel> level0 = std::make_shared<Level0>();
 	std::shared_ptr<ILevel> level1 = std::make_shared<Level1>();
 	std::shared_ptr<ILevel> flightTester = std::make_shared<TestLevel1>();
+	std::shared_ptr<ILevel> mainMenuLevel = std::make_shared<MainMenuLevel>();
 
 
 
@@ -102,7 +104,7 @@ int main(int, char const**)
 
 
 
-	levelOrchestrator.initDefaultManager();
+	levelOrchestrator.initDefaultManagers();
 	levelOrchestrator.initDefaultDrawableLayersAndOrder();
 	levelOrchestrator.initializeLevelIntroText(uiManager);
 
@@ -123,7 +125,7 @@ int main(int, char const**)
 		if (levelOrchestrator.checkForGameEvent(playerController))
 			continue;
 
-		levelOrchestrator.enemyShipCreation();
+		levelOrchestrator.updateLevel();
 
 		//update ships based on inputs from controllers
 		playerShip.updateShip(playerController);

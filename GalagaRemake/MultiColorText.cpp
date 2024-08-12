@@ -22,7 +22,7 @@ MultiColorText<TextType>& MultiColorText<TextType>::addTextSegment(const std::st
     temp.setFillColor(color);
     if (isBold) {
         temp.setOutlineColor(color);
-        temp.setOutlineThickness(0.5f);
+        temp.setOutlineThickness(0.25f);
     }
 
 

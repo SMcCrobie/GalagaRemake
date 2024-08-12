@@ -13,33 +13,6 @@ constexpr int health_segment_score_value = 100;
 extern PlayerShip playerShip;
 
 
-
-void UIManager::initializePauseText()
-{
-	auto primaryText = sf::Text("Game Paused", Fonts::galaxus);
-	formatPrimaryText(primaryText);
-	primaryText.setFillColor(PRIMARY_COLOR);
-	m_pauseTexts.push_back(primaryText);
-
-	auto templateText = sf::Text("", Fonts::play_fair);
-
-	auto pauseHelpText = MultiColorText(templateText);
-	pauseHelpText.addTextSegment("Press [", PRIMARY_COLOR)
-		.addTextSegment("tab", SECONDARY_COLOR, 1.f, true)
-		.addTextSegment("] to resume", PRIMARY_COLOR);
-	formatSecondaryText(pauseHelpText, primaryText.getGlobalBounds());
-	pauseHelpText.dumpSegments(m_pauseTexts);
-
-
-	auto windowResizeHelpText = MultiColorText(templateText);
-	windowResizeHelpText.addTextSegment("Press [", PRIMARY_COLOR)
-		.addTextSegment("r", SECONDARY_COLOR, 2.5f, true)
-		.addTextSegment("] to reset window size", PRIMARY_COLOR);
-	formatSecondaryText(windowResizeHelpText, pauseHelpText.getGlobalBounds());
-	windowResizeHelpText.dumpSegments(m_pauseTexts);
-
-}
-
 void UIManager::init(const Ship& shipModel, int totalExtraLives, float windowMargin)
 {
 	m_baseScale = sf::Vector2f(.45f, .55f);
@@ -47,7 +20,7 @@ void UIManager::init(const Ship& shipModel, int totalExtraLives, float windowMar
 	m_lifeSymbol = shipModel;
 	m_totalExtraLives = totalExtraLives;
 	m_windowDimensions = GameState::world_bounds;
-
+	m_isUiHidden = false;
 
 	initializePauseText();
 	initializeScore();
@@ -122,6 +95,37 @@ void UIManager::updateUI()
 	else {
 		m_lives.back().updateRespawnTimer();
 	}
+
+}
+
+void UIManager::initMainMenuText()
+{
+	auto gameTitle = TempText("Galaxus II", Fonts::galaxus, 999999);
+	gameTitle.setFillColor(SECONDARY_COLOR);
+	formatPrimaryText(gameTitle);
+	gameTitle.move(0.f, -50.f);
+	
+
+	auto menuOption1 = TempText("PLAY", Fonts::roboto, 999999);
+	formatSecondaryText(menuOption1, gameTitle.getGlobalBounds());
+	menuOption1.setCharacterSize(20);
+	menuOption1.move(0.f, 20.f);
+
+	auto menuOption2 = TempText("SETTINGS", Fonts::roboto, 999999);
+	formatSecondaryText(menuOption2, menuOption1.getGlobalBounds());
+	menuOption2.setCharacterSize(20);
+	menuOption2.move(0.f, 20.f);
+
+	auto menuOption3 = TempText("QUIT", Fonts::roboto, 999999);
+	formatSecondaryText(menuOption3, menuOption2.getGlobalBounds());
+	menuOption3.setCharacterSize(20);
+	menuOption3.move(0.f, 20.f);
+	
+
+	m_mainMenuTexts.push_back(gameTitle);
+	m_mainMenuTexts.push_back(menuOption1);
+	m_mainMenuTexts.push_back(menuOption2);
+	m_mainMenuTexts.push_back(menuOption3);
 
 }
 
@@ -224,11 +228,6 @@ void UIManager::initializeLevelOutroText(TempText& primaryText, TempText& second
 
 
 
-
-
-
-
-
 void UIManager::resetManager()
 {
 	initializePlayerHealth();
@@ -252,6 +251,16 @@ void UIManager::addPointValue(sf::Vector2f position, int pointValue, sf::Color c
 	pointsText.setFillColor(color);
 	if (scale > 0.f)
 		pointsText.setScale(scale, scale);
+}
+
+void UIManager::hideUI()
+{
+	m_isUiHidden = true;
+}
+
+void UIManager::unHideUI()
+{
+	m_isUiHidden = false;
 }
 
 
@@ -317,6 +326,32 @@ void UIManager::initializeGameOverText()
 	m_gameOverTexts.push_back(text);
 }
 
+void UIManager::initializePauseText()
+{
+	auto primaryText = sf::Text("Game Paused", Fonts::galaxus);
+	formatPrimaryText(primaryText);
+	primaryText.setFillColor(PRIMARY_COLOR);
+	m_pauseTexts.push_back(primaryText);
+
+	auto templateText = sf::Text("", Fonts::play_fair);
+
+	auto pauseHelpText = MultiColorText(templateText);
+	pauseHelpText.addTextSegment("Press [", PRIMARY_COLOR)
+		.addTextSegment("tab", SECONDARY_COLOR, 1.f, true)
+		.addTextSegment("] to resume", PRIMARY_COLOR);
+	formatSecondaryText(pauseHelpText, primaryText.getGlobalBounds());
+	pauseHelpText.dumpSegments(m_pauseTexts);
+
+
+	auto windowResizeHelpText = MultiColorText(templateText);
+	windowResizeHelpText.addTextSegment("Press [", PRIMARY_COLOR)
+		.addTextSegment("r", SECONDARY_COLOR, 2.5f, true)
+		.addTextSegment("] to reset window size", PRIMARY_COLOR);
+	formatSecondaryText(windowResizeHelpText, pauseHelpText.getGlobalBounds());
+	windowResizeHelpText.dumpSegments(m_pauseTexts);
+
+}
+
 void UIManager::initializeExtraLivesText()
 {
 	m_extraLivesText = sf::Text("Lives ", Fonts::galaxus);
@@ -376,18 +411,12 @@ void UIManager::initializePlayerHealth()
 
 void UIManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	target.draw(m_scoreText);
-	target.draw(m_extraLivesText);
-	for (auto& life : m_lives) 
-		target.draw(life);
-	if(!GameState::isPaused && !GameState::isGameOver)
+
+	if (!GameState::isPaused && !GameState::isGameOver)
 	{
 		for (auto& text : m_texts)
 			target.draw(text);
 	}
-	for (auto& healthBarSegment : m_healthBarSegments)
-		target.draw(healthBarSegment);
-
 
 	if (GameState::isGameOver)
 	{
@@ -395,11 +424,30 @@ void UIManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 			target.draw(text);
 
 	}
-		
+
 	if (GameState::isPaused && !GameState::isGameOver)
 	{
 		for (const auto& text : m_pauseTexts)
 			target.draw(text);
 	}
+
+	if (!GameState::isPaused && !GameState::isGameOver)
+	{
+		for (const auto& text : m_mainMenuTexts)
+			target.draw(text);
+	}
+
+
+
+	if(m_isUiHidden)//todo anything above this line needs a new class, `TextManager` Maybe
+		return;
+
+	target.draw(m_scoreText);
+	target.draw(m_extraLivesText);
+	for (auto& life : m_lives) 
+		target.draw(life);
+
+	for (auto& healthBarSegment : m_healthBarSegments)
+		target.draw(healthBarSegment);
 		
 }

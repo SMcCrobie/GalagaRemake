@@ -20,12 +20,15 @@ public:
 	bool isOutOfLives() const;
 	void playerLostLife();
 	void updateUI();
+	void initMainMenuText();
 	static void formatPrimaryText(sf::Text& primaryText);
 	static void formatSecondaryText(sf::Text& secondaryText, sf::FloatRect primaryText);
 	void initializeLevelIntroText(TempText& primaryText, TempText& secondaryText);
 	void initializeLevelOutroText(TempText& primaryText, TempText& secondaryText);
 	void resetManager() override;
 	void addPointValue(sf::Vector2f position, int pointValue, sf::Color color = sf::Color::White, float scale = 0.f);
+	void hideUI();
+	void unHideUI();
 
 
 private:
@@ -53,6 +56,7 @@ private:
 	std::vector<TempText> m_texts;
 	std::vector<sf::Text> m_gameOverTexts;
 	std::vector<sf::Text> m_pauseTexts;
+	std::vector<sf::Text> m_mainMenuTexts;
 
 	sf::Text m_scoreText;
 	sf::Text m_extraLivesText;
@@ -65,7 +69,7 @@ private:
 	TempText m_introPrimaryText;
 	TempText m_introSecondaryText;
 	TempText m_shipPointValue;
-
+	bool m_isUiHidden;
 
 	// Inherited via Drawable
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
