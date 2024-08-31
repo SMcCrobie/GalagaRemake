@@ -1,9 +1,13 @@
 #include "Ship.h"
-
 #include <iostream>
 
 #include "GameState.h"
 #include "ProjectileManager.h"
+#include "SoundManager.h"
+
+
+extern SoundManager soundManager;
+
 
 Ship::Ship() : sf::Sprite()
 {
@@ -13,6 +17,7 @@ Ship::Ship() : sf::Sprite()
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
 	RectangleProjectile temp(sf::Vector2f(3, 12));
 	temp.setFillColor(sf::Color(5, 236, 241));
+	temp.setSoundType(SoundType::Laser);
 	m_weapon1Projectile = std::make_shared<RectangleProjectile>(temp);
 	/*m_weapon1Projectile.setOutlineColor(sf::Color(255, 255, 255, 30));
 	m_weapon1Projectile.setOutlineThickness(3.f);*/
@@ -33,6 +38,7 @@ Ship::Ship() : sf::Sprite()
 	m_rotationIncrement = 10.f;
 	m_rotationCounter = 0.f;
 	m_pointValue = 100;
+	m_deathSoundType = SoundType::ShipDeath;
 
 	resetRotationTypes();
 	
@@ -186,6 +192,7 @@ bool Ship::detectCollision(ProjectileManager& projectileManager)
 	if (hasShield())
 	{
 		if (projectileManager.detectCollisionAndDestroyProjectile(m_shield)) {
+			soundManager.playSound(SoundType::Hit);
 			decrementShieldHealth();
 			return true;
 		}
@@ -194,6 +201,7 @@ bool Ship::detectCollision(ProjectileManager& projectileManager)
 	else if (hasHealth())
 	{
 		if (projectileManager.detectCollisionAndDestroyProjectile(*this)) {
+			soundManager.playSound(SoundType::Hit);
 			decrementHealth();
 			return true;
 		}
@@ -307,6 +315,17 @@ int Ship::getPointValue() const
 {
 	return m_pointValue;
 }
+
+void Ship::setDeathSound(SoundType soundType)
+{
+	m_deathSoundType = soundType;
+}
+
+SoundType Ship::getDeathSound()
+{
+	return m_deathSoundType;
+}
+
 
 //void Ship::setStartHealth(int startHealth)
 //{
@@ -597,7 +616,6 @@ void Ship::rotateIfTriggered()
 	initRotation();
 }
 
-
 //really solid function
 std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 {
@@ -614,6 +632,7 @@ std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 	}
 	if (!m_shipControlsStateMappings[FireWeapon1] || m_weapon1Projectile == nullptr)
 		return {};
+
 	const BoundedFloatRect currentShipPosition = getGlobalBounds();
 	const float verticalStartPoint = m_isBackwards ? currentShipPosition.bottom - m_weapon1Projectile->getGlobalBounds().height : currentShipPosition.top;
 	const float horizontalStartPoint = currentShipPosition.left + (currentShipPosition.width / 2) - (m_weapon1Projectile->getGlobalBounds().width / 2);
@@ -625,6 +644,11 @@ std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon1IfFired()
 	m_shipControlsStateMappings[FireWeapon1] = false;
 	m_weapon1Projectile->initStartPosition(horizontalStartPoint, verticalStartPoint, isBackwards());
 	m_weapon1Projectile->setVelocity(sf::Vector2f(xVel, yVel));
+	const sf::FloatRect projectileBounds = m_weapon1Projectile->getGlobalBounds();
+	if (!GameState::world_bounds.intersects(projectileBounds))
+		return{};
+
+	soundManager.playSound(m_weapon1Projectile->getSoundType());
 	return m_weapon1Projectile->clone();
 
 }
@@ -651,10 +675,14 @@ std::optional<std::shared_ptr<Projectile>> Ship::fireWeapon2IfFired()
 	auto yVel = abs(m_weapon2Projectile->getVelocity().y);
 	yVel = m_isBackwards ? yVel : -yVel;
 
-
 	m_shipControlsStateMappings[FireWeapon2] = false;
 	m_weapon2Projectile->initStartPosition(horizontalStartPoint, verticalStartPoint, isBackwards());
 	m_weapon2Projectile->setVelocity(sf::Vector2f(0, yVel));
+	const sf::FloatRect projectileBounds = m_weapon2Projectile->getGlobalBounds();
+	if (!GameState::world_bounds.intersects(projectileBounds))
+		return{};
+
+	soundManager.playSound(m_weapon2Projectile->getSoundType());
 	return m_weapon2Projectile->clone();
 }
 

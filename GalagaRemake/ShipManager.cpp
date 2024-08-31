@@ -38,6 +38,7 @@ void ShipManager::updateShips()
 void ShipManager::detectCollision(ProjectileManager& projectileManager)
 {
 	extern UIManager uiManager;
+	extern SoundManager soundManager;
 	auto it = m_ships.begin();
 	while (it != m_ships.end()) {
 		it->first.detectCollision(projectileManager);
@@ -56,6 +57,7 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager)
 		{
 			uiManager.addPointValue(it->first.getPosition(), it->first.getPointValue());
 		}
+		soundManager.playSound(it->first.m_deathSoundType);
 		it = m_ships.erase(it);//increments the iterator
 		std::cout << "Destroy Ship!" << std::endl;
 		

@@ -15,6 +15,7 @@ extern ShipManager enemyShipsManager;
 extern UIManager uiManager;
 extern BackgroundManager backgroundManager;
 extern GameObjectManager gameObjectManager;
+extern SoundManager soundManager;
 
 LevelOrchestrator& LevelOrchestrator::addDrawableLayer(Drawable* drawable)
 {
@@ -24,7 +25,19 @@ LevelOrchestrator& LevelOrchestrator::addDrawableLayer(Drawable* drawable)
 
 void LevelOrchestrator::initDefaultManagers()
 {
+	addManager(&backgroundManager)
+		.addManager(&playerProjectileManager)
+		.addManager(&enemyProjectileManager)
+		.addManager(&enemyShipsManager)
+		.addManager(&gameObjectManager)
+		.addManager(&playerShip)
+		.addManager(&uiManager)
+		.addManager(&soundManager);
+	
+}
 
+void LevelOrchestrator::initDefaultDrawableLayersAndOrder()
+{
 	addDrawableLayer(&backgroundManager)
 		.addDrawableLayer(&playerProjectileManager)
 		.addDrawableLayer(&enemyProjectileManager)
@@ -32,17 +45,6 @@ void LevelOrchestrator::initDefaultManagers()
 		.addDrawableLayer(&gameObjectManager)
 		.addDrawableLayer(&playerShip)
 		.addDrawableLayer(&uiManager);
-}
-
-void LevelOrchestrator::initDefaultDrawableLayersAndOrder()
-{
-	addManager(&backgroundManager)
-		.addManager(&playerProjectileManager)
-		.addManager(&enemyProjectileManager)
-		.addManager(&enemyShipsManager)
-		.addManager(&gameObjectManager)
-		.addManager(&playerShip)
-		.addManager(&uiManager);
 }
 
 
@@ -75,7 +77,9 @@ void LevelOrchestrator::reset(KeyboardController& playerController) const
 	{
 		manager->resetManager();
 	}
+
 	m_level->resetLevel();
+	uiManager.initializeLevelIntroText(m_level->level_into_text_primary, m_level->level_into_text_secondary);
 }
 
 bool LevelOrchestrator::shouldRunLoop()

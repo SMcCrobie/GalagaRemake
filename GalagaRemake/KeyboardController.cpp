@@ -1,4 +1,4 @@
-#include "Controller.h"
+#include "KeyboardController.h"
 #include "GameState.h"
 
 void KeyboardController::initKeyMappings()
@@ -78,6 +78,17 @@ void KeyboardController::swapControlsAndStatesBasedOnMovementSetting(Ship& ship)
 		
 	}
 }
+extern SoundManager soundManager;
+void pauseGame() {
+	GameState::isPaused = true;
+	soundManager.pause();
+}
+
+void resumeGame(PlayerShip& ship) {
+	ship.disableCurrentShipStates();
+	GameState::isPaused = false;
+	soundManager.resume();
+}
 
 void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, PlayerShip& ship)
 {
@@ -91,21 +102,22 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 			window.close();
 		}
 		if(event.type == sf::Event::LostFocus && !GameState::isMainMenu){
-			GameState::isPaused = true;
+			pauseGame();//why no disable ship state here
 			continue;
 		}
 		if (event.type == sf::Event::GainedFocus) {
-			GameState::isPaused = false;
+			resumeGame(ship);//why no disable ship state here
 			continue;
 		}
 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab && !GameState::isMainMenu) {
-			ship.disableCurrentShipStates();
-			GameState::isPaused = !GameState::isPaused;
+			if (GameState::isPaused)
+				resumeGame(ship);
+			else
+				pauseGame();
 		}
 		if(event.type == sf::Event::Resized && !GameState::ignoreNextResizeEvent && !GameState::isMainMenu){
-			ship.disableCurrentShipStates();
-			GameState::isPaused = true;
+			resumeGame(ship);
 		}
 		if(event.type == sf::Event::Resized && GameState::ignoreNextResizeEvent){
 			GameState::ignoreNextResizeEvent = false;
@@ -136,6 +148,7 @@ void KeyboardController::PollEventsAndUpdateShipState(sf::Window& window, Player
 		if (m_keyboardToShipControlMap.find(event.key.code) == m_keyboardToShipControlMap.end())
 			continue;
 
+		//INVESTIGATE
 		if (!GameState::isKeyTrapActivated && event.key.code != sf::Keyboard::Key::Enter)
 		{
 			ship.disableCurrentShipStates();

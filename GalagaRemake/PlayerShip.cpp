@@ -1,7 +1,9 @@
 #include "PlayerShip.h"
 
-#include "Controller.h"
+#include "KeyboardController.h"
 #include "GameState.h"
+
+extern SoundManager soundManager;
 
 void PlayerShip::initStartHealth()
 {
@@ -38,11 +40,7 @@ void PlayerShip::calculateStartPosition()
 PlayerShip::PlayerShip(const sf::Texture& texture)
 	: Ship()
 {
-	setTexture(texture);
-	setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(45, 48)));
 
-	calculateStartPosition();
-	initStartState();
 }
 
 PlayerShip::PlayerShip()
@@ -51,6 +49,7 @@ PlayerShip::PlayerShip()
 void PlayerShip::respawnShip()
 {
 	initStartHealth();
+	soundManager.playSound(m_deathSoundType);
 	m_gameCyclesTillRespawned = 100;
 }
 
@@ -113,9 +112,11 @@ void PlayerShip::resetManager()
 
 void PlayerShip::useItem(const ItemType itemType)
 {
+
 	if (itemType == ItemType::Repair_Kit)
 	{
 		initStartHealth();
+		soundManager.playSound(SoundType::Repair);
 		return;
 	}
 	throw std::invalid_argument("Item Type Not Mapped for Ship interaction");

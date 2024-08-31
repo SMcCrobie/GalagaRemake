@@ -63,15 +63,25 @@ void RectangleProjectile::setGrowthSpeed(sf::Vector2f& growthAmount)
 
 }
 
-const sf::Vector2f& Projectile::getVelocity() const
-{
-	return m_velocity;
-}
-
-
 void Projectile::setVelocity(const sf::Vector2f& velocity)
 {
 	m_velocity = velocity;
+}
+
+const sf::Vector2f& Projectile::getVelocity() const
+{
+    return m_velocity;
+}
+
+void Projectile::setSoundType(const SoundType soundType)
+{
+    m_soundType = soundType;
+}
+
+
+SoundType Projectile::getSoundType() const
+{
+    return m_soundType;
 }
 
 void Projectile::setInitOffSets(float x, float y)

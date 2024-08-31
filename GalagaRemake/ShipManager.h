@@ -1,7 +1,7 @@
 #pragma once
 #include "Ship.h"
 
-#include "Controller.h"
+#include "KeyboardController.h"
 #include <list>
 #include "ProjectileManager.h"
 
@@ -21,7 +21,7 @@ public:
 private:
 	std::list<std::pair<Ship, StateMachineController>> m_ships;
 	StateMachineController m_shipController;//might want a vec later on
-
+	sf::Sound m_soundPlayer;
 	// Inherited via Drawable
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };

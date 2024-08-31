@@ -1,12 +1,11 @@
 #include "Level1.h"
 
 #include <climits>
-#include <iostream>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 
 #include "BackgroundManager.h"
-#include "Controller.h"
+#include "KeyboardController.h"
 #include "ControllerConfigs.h"
 #include "Fonts.h"
 #include "GameObject.h"
@@ -16,6 +15,7 @@
 #include "Loader.h"
 #include "RandMacros.h"
 #include "Ship.h"
+#include "SoundManager.h"
 
 //level flags
 static bool isRepairKitOneCreated = false;
@@ -56,6 +56,7 @@ static StateMachineController bossController;
 static sf::Texture planetsSheet;
 
 extern PlayerShip playerShip;
+extern SoundManager soundManager;
 
 void Level1::initializeLevel()
 {
@@ -86,6 +87,7 @@ void Level1::initializeLevel()
 	enemyShip.setShipColor(sf::Color::Magenta);
 	enemyShip.setWeaponRechargeTime(20);
 	enemyShip.setOrigin(enemyShip.getLocalBounds().width / 2, enemyShip.getLocalBounds().height / 2);
+	enemyShip.setDeathSound(SoundType::ShipDeath);
 
 
 	bossShip.setIsHorizontallyWorldBound(false);
@@ -116,6 +118,7 @@ void Level1::initializeLevel()
 	bossProjectile.setInitOffSets(12.f, 15.f);
 	bossProjectile.setShieldColor(sf::Color::Red);
 	bossProjectile.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	bossProjectile.setSoundType(SoundType::Laser3);
 
 	bossShip.setProjectile1(bossProjectile);
 
@@ -248,6 +251,7 @@ void Level1::updateLevel()
 	////boss
 	if (GameState::killCounter >= 32 && !GameState::isBossCreated && enemyShipsManager.isEmpty()) {
 		GameState::isBossCreated = true;
+		soundManager.playBossMusic();
 		enemyShipsManager.createShip(bossShip, bossController);
 		enemyShipsManager.createShip(bossSideKicks, bossSideKicksController);
 		bossSideKicks.move(300.f, 0.f);

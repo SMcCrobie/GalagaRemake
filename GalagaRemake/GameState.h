@@ -13,7 +13,7 @@ namespace GameState
 
 	inline BoundedFloatRect world_bounds(0.0f, 0.0f, 600.0f, 1000.0f);
 	inline sf::View world_view(world_bounds);
-
+	//need to do elsewhere so it doesnt recompile every object when changed
 	inline void init()
 	{
 		isGameOver = false;

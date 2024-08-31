@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "RotationType.h"
+#include "SoundManager.h"
 
 
 enum ShipControl
@@ -83,6 +84,8 @@ public:
 	void setMovementIncrements(float horizontal, float up, float down);
 	void setPointValue(int pointValue);
 	int getPointValue() const;
+	void setDeathSound(SoundType soundType);
+	SoundType getDeathSound();
 	//void setStartHealth(int startHealth);//TODO fix this shit
 
 
@@ -126,6 +129,7 @@ protected:
 	std::unordered_map<RotationType, bool> m_rotationTypes;
 	int m_startHealth;
 	int m_pointValue;
+	SoundType m_deathSoundType;
 
 private:
 	void incrementRotation();

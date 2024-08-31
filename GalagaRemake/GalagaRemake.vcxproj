@@ -147,7 +147,7 @@
     <ClCompile Include="BoundedFloatRect.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="KeyboardController.cpp" />
     <ClCompile Include="Fonts.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -163,6 +163,7 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="TempText.cpp" />
     <ClCompile Include="TestLevel1.cpp" />
     <ClCompile Include="UIManager.cpp" />
@@ -174,7 +175,7 @@
     <ClInclude Include="ILevel.h" />
     <ClInclude Include="BoundedFloatRect.h" />
     <ClInclude Include="Collision.h" />
-    <ClInclude Include="Controller.h" />
+    <ClInclude Include="KeyboardController.h" />
     <ClInclude Include="ControllerConfigs.h" />
     <ClInclude Include="DebugMacros.h" />
     <ClInclude Include="Fonts.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="TempText.h" />
     <ClInclude Include="TestLevel1.h" />
     <ClInclude Include="UIManager.h" />

@@ -2,10 +2,11 @@
 #include <ctime>
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <climits>
 
 #include "BackgroundManager.h"
-#include "Controller.h"
+#include "KeyboardController.h"
 #include "DebugMacros.h"
 #include "GameState.h"
 #include "LevelOrchestrator.h"
@@ -25,9 +26,9 @@
 #include "Level0.h"
 #include "Level1.h"
 #include "MainMenuLevel.h"
+#include "SoundManager.h"
 #include "TestLevel1.h"
-//YOU HAVE TODOS TODO
-
+//YOU HAVE TODOS 
 //Managers Class declaration
 PlayerShip playerShip;
 ProjectileManager enemyProjectileManager;
@@ -36,13 +37,13 @@ ShipManager enemyShipsManager;
 UIManager uiManager;
 BackgroundManager backgroundManager;
 GameObjectManager gameObjectManager;
+SoundManager soundManager;
 
 //Level Orchestrator
 LevelOrchestrator levelOrchestrator;
 
 int main(int, char const**)
 {
-
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	SendMessage(GetConsoleWindow(), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
@@ -64,19 +65,24 @@ int main(int, char const**)
 
 	//textures
 	sf::Texture shipAnimations;
+	
+
+
 
 	//LOADING
 	//textures
 	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
-	//fonts
+
 	Fonts::load();
 
-	
+
+
 
 	//intialize ships
 	playerShip.init(shipAnimations);
 	uiManager.init(playerShip);
 	playerShip.setOrigin(playerShip.getLocalBounds().width / 2, playerShip.getLocalBounds().height / 2);
+	soundManager.init();
 
 
 	//intialize controller
@@ -133,6 +139,7 @@ int main(int, char const**)
 
 		//update Game objects
 		gameObjectManager.update();
+		soundManager.update();
 
 		//object and Item Collisions
 		gameObjectManager.detectItemCollision(playerShip);
@@ -171,9 +178,9 @@ int main(int, char const**)
 		{
 			GameState::levelOutroDelay--;
 			levelOrchestrator.initializeLevelOutroText(uiManager);
+			soundManager.playLevelCompleteMusic();
 		
 		}
-
 		//UI Update
 		uiManager.updateUI();
 

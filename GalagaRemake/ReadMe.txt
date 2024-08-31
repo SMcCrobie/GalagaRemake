@@ -30,10 +30,14 @@ Notes
 - The Direction of rotate, visually, improvement
 	- Have it be based off the current momentum, on the x-axis, being positive or negative
 	- If its neutral, rand()
+git ss
+- play around with more game music options
+- eventually will need a pause for sounds, and maybe just music too
 
 
 Bugs/Visual issues
 ---------------------------------------------------------------
 - Sometimes point values can appear to close to the edge of the screen, should investigate
 - double firing immediatly after a turn, bug or feature??
+
 
