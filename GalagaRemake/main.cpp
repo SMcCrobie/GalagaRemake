@@ -2,7 +2,6 @@
 #include <ctime>
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
 #include <climits>
 
 #include "BackgroundManager.h"
@@ -30,6 +29,7 @@
 #include "TestLevel1.h"
 //YOU HAVE TODOS 
 //Managers Class declaration
+
 PlayerShip playerShip;
 ProjectileManager enemyProjectileManager;
 ProjectileManager playerProjectileManager;
@@ -44,6 +44,7 @@ LevelOrchestrator levelOrchestrator;
 
 int main(int, char const**)
 {
+
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	SendMessage(GetConsoleWindow(), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
@@ -71,7 +72,7 @@ int main(int, char const**)
 
 	//LOADING
 	//textures
-	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
+	Loader::LOAD_SAFELY(shipAnimations, R"(Assets\Images\ShipAnimations.png)");
 
 	Fonts::load();
 

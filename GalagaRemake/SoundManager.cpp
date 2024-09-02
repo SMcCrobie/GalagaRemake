@@ -17,24 +17,24 @@ void SoundManager::init()
     }
 
     // Now you can load the actual sound files
-    Loader::LOAD_SAFELY(m_soundMap[SoundType::Laser], "Blast Laser 2.wav");
-    Loader::LOAD_SAFELY(m_soundMap[SoundType::Laser2], "shotFired.wav");
-    Loader::LOAD_SAFELY(m_soundMap[SoundType::Laser3], "Blast Laser 4.wav");
-    Loader::LOAD_SAFELY(m_soundMap[SoundType::ShipDeath], "Big Explosion.wav");
-    Loader::LOAD_SAFELY(m_soundMap[SoundType::Repair], "passive gain life-sound.wav"); 
-    Loader::LOAD_SAFELY(m_soundMap[SoundType::Hit], "8bit_hit_13.wav");
+    Loader::LOAD_SAFELY(m_soundMap[SoundType::Laser], R"(Assets\Sounds\Blast Laser 2.wav)");
+    Loader::LOAD_SAFELY(m_soundMap[SoundType::Laser2], R"(Assets\Sounds\shotFired.wav)");
+    Loader::LOAD_SAFELY(m_soundMap[SoundType::Laser3], R"(Assets\Sounds\Blast Laser 4.wav)");
+    Loader::LOAD_SAFELY(m_soundMap[SoundType::ShipDeath], R"(Assets\Sounds\Big Explosion.wav)");
+    Loader::LOAD_SAFELY(m_soundMap[SoundType::Repair], R"(Assets\Sounds\passive gain life-sound.wav)"); 
+    Loader::LOAD_SAFELY(m_soundMap[SoundType::Hit], R"(Assets\Sounds\8bit_hit_13.wav)");
 
-    m_levelCompleteMusic.openFromFile("Final Fantasy VII - Victory Fanfare.wav");
+    m_levelCompleteMusic.openFromFile(R"(Assets\Sounds\Final Fantasy VII - Victory Fanfare.wav)");
     m_levelCompleteMusic.setVolume(60.f);
 
 
 
-    m_levelMusic.openFromFile("DSGNDron_Sci-Fi Pad Digital Fallen Angel.wav");
+    m_levelMusic.openFromFile(R"(Assets\Sounds\DSGNDron_Sci-Fi Pad Digital Fallen Angel.wav)");
     m_levelMusic.setVolume(40.f);
     m_levelMusic.setLoop(true);
     m_levelMusic.play();
 
-    m_bossMusic.openFromFile("DSGNDron_Sci-Fi Bg Roomtone Spaceship Alert.wav");
+    m_bossMusic.openFromFile(R"(Assets\Sounds\DSGNDron_Sci-Fi Bg Roomtone Spaceship Alert.wav)");
     m_bossMusic.setVolume(60.f);
 }
 

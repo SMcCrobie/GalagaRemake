@@ -9,9 +9,9 @@ namespace Fonts
 
 	void load()
 	{
-		Loader::LOAD_SAFELY(galaxus, "ClimateCrisis-Regular.ttf");
-		Loader::LOAD_SAFELY(play_fair, "PlayfairDisplay.ttf");
-		Loader::LOAD_SAFELY(roboto, "RobotoMedium.ttf");
+		Loader::LOAD_SAFELY(galaxus, R"(Assets\Fonts\ClimateCrisis-Regular.ttf)");
+		Loader::LOAD_SAFELY(play_fair, R"(Assets\Fonts\PlayfairDisplay.ttf)");
+		Loader::LOAD_SAFELY(roboto, R"(Assets\Fonts\RobotoMedium.ttf)");
 	}
 
 	

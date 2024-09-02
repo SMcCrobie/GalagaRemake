@@ -206,47 +206,10 @@
     <ClInclude Include="WindowUtil.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Desktop\SpriteAttempts\BossSideKicksAnimations.png" />
-    <Image Include="..\..\..\..\Desktop\SpriteAttempts\LaserTurretAnimations.png" />
-    <Image Include="..\..\..\..\Desktop\SpriteAttempts\MeteorAnimations1.png" />
-    <Image Include="..\..\..\..\Desktop\SpriteAttempts\repairKitAnimation.png" />
-    <Image Include="..\x64\Release\repairKit.png">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </Image>
-    <Image Include="BossAnimations.ico" />
-    <Image Include="BossAnimations.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Image>
-    <Image Include="icon1.ico" />
-    <Image Include="meteor.png" />
-    <Image Include="MeteorAnimations1.png" />
-    <Image Include="Planets(1).png" />
-    <Image Include="Planets.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </Image>
-    <Image Include="shieldWithCracksOverTime.png" />
-    <Image Include="ShipAnimations.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="Galaxus.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </Font>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ControlsConfig.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="GalagaRemake.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -62,12 +62,12 @@ void Level1::initializeLevel()
 {
 	bossProjectileTexture = std::make_shared<sf::Texture>();
 	//textures
-	Loader::LOAD_SAFELY(shipAnimations, "ShipAnimations.png");
-	Loader::LOAD_SAFELY(bossAnimations, "bossAnimations.png");
-	Loader::LOAD_SAFELY(bossSideKicksAnimations, "BossSideKicksAnimations.png");
-	Loader::LOAD_SAFELY(*bossProjectileTexture, "shieldWithCracksOverTime.png");
-	Loader::LOAD_SAFELY(planetsSheet, "Planets(1).png");
-	Loader::LOAD_SAFELY(repairKitAnimations, "repairKitAnimation.png");
+	Loader::LOAD_SAFELY(shipAnimations, R"(Assets\Images\ShipAnimations.png)");
+	Loader::LOAD_SAFELY(bossAnimations, R"(Assets\Images\bossAnimations.png)");
+	Loader::LOAD_SAFELY(bossSideKicksAnimations, R"(Assets\Images\BossSideKicksAnimations.png)");
+	Loader::LOAD_SAFELY(*bossProjectileTexture, R"(Assets\Images\shieldWithCracksOverTime.png)");
+	Loader::LOAD_SAFELY(planetsSheet, R"(Assets\Images\Planets(1).png)");
+	Loader::LOAD_SAFELY(repairKitAnimations, R"(Assets\Images\repairKitAnimation.png)");
 
 
 	planetsSheet.setSmooth(true);
