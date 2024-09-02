@@ -41,3 +41,12 @@ Bugs/Visual issues
 - double firing immediatly after a turn, bug or feature??
 
 
+Game Notes
+===============================
+- you need to add health packs into game
+	- extra points for life currently had
+	- can have a base point value, so even if your almost at death you can still get a
+	  point bonus for collecting the pack, more for more health you have
+- each level is going to have its own score
+	- after you beat the game you can run all the levels back to back
+	  and try and place a score on that
