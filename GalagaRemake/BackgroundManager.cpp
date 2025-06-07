@@ -16,8 +16,8 @@ void BackgroundManager::init()
 		star.setOutlineColor(i == 0 ? sf::Color(153, 230, 255, 80) : sf::Color(255, 255, 230, 80));
 		star.setOutlineThickness(2.5f);
 
-		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(m_windowDimensions.left, m_windowDimensions.right);
-		const float yCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(m_windowDimensions.top - m_windowBuffer, m_windowDimensions.bottom + m_windowBuffer);
+		const float xCoordinate = RANDOM_FLOAT_WITHIN_RANGE(m_windowDimensions.left, m_windowDimensions.right);
+		const float yCoordinate = RANDOM_FLOAT_WITHIN_RANGE(m_windowDimensions.top - m_windowBuffer, m_windowDimensions.bottom + m_windowBuffer);
 		star.setPosition(xCoordinate, yCoordinate);
 	}
 }
@@ -33,7 +33,7 @@ void BackgroundManager::moveBackground(float increment)
 	for (auto& star : m_stars) {
 		star.move(0, increment);
 		if (star.getGlobalBounds().top > m_windowDimensions.bottom + m_windowBuffer) {
-			const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(m_windowDimensions.left, m_windowDimensions.right);
+			const float xCoordinate = RANDOM_FLOAT_WITHIN_RANGE(m_windowDimensions.left, m_windowDimensions.right);
 			star.setPosition(xCoordinate, m_windowDimensions.top - m_windowBuffer);
 		}
 	}

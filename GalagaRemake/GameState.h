@@ -5,11 +5,10 @@ namespace GameState
 {
 	enum movement_control { full_window_orientation, window_and_ship_orientation, full_ship_orientation };
 
-	inline bool isGameOver, isPaused, requiresLevelRestart, isBossCreated, isBossDestroyed, isPlayerDead, isKeyTrapActivated, isIntroDone, resetWindow, ignoreNextResizeEvent, isMainMenu;
+	inline bool isGameOver, isPaused, requiresLevelRestart, isBossCreated, isBossDestroyed, isPlayerDead, isKeyTrapActivated, isIntroDone, resetWindow, ignoreNextResizeEvent, isMainMenu, isMovementSet;
 	inline int killCounter, gameCycleCounter, timeOfLastGameLoop, timeOfLastEnemyShip, deltaTillNextEnemyShip, levelOutroDelay, score;
 	inline sf::Clock clock;
 	inline movement_control movementControlSetting = window_and_ship_orientation;
-	inline bool isMovementSet = false;
 
 	inline BoundedFloatRect world_bounds(0.0f, 0.0f, 600.0f, 1000.0f);
 	inline sf::View world_view(world_bounds);
@@ -19,6 +18,7 @@ namespace GameState
 		isGameOver = false;
 		isPaused = false;
 		requiresLevelRestart = false;
+		isMovementSet = true;
 		isBossCreated = false;
 		isBossDestroyed = false;
 		isPlayerDead = false;

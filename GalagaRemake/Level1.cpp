@@ -196,32 +196,32 @@ void Level1::updateLevel()
 
 	const auto size = enemyShipsManager.count();
 	if (GameState::killCounter < 8 && enemyShipsManager.count() < 2) {
-		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
+		const float xCoordinate = RANDOM_FLOAT_WITHIN_RANGE(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(enemyShip);
 	}
 
 	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4){
-		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
+		const float xCoordinate = RANDOM_FLOAT_WITHIN_RANGE(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(enemyShip);
 	}
 
 	if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager.count() < INT_MAX) {
-		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 589.F);//should make sizing dynamic
+		const float xCoordinate = RANDOM_FLOAT_WITHIN_RANGE(56.F, 589.F);//should make sizing dynamic
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.top - 50.f));
 		enemyShipsManager.createShip(enemyShip);
 	}
 	//enemyship Upgrade
 	if (GameState::killCounter >= 8 && GameState::killCounter < 24 && enemyShipsManager.count() < 4) {
-		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 546.F);
+		const float xCoordinate = RANDOM_FLOAT_WITHIN_RANGE(56.F, 546.F);
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.bottom + 50.f));
 		enemyShip.rotate180();
 		enemyShipsManager.createShip(enemyShip);
 		enemyShip.rotate180();
 	}
 	if (GameState::killCounter >= 24 && GameState::killCounter < 32 && enemyShipsManager.count() < INT_MAX) {
-		const float xCoordinate = RANDOM_FLOAT_WITHIN_LIMIT(56.F, 546.F);
+		const float xCoordinate = RANDOM_FLOAT_WITHIN_RANGE(56.F, 546.F);
 		enemyShip.setPosition(sf::Vector2f(xCoordinate, GameState::world_bounds.bottom + 50.f));
 		enemyShip.rotate180();
 		enemyShipsManager.createShip(enemyShip);
