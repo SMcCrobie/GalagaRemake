@@ -19,7 +19,7 @@ extern PlayerShip playerShip;
 
 void Level0::initializeLevel()
 {
-	Loader::LOAD_SAFELY(meteorTexture, "MeteorAnimations1.png");//this sprite needs work
+	Loader::LOAD_SAFELY(meteorTexture, R"(Assets\Images\MeteorAnimations1.png)");//this sprite needs work
 
 	level_into_text_primary = TempText("Level 0", Fonts::galaxus);
 	level_into_text_secondary = TempText("Escaping Starship SaberII", Fonts::play_fair);
