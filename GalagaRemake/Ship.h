@@ -5,6 +5,7 @@
 #include <optional>
 #include <unordered_map>
 
+#include "CollisionResult.h"
 #include "RotationType.h"
 #include "SoundManager.h"
 
@@ -52,6 +53,9 @@ public:
 	void setProjectile2(const CircleProjectile& projectile);
 	void setIsHorizontallyWorldBound(bool isHorizontallyWorldBound);
 	void setVelocity(float x, float y);
+	sf::Vector2f getVelocity() const;
+	float getMass() const;
+	sf::Vector2f getMomentum() const;
 	void updateRespawnTimer();
 	void setStatic();
 	void decrementShieldHealth();
@@ -86,6 +90,7 @@ public:
 	int getPointValue() const;
 	void setDeathSound(SoundType soundType);
 	SoundType getDeathSound();
+	void applyPhysicsFromCollision(sf::Vector2f momentum, const sf::Vector2f pointOfImpact);
 	//void setStartHealth(int startHealth);//TODO fix this shit
 
 
@@ -111,6 +116,7 @@ protected:
 	float m_moveDownIncrement;
 	sf::Vector2i m_shipAnimationFrame;
     sf::Vector2f m_velocity;
+	float m_mass;
     sf::RectangleShape m_collisionBox;
 	CircleProjectile m_shield;
 	int m_shieldHealth;

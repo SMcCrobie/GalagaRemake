@@ -47,17 +47,30 @@ void GameObjectManager::resetManager()
 
 void GameObjectManager::updateCollidables()
 {
+	extern PlayerShip playerShip;
 	for (auto it = m_collidables.begin(); it != m_collidables.end(); ) {
 		it->update();
 		auto collisionResult = it->detectProjectileCollision();
 		if(collisionResult.has_value())
 		{
-			it->applyPhysicsFromProjectile(collisionResult.value());
+			it->applyPhysicsFromCollision(collisionResult.value());
 			if(it->getHealth() < 1)
 			{
 				it = m_collidables.erase(it);
 				continue;
 			}
+
+		}
+		auto pointOfImpact = it->detectCollision(playerShip);
+		if(pointOfImpact.has_value())
+		{
+			it->applyPhysics(playerShip.getMomentum(), pointOfImpact.value());
+			if(it->getHealth() < 1)
+			{
+				it = m_collidables.erase(it);
+				continue;
+			}
+			playerShip.applyPhysicsFromCollision(it->getMomentum(), pointOfImpact.value());
 
 		}
 
@@ -66,7 +79,7 @@ void GameObjectManager::updateCollidables()
 			innerIt++;
 			if (innerIt == m_collidables.end())
 				break;
-			auto pointOfImpact = it->detectCollision(*innerIt);
+			pointOfImpact = it->detectCollision(*innerIt);
 			if (pointOfImpact.has_value())
 			{
 				it->applyPhysicsToEachOther(*innerIt, pointOfImpact.value());

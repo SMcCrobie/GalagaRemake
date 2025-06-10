@@ -3,6 +3,7 @@
 #include "Collision.h"
 #include "DebugMacros.h"
 
+extern ProjectileManager playerProjectileManager;
 
 float Collidable::vectorMagnitude(const sf::Vector2f& vector) const
 {
@@ -62,6 +63,7 @@ void Collidable::animateOnHealth(const int amountOfFrames, const sf::IntRect fra
 	m_framesCount = amountOfFrames;
 	m_isAnimatedBasedOnHealth = true;
 }
+
 
 
 void Collidable::explode()
@@ -160,7 +162,14 @@ void Collidable::applyPhysicsToEachOther(Collidable& collidable, const sf::Vecto
 	collidable.decrementHealth(collidable.getMomentum() - theirInitialMomentum);
 }
 
-void Collidable::applyPhysicsFromProjectile(const CollisionResult collisionResult)
+void Collidable::applyPhysics(sf::Vector2f momentum, const sf::Vector2f pointOfImpact)
+{
+	const auto initialMomentum = getMomentum();
+	applyMomentum(momentum, pointOfImpact);
+	decrementHealth(getMomentum() - initialMomentum);
+}
+
+void Collidable::applyPhysicsFromCollision(const CollisionResult collisionResult)
 {
 	const auto initialMomentum = getMomentum();
 	applyMomentum(collisionResult.momentum);
@@ -179,7 +188,6 @@ void Collidable::update()
 
 std::optional<CollisionResult> Collidable::detectProjectileCollision()
 {
-	extern ProjectileManager playerProjectileManager;
 	if (m_isThereCircle)
 	{
 		//TODO switch to circle shapes, everywhere

@@ -19,10 +19,11 @@ public:
     void setMass(float mass);
     float getAngularVelocity() const;
     void applyPhysicsToEachOther(Collidable& collidable, const sf::Vector2f pointOfImpact);
+    void applyPhysics(sf::Vector2f momentum, sf::Vector2f pointOfImpact);
     std::optional<sf::Vector2f> detectCollision(const Collidable& collidable) const;
     std::optional<sf::Vector2f> detectCollision(const sf::RectangleShape& rect) const;
     std::optional<sf::Vector2f> detectCollision(const sf::Sprite& sprite) const;
-    void applyPhysicsFromProjectile(CollisionResult collisionResult);
+    void applyPhysicsFromCollision(CollisionResult collisionResult);
     void decrementHealth(const sf::Vector2f& changeInMomentum);
     void animateOnHealth(int amountOfFrames, const sf::IntRect frame);
 

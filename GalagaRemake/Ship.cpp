@@ -12,6 +12,7 @@ extern SoundManager soundManager;
 Ship::Ship() : sf::Sprite()
 {
 	m_velocity = sf::Vector2f(0.0f, 0.0f);
+	m_mass = 10.f;
 	m_collisionBox = sf::RectangleShape();
 	m_shipControlsStateMappings = std::map<ShipControl, bool>();
 	m_shipAnimationFrame = sf::Vector2i(45, 48);
@@ -239,6 +240,21 @@ void Ship::setVelocity(const float x, const float y)
 	m_velocity = sf::Vector2f(x, y);
 }
 
+sf::Vector2f Ship::getVelocity() const
+{
+	return m_velocity;
+}
+
+float Ship::getMass() const
+{
+	return m_mass;
+}
+
+sf::Vector2f Ship::getMomentum() const
+{
+	return m_mass * m_velocity;
+}
+
 void Ship::updateRespawnTimer()
 {
 	if (m_gameCyclesTillRespawned <= 0)
@@ -324,6 +340,33 @@ void Ship::setDeathSound(SoundType soundType)
 SoundType Ship::getDeathSound()
 {
 	return m_deathSoundType;
+}
+
+void Ship::applyPhysicsFromCollision(sf::Vector2f momentum, const sf::Vector2f pointOfImpact)
+{
+	constexpr float coefficient_of_restitution = 0.65f;
+	std::cout << "applying physics from collision" << std::endl;
+	//can be some value 0 to 1 to simulate kinetic energy lost in the collision to other factors
+
+	const sf::Vector2f centerOfMass = getTransform().transformPoint(getOrigin());
+
+	// Calculate the vector from the impact location to the center of mass
+	const sf::Vector2f impactToCenter = centerOfMass - pointOfImpact;
+
+	// Calculate the cross product of the impact-to-center vector and the momentum vector
+	const float crossProduct = impactToCenter.x * momentum.y - impactToCenter.y * momentum.x;
+
+	if (impactToCenter.x * momentum.x < 0)//less than zero is opposing
+	{
+		momentum.x = momentum.x * -0.6f;
+	}
+	if (impactToCenter.y * momentum.y < 0)
+	{
+		momentum.y = momentum.y * -0.6f;
+	}
+
+	m_velocity = ((getMomentum() + momentum) / m_mass + sf::Vector2f(crossProduct * impactToCenter.y, -crossProduct * impactToCenter.x) / (m_mass * impactToCenter.x * impactToCenter.x + m_mass * impactToCenter.y * impactToCenter.y)) * coefficient_of_restitution;
+
 }
 
 

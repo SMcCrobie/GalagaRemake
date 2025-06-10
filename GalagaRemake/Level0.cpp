@@ -23,7 +23,7 @@ extern PlayerShip playerShip;
 
 void Level0::initializeLevel()
 {
-	Loader::LOAD_SAFELY(meteorTexture, R"(Assets\Images\meteor2(1).png)");//this sprite needs work
+	Loader::LOAD_SAFELY(meteorTexture, R"(Assets\Images\meteor2(1).png)");
 	Loader::LOAD_SAFELY(enemyShipAnimations, R"(Assets\Images\bladeShip2(3).png)");
 
 	level_into_text_primary = TempText("Level 0", Fonts::galaxus);
@@ -56,7 +56,7 @@ void Level0::updateLevel()
 	extern ShipManager enemyShipsManager;
 	extern GameObjectManager gameObjectManager;
 
-	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip-250)
+	if (GameState::gameCycleCounter - GameState::timeOfLastEnemyShip <= GameState::deltaTillNextEnemyShip)
 		return;
 	GameState::timeOfLastEnemyShip = GameState::gameCycleCounter;
 
@@ -95,11 +95,11 @@ void Level0::updateLevel()
 			gameObjectManager.createCollidable(meteor);
 		}
 
-		if (GameState::killCounter < 8 && enemyShipsManager.count() < 2) {
+		/*if (GameState::killCounter < 8 && enemyShipsManager.count() < 2) {
 			const float xCoord = RANDOM_FLOAT_WITHIN_RANGE(156.F, 489.F);//should make sizing dynamic
 			enemyShip.setPosition(sf::Vector2f(xCoord, GameState::world_bounds.top - 50.f));
 			enemyShipsManager.createShip(enemyShip);
-		}
+		}*/
 
 	}
 	
