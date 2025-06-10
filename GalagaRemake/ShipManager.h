@@ -4,6 +4,7 @@
 #include "KeyboardController.h"
 #include <list>
 #include "ProjectileManager.h"
+#include "Collidable.h"
 
 class ShipManager
 	: public sf::Drawable, public IManager
@@ -13,6 +14,7 @@ public:
 	void createShip(const Ship& ship, const StateMachineController& controller);
 	void updateShips();
 	void detectCollision(ProjectileManager& projectileManager);//and getScore
+	std::optional<sf::Vector2f>  detectCollision(const Collidable& collidable);
 	void offloadProjectiles(ProjectileManager& projectileManager);
 	[[nodiscard]] bool isEmpty() const;
 	[[nodiscard]] size_t count() const;

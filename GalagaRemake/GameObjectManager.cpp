@@ -1,6 +1,7 @@
 #include "GameObjectManager.h"
 
 #include "GameState.h"
+#include "ShipManager.h"
 #include "UIManager.h"
 
 void GameObjectManager::createGameObject(const GameObject& obj)
@@ -47,6 +48,7 @@ void GameObjectManager::resetManager()
 
 void GameObjectManager::updateCollidables()
 {
+	extern ShipManager enemyShipsManager;
 	extern PlayerShip playerShip;
 	for (auto it = m_collidables.begin(); it != m_collidables.end(); ) {
 		it->update();
@@ -71,8 +73,19 @@ void GameObjectManager::updateCollidables()
 				continue;
 			}
 			playerShip.applyPhysicsFromCollision(it->getMomentum(), pointOfImpact.value());
-
 		}
+
+		pointOfImpact = enemyShipsManager.detectCollision(*it);
+		if (pointOfImpact.has_value())
+		{
+			it->applyPhysics(playerShip.getMomentum()/*Neesd to be enemey ship value*/, pointOfImpact.value());
+			if(it->getHealth() < 1)
+			{
+				it = m_collidables.erase(it);
+				continue;
+			}
+		}
+		
 
 		for (auto innerIt = it; innerIt != m_collidables.end(); )
 		{

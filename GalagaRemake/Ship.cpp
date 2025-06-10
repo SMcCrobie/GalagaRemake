@@ -367,6 +367,8 @@ void Ship::applyPhysicsFromCollision(sf::Vector2f momentum, const sf::Vector2f p
 
 	m_velocity = ((getMomentum() + momentum) / m_mass + sf::Vector2f(crossProduct * impactToCenter.y, -crossProduct * impactToCenter.x) / (m_mass * impactToCenter.x * impactToCenter.x + m_mass * impactToCenter.y * impactToCenter.y)) * coefficient_of_restitution;
 
+
+	//decrementHealth();
 }
 
 

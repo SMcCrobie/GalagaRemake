@@ -4,6 +4,7 @@
 #include "DebugMacros.h"
 
 extern ProjectileManager playerProjectileManager;
+extern ProjectileManager enemyProjectileManager;
 
 float Collidable::vectorMagnitude(const sf::Vector2f& vector) const
 {
@@ -194,14 +195,20 @@ std::optional<CollisionResult> Collidable::detectProjectileCollision()
 		return std::nullopt;//playerProjectileManager.detectCollisionAndDestroyProjectile(m_circle);
 	}
 	if (m_isThereRect) {
-		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
+		auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
+		if (collisionResult.has_value())
+			return collisionResult;
+		collisionResult = enemyProjectileManager.detectCollisionAndDestroyProjectile(m_rectangle.getGlobalBounds());
 		if (collisionResult.has_value())
 			return collisionResult;
 		return std::nullopt;
 	}
 	if (m_isThereSprite)
 	{
-		const auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_sprite);
+		auto collisionResult = playerProjectileManager.detectCollisionAndDestroyProjectile(m_sprite);
+		if (collisionResult.has_value())
+			return collisionResult;
+		collisionResult = enemyProjectileManager.detectCollisionAndDestroyProjectile(m_sprite);
 		if (collisionResult.has_value())
 			return collisionResult;
 		return std::nullopt;

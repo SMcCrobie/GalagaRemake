@@ -64,6 +64,21 @@ void ShipManager::detectCollision(ProjectileManager& projectileManager)
 	}
 }
 
+std::optional<sf::Vector2f> ShipManager::detectCollision(const Collidable& collidable)
+{
+	auto it = m_ships.begin();
+	while (it != m_ships.end()) {
+		auto pointOfImpact = collidable.detectCollision(it->first);
+		if (pointOfImpact.has_value())
+		{
+			it->first.applyPhysicsFromCollision(collidable.getMomentum(), pointOfImpact.value());
+			return pointOfImpact;
+		}
+		++it;
+	}
+	return std::nullopt;
+}
+
 void ShipManager::offloadProjectiles(ProjectileManager& projectileManager)
 {
 	for (auto it = m_ships.begin(); it != m_ships.end(); it++) {

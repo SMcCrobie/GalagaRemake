@@ -95,11 +95,11 @@ void Level0::updateLevel()
 			gameObjectManager.createCollidable(meteor);
 		}
 
-		/*if (GameState::killCounter < 8 && enemyShipsManager.count() < 2) {
+		if (GameState::killCounter < 8 && enemyShipsManager.count() < 2) {
 			const float xCoord = RANDOM_FLOAT_WITHIN_RANGE(156.F, 489.F);//should make sizing dynamic
 			enemyShip.setPosition(sf::Vector2f(xCoord, GameState::world_bounds.top - 50.f));
 			enemyShipsManager.createShip(enemyShip);
-		}*/
+		}
 
 	}
 	
